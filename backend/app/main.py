@@ -23,6 +23,11 @@ app.add_middleware(
 )
 
 
+from app.api.graph import router as graph_router
+
+app.include_router(graph_router)
+
+
 class HealthResponse(BaseModel):
     status: str
     service: str

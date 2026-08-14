@@ -1,0 +1,1309 @@
+{
+  "metadata": {
+    "description": "Deterministic mock graph query responses for Detection Team & Multi-Agent testing",
+    "source_dataset": "RogRakshak Synthetic Hospital Outbreak Dataset",
+    "planted_organism": "Klebsiella pneumoniae (MDR)"
+  },
+  "index_patient_contacts": {
+    "patient_id": 1,
+    "patient_name": "Rajesh Verma (Index)",
+    "total_contacts": 31,
+    "staff_contacts": [
+      {
+        "event_id": "EVT-PS-c89c87a7fad8500c",
+        "contact_type": "patient_staff",
+        "patient_id": 1,
+        "patient_name": "Rajesh Verma (Index)",
+        "connected_entity": {
+          "type": "staff",
+          "id": 25,
+          "name": "Technician Gaurav Reddy",
+          "role_or_diagnosis": "technician"
+        },
+        "location": {
+          "type": "ward",
+          "id": 1,
+          "name": "Intensive Care Unit (ICU)"
+        },
+        "start_time": "2026-08-02T15:00:00",
+        "end_time": "2026-08-03T03:00:00",
+        "overlap_minutes": 720.0,
+        "evidence_source": [
+          "movements"
+        ],
+        "source_record_ids": {
+          "patient_movement_id": 2,
+          "staff_movement_id": 247,
+          "ward_id": 1
+        }
+      },
+      {
+        "event_id": "EVT-PS-372184e9d8628fb3",
+        "contact_type": "patient_staff",
+        "patient_id": 1,
+        "patient_name": "Rajesh Verma (Index)",
+        "connected_entity": {
+          "type": "staff",
+          "id": 13,
+          "name": "Nurse Karan Deshmukh",
+          "role_or_diagnosis": "nurse"
+        },
+        "location": {
+          "type": "ward",
+          "id": 1,
+          "name": "Intensive Care Unit (ICU)"
+        },
+        "start_time": "2026-08-03T03:00:00",
+        "end_time": "2026-08-03T11:00:00",
+        "overlap_minutes": 480.0,
+        "evidence_source": [
+          "movements"
+        ],
+        "source_record_ids": {
+          "patient_movement_id": 2,
+          "staff_movement_id": 163,
+          "ward_id": 1
+        }
+      },
+      {
+        "event_id": "EVT-PS-3cee922d74121e3f",
+        "contact_type": "patient_staff",
+        "patient_id": 1,
+        "patient_name": "Rajesh Verma (Index)",
+        "connected_entity": {
+          "type": "staff",
+          "id": 19,
+          "name": "Doctor Arjun Kulkarni",
+          "role_or_diagnosis": "doctor"
+        },
+        "location": {
+          "type": "ward",
+          "id": 1,
+          "name": "Intensive Care Unit (ICU)"
+        },
+        "start_time": "2026-08-03T03:00:00",
+        "end_time": "2026-08-03T15:00:00",
+        "overlap_minutes": 720.0,
+        "evidence_source": [
+          "movements"
+        ],
+        "source_record_ids": {
+          "patient_movement_id": 2,
+          "staff_movement_id": 205,
+          "ward_id": 1
+        }
+      },
+      {
+        "event_id": "EVT-PS-d0efeedc0149131d",
+        "contact_type": "patient_staff",
+        "patient_id": 1,
+        "patient_name": "Rajesh Verma (Index)",
+        "connected_entity": {
+          "type": "staff",
+          "id": 7,
+          "name": "Nurse Rohan Rao",
+          "role_or_diagnosis": "nurse"
+        },
+        "location": {
+          "type": "ward",
+          "id": 1,
+          "name": "Intensive Care Unit (ICU)"
+        },
+        "start_time": "2026-08-03T04:00:00",
+        "end_time": "2026-08-03T16:00:00",
+        "overlap_minutes": 720.0,
+        "evidence_source": [
+          "movements"
+        ],
+        "source_record_ids": {
+          "patient_movement_id": 2,
+          "staff_movement_id": 121,
+          "ward_id": 1
+        }
+      },
+      {
+        "event_id": "EVT-PS-0517515181c9b133",
+        "contact_type": "patient_staff",
+        "patient_id": 1,
+        "patient_name": "Rajesh Verma (Index)",
+        "connected_entity": {
+          "type": "staff",
+          "id": 1,
+          "name": "Nurse Anita Sharma",
+          "role_or_diagnosis": "nurse"
+        },
+        "location": {
+          "type": "ward",
+          "id": 1,
+          "name": "Intensive Care Unit (ICU)"
+        },
+        "start_time": "2026-08-03T16:00:00",
+        "end_time": "2026-08-04T04:00:00",
+        "overlap_minutes": 720.0,
+        "evidence_source": [
+          "movements"
+        ],
+        "source_record_ids": {
+          "patient_movement_id": 2,
+          "staff_movement_id": 5,
+          "ward_id": 1
+        }
+      },
+      {
+        "event_id": "EVT-PPS-19784b5aca19ed85",
+        "contact_type": "patient_procedure_staff",
+        "patient_id": 1,
+        "patient_name": "Rajesh Verma (Index)",
+        "connected_entity": {
+          "type": "staff",
+          "id": 1,
+          "name": "Nurse Anita Sharma",
+          "role_or_diagnosis": "nurse"
+        },
+        "location": {
+          "type": "procedure_room",
+          "id": 1,
+          "name": "Procedure Room (Central Line Insertion)"
+        },
+        "start_time": "2026-08-03T18:00:00",
+        "end_time": "2026-08-03T19:30:00",
+        "overlap_minutes": 90.0,
+        "evidence_source": [
+          "procedures"
+        ],
+        "source_record_ids": {
+          "procedure_id": 1,
+          "staff_id": 1
+        }
+      },
+      {
+        "event_id": "EVT-PS-a761db13f92b227c",
+        "contact_type": "patient_staff",
+        "patient_id": 1,
+        "patient_name": "Rajesh Verma (Index)",
+        "connected_entity": {
+          "type": "staff",
+          "id": 13,
+          "name": "Nurse Karan Deshmukh",
+          "role_or_diagnosis": "nurse"
+        },
+        "location": {
+          "type": "ward",
+          "id": 1,
+          "name": "Intensive Care Unit (ICU)"
+        },
+        "start_time": "2026-08-04T16:00:00",
+        "end_time": "2026-08-05T04:00:00",
+        "overlap_minutes": 720.0,
+        "evidence_source": [
+          "movements"
+        ],
+        "source_record_ids": {
+          "patient_movement_id": 2,
+          "staff_movement_id": 164,
+          "ward_id": 1
+        }
+      },
+      {
+        "event_id": "EVT-PS-ded9ce63936ecb26",
+        "contact_type": "patient_staff",
+        "patient_id": 1,
+        "patient_name": "Rajesh Verma (Index)",
+        "connected_entity": {
+          "type": "staff",
+          "id": 25,
+          "name": "Technician Gaurav Reddy",
+          "role_or_diagnosis": "technician"
+        },
+        "location": {
+          "type": "ward",
+          "id": 1,
+          "name": "Intensive Care Unit (ICU)"
+        },
+        "start_time": "2026-08-04T16:00:00",
+        "end_time": "2026-08-05T04:00:00",
+        "overlap_minutes": 720.0,
+        "evidence_source": [
+          "movements"
+        ],
+        "source_record_ids": {
+          "patient_movement_id": 2,
+          "staff_movement_id": 248,
+          "ward_id": 1
+        }
+      },
+      {
+        "event_id": "EVT-PS-02967d56a6ed51cd",
+        "contact_type": "patient_staff",
+        "patient_id": 1,
+        "patient_name": "Rajesh Verma (Index)",
+        "connected_entity": {
+          "type": "staff",
+          "id": 7,
+          "name": "Nurse Rohan Rao",
+          "role_or_diagnosis": "nurse"
+        },
+        "location": {
+          "type": "ward",
+          "id": 1,
+          "name": "Intensive Care Unit (ICU)"
+        },
+        "start_time": "2026-08-05T04:00:00",
+        "end_time": "2026-08-05T12:00:00",
+        "overlap_minutes": 480.0,
+        "evidence_source": [
+          "movements"
+        ],
+        "source_record_ids": {
+          "patient_movement_id": 2,
+          "staff_movement_id": 122,
+          "ward_id": 1
+        }
+      },
+      {
+        "event_id": "EVT-PS-f9561538e28e21f7",
+        "contact_type": "patient_staff",
+        "patient_id": 1,
+        "patient_name": "Rajesh Verma (Index)",
+        "connected_entity": {
+          "type": "staff",
+          "id": 19,
+          "name": "Doctor Arjun Kulkarni",
+          "role_or_diagnosis": "doctor"
+        },
+        "location": {
+          "type": "ward",
+          "id": 1,
+          "name": "Intensive Care Unit (ICU)"
+        },
+        "start_time": "2026-08-05T04:00:00",
+        "end_time": "2026-08-05T16:00:00",
+        "overlap_minutes": 720.0,
+        "evidence_source": [
+          "movements"
+        ],
+        "source_record_ids": {
+          "patient_movement_id": 2,
+          "staff_movement_id": 206,
+          "ward_id": 1
+        }
+      },
+      {
+        "event_id": "EVT-PS-65f9856e824e962f",
+        "contact_type": "patient_staff",
+        "patient_id": 1,
+        "patient_name": "Rajesh Verma (Index)",
+        "connected_entity": {
+          "type": "staff",
+          "id": 7,
+          "name": "Nurse Rohan Rao",
+          "role_or_diagnosis": "nurse"
+        },
+        "location": {
+          "type": "ward",
+          "id": 1,
+          "name": "Intensive Care Unit (ICU)"
+        },
+        "start_time": "2026-08-06T15:00:00",
+        "end_time": "2026-08-06T23:00:00",
+        "overlap_minutes": 480.0,
+        "evidence_source": [
+          "movements"
+        ],
+        "source_record_ids": {
+          "patient_movement_id": 2,
+          "staff_movement_id": 123,
+          "ward_id": 1
+        }
+      },
+      {
+        "event_id": "EVT-PS-d5aa7583fa6d31a9",
+        "contact_type": "patient_staff",
+        "patient_id": 1,
+        "patient_name": "Rajesh Verma (Index)",
+        "connected_entity": {
+          "type": "staff",
+          "id": 19,
+          "name": "Doctor Arjun Kulkarni",
+          "role_or_diagnosis": "doctor"
+        },
+        "location": {
+          "type": "ward",
+          "id": 1,
+          "name": "Intensive Care Unit (ICU)"
+        },
+        "start_time": "2026-08-06T15:00:00",
+        "end_time": "2026-08-06T23:00:00",
+        "overlap_minutes": 480.0,
+        "evidence_source": [
+          "movements"
+        ],
+        "source_record_ids": {
+          "patient_movement_id": 2,
+          "staff_movement_id": 207,
+          "ward_id": 1
+        }
+      },
+      {
+        "event_id": "EVT-PS-f0e68db22cf7c389",
+        "contact_type": "patient_staff",
+        "patient_id": 1,
+        "patient_name": "Rajesh Verma (Index)",
+        "connected_entity": {
+          "type": "staff",
+          "id": 13,
+          "name": "Nurse Karan Deshmukh",
+          "role_or_diagnosis": "nurse"
+        },
+        "location": {
+          "type": "ward",
+          "id": 1,
+          "name": "Intensive Care Unit (ICU)"
+        },
+        "start_time": "2026-08-07T03:00:00",
+        "end_time": "2026-08-07T11:00:00",
+        "overlap_minutes": 480.0,
+        "evidence_source": [
+          "movements"
+        ],
+        "source_record_ids": {
+          "patient_movement_id": 2,
+          "staff_movement_id": 165,
+          "ward_id": 1
+        }
+      },
+      {
+        "event_id": "EVT-PS-2d9941e19129b6d7",
+        "contact_type": "patient_staff",
+        "patient_id": 1,
+        "patient_name": "Rajesh Verma (Index)",
+        "connected_entity": {
+          "type": "staff",
+          "id": 25,
+          "name": "Technician Gaurav Reddy",
+          "role_or_diagnosis": "technician"
+        },
+        "location": {
+          "type": "ward",
+          "id": 1,
+          "name": "Intensive Care Unit (ICU)"
+        },
+        "start_time": "2026-08-07T03:00:00",
+        "end_time": "2026-08-07T15:00:00",
+        "overlap_minutes": 720.0,
+        "evidence_source": [
+          "movements"
+        ],
+        "source_record_ids": {
+          "patient_movement_id": 2,
+          "staff_movement_id": 249,
+          "ward_id": 1
+        }
+      },
+      {
+        "event_id": "EVT-PS-80a53b2d63291df1",
+        "contact_type": "patient_staff",
+        "patient_id": 1,
+        "patient_name": "Rajesh Verma (Index)",
+        "connected_entity": {
+          "type": "staff",
+          "id": 16,
+          "name": "Doctor Neha Sharma",
+          "role_or_diagnosis": "doctor"
+        },
+        "location": {
+          "type": "ward",
+          "id": 4,
+          "name": "Surgical Ward"
+        },
+        "start_time": "2026-08-08T15:00:00",
+        "end_time": "2026-08-09T03:00:00",
+        "overlap_minutes": 720.0,
+        "evidence_source": [
+          "movements"
+        ],
+        "source_record_ids": {
+          "patient_movement_id": 4,
+          "staff_movement_id": 187,
+          "ward_id": 4
+        }
+      },
+      {
+        "event_id": "EVT-PS-95259fbb8d8defc7",
+        "contact_type": "patient_staff",
+        "patient_id": 1,
+        "patient_name": "Rajesh Verma (Index)",
+        "connected_entity": {
+          "type": "staff",
+          "id": 4,
+          "name": "Nurse Sunita Kulkarni",
+          "role_or_diagnosis": "nurse"
+        },
+        "location": {
+          "type": "ward",
+          "id": 4,
+          "name": "Surgical Ward"
+        },
+        "start_time": "2026-08-08T16:00:00",
+        "end_time": "2026-08-09T04:00:00",
+        "overlap_minutes": 720.0,
+        "evidence_source": [
+          "movements"
+        ],
+        "source_record_ids": {
+          "patient_movement_id": 4,
+          "staff_movement_id": 103,
+          "ward_id": 4
+        }
+      },
+      {
+        "event_id": "EVT-PS-ec39d3816214f490",
+        "contact_type": "patient_staff",
+        "patient_id": 1,
+        "patient_name": "Rajesh Verma (Index)",
+        "connected_entity": {
+          "type": "staff",
+          "id": 10,
+          "name": "Nurse Pooja Reddy",
+          "role_or_diagnosis": "nurse"
+        },
+        "location": {
+          "type": "ward",
+          "id": 4,
+          "name": "Surgical Ward"
+        },
+        "start_time": "2026-08-09T03:00:00",
+        "end_time": "2026-08-09T11:00:00",
+        "overlap_minutes": 480.0,
+        "evidence_source": [
+          "movements"
+        ],
+        "source_record_ids": {
+          "patient_movement_id": 4,
+          "staff_movement_id": 145,
+          "ward_id": 4
+        }
+      },
+      {
+        "event_id": "EVT-PS-2f47b5541fcb4a12",
+        "contact_type": "patient_staff",
+        "patient_id": 1,
+        "patient_name": "Rajesh Verma (Index)",
+        "connected_entity": {
+          "type": "staff",
+          "id": 22,
+          "name": "Doctor Shweta Rao",
+          "role_or_diagnosis": "doctor"
+        },
+        "location": {
+          "type": "ward",
+          "id": 4,
+          "name": "Surgical Ward"
+        },
+        "start_time": "2026-08-09T04:00:00",
+        "end_time": "2026-08-09T16:00:00",
+        "overlap_minutes": 720.0,
+        "evidence_source": [
+          "movements"
+        ],
+        "source_record_ids": {
+          "patient_movement_id": 4,
+          "staff_movement_id": 229,
+          "ward_id": 4
+        }
+      },
+      {
+        "event_id": "EVT-PS-09b4d74d1677e98a",
+        "contact_type": "patient_staff",
+        "patient_id": 1,
+        "patient_name": "Rajesh Verma (Index)",
+        "connected_entity": {
+          "type": "staff",
+          "id": 10,
+          "name": "Nurse Pooja Reddy",
+          "role_or_diagnosis": "nurse"
+        },
+        "location": {
+          "type": "ward",
+          "id": 4,
+          "name": "Surgical Ward"
+        },
+        "start_time": "2026-08-10T15:00:00",
+        "end_time": "2026-08-11T03:00:00",
+        "overlap_minutes": 720.0,
+        "evidence_source": [
+          "movements"
+        ],
+        "source_record_ids": {
+          "patient_movement_id": 4,
+          "staff_movement_id": 146,
+          "ward_id": 4
+        }
+      },
+      {
+        "event_id": "EVT-PS-fb565e0f406da768",
+        "contact_type": "patient_staff",
+        "patient_id": 1,
+        "patient_name": "Rajesh Verma (Index)",
+        "connected_entity": {
+          "type": "staff",
+          "id": 16,
+          "name": "Doctor Neha Sharma",
+          "role_or_diagnosis": "doctor"
+        },
+        "location": {
+          "type": "ward",
+          "id": 4,
+          "name": "Surgical Ward"
+        },
+        "start_time": "2026-08-10T16:00:00",
+        "end_time": "2026-08-11T00:00:00",
+        "overlap_minutes": 480.0,
+        "evidence_source": [
+          "movements"
+        ],
+        "source_record_ids": {
+          "patient_movement_id": 4,
+          "staff_movement_id": 188,
+          "ward_id": 4
+        }
+      },
+      {
+        "event_id": "EVT-PS-b34653df936a13cd",
+        "contact_type": "patient_staff",
+        "patient_id": 1,
+        "patient_name": "Rajesh Verma (Index)",
+        "connected_entity": {
+          "type": "staff",
+          "id": 4,
+          "name": "Nurse Sunita Kulkarni",
+          "role_or_diagnosis": "nurse"
+        },
+        "location": {
+          "type": "ward",
+          "id": 4,
+          "name": "Surgical Ward"
+        },
+        "start_time": "2026-08-11T04:00:00",
+        "end_time": "2026-08-11T16:00:00",
+        "overlap_minutes": 720.0,
+        "evidence_source": [
+          "movements"
+        ],
+        "source_record_ids": {
+          "patient_movement_id": 4,
+          "staff_movement_id": 104,
+          "ward_id": 4
+        }
+      },
+      {
+        "event_id": "EVT-PS-642409fc24fe63cd",
+        "contact_type": "patient_staff",
+        "patient_id": 1,
+        "patient_name": "Rajesh Verma (Index)",
+        "connected_entity": {
+          "type": "staff",
+          "id": 22,
+          "name": "Doctor Shweta Rao",
+          "role_or_diagnosis": "doctor"
+        },
+        "location": {
+          "type": "ward",
+          "id": 4,
+          "name": "Surgical Ward"
+        },
+        "start_time": "2026-08-11T04:00:00",
+        "end_time": "2026-08-11T12:00:00",
+        "overlap_minutes": 480.0,
+        "evidence_source": [
+          "movements"
+        ],
+        "source_record_ids": {
+          "patient_movement_id": 4,
+          "staff_movement_id": 230,
+          "ward_id": 4
+        }
+      }
+    ],
+    "patient_contacts": [
+      {
+        "event_id": "EVT-PP-34892d40f7f0f864",
+        "contact_type": "patient_patient",
+        "patient_id": 1,
+        "patient_name": "Rajesh Verma (Index)",
+        "connected_entity": {
+          "type": "patient",
+          "id": 6,
+          "name": "Kavita Sharma",
+          "role_or_diagnosis": "Decompensated Heart Failure"
+        },
+        "location": {
+          "type": "ward",
+          "id": 4,
+          "name": "Surgical Ward"
+        },
+        "start_time": "2026-08-07T20:00:00",
+        "end_time": "2026-08-07T22:00:00",
+        "overlap_minutes": 120.0,
+        "evidence_source": [
+          "movements"
+        ],
+        "source_record_ids": {
+          "patient_1_movement_id": 4,
+          "patient_2_movement_id": 17,
+          "ward_id": 4
+        }
+      },
+      {
+        "event_id": "EVT-PP-d36a5e9c357c170c",
+        "contact_type": "patient_patient",
+        "patient_id": 1,
+        "patient_name": "Rajesh Verma (Index)",
+        "connected_entity": {
+          "type": "patient",
+          "id": 10,
+          "name": "Rahul Gupta",
+          "role_or_diagnosis": "Acute Pancreatitis"
+        },
+        "location": {
+          "type": "ward",
+          "id": 4,
+          "name": "Surgical Ward"
+        },
+        "start_time": "2026-08-07T20:00:00",
+        "end_time": "2026-08-11T22:00:00",
+        "overlap_minutes": 5880.0,
+        "evidence_source": [
+          "movements"
+        ],
+        "source_record_ids": {
+          "patient_1_movement_id": 4,
+          "patient_2_movement_id": 25,
+          "ward_id": 4
+        }
+      },
+      {
+        "event_id": "EVT-PP-c1267497be573733",
+        "contact_type": "patient_patient",
+        "patient_id": 1,
+        "patient_name": "Rajesh Verma (Index)",
+        "connected_entity": {
+          "type": "patient",
+          "id": 14,
+          "name": "Nisha Chopra",
+          "role_or_diagnosis": "COPD Exacerbation"
+        },
+        "location": {
+          "type": "ward",
+          "id": 4,
+          "name": "Surgical Ward"
+        },
+        "start_time": "2026-08-07T20:00:00",
+        "end_time": "2026-08-09T20:00:00",
+        "overlap_minutes": 2880.0,
+        "evidence_source": [
+          "movements"
+        ],
+        "source_record_ids": {
+          "patient_1_movement_id": 4,
+          "patient_2_movement_id": 33,
+          "ward_id": 4
+        }
+      },
+      {
+        "event_id": "EVT-PP-cc8d31ce57de8a7e",
+        "contact_type": "patient_patient",
+        "patient_id": 1,
+        "patient_name": "Rajesh Verma (Index)",
+        "connected_entity": {
+          "type": "patient",
+          "id": 22,
+          "name": "Vikram Gupta",
+          "role_or_diagnosis": "Community-Acquired Pneumonia"
+        },
+        "location": {
+          "type": "ward",
+          "id": 4,
+          "name": "Surgical Ward"
+        },
+        "start_time": "2026-08-07T20:00:00",
+        "end_time": "2026-08-11T00:00:00",
+        "overlap_minutes": 4560.0,
+        "evidence_source": [
+          "movements"
+        ],
+        "source_record_ids": {
+          "patient_1_movement_id": 4,
+          "patient_2_movement_id": 49,
+          "ward_id": 4
+        }
+      },
+      {
+        "event_id": "EVT-PP-caff121d6d9dc24c",
+        "contact_type": "patient_patient",
+        "patient_id": 1,
+        "patient_name": "Rajesh Verma (Index)",
+        "connected_entity": {
+          "type": "patient",
+          "id": 26,
+          "name": "Meera Chopra",
+          "role_or_diagnosis": "Acute Appendicitis"
+        },
+        "location": {
+          "type": "ward",
+          "id": 4,
+          "name": "Surgical Ward"
+        },
+        "start_time": "2026-08-07T20:00:00",
+        "end_time": "2026-08-11T22:00:00",
+        "overlap_minutes": 5880.0,
+        "evidence_source": [
+          "movements"
+        ],
+        "source_record_ids": {
+          "patient_1_movement_id": 4,
+          "patient_2_movement_id": 57,
+          "ward_id": 4
+        }
+      },
+      {
+        "event_id": "EVT-PP-3e938a00482b3ea9",
+        "contact_type": "patient_patient",
+        "patient_id": 1,
+        "patient_name": "Rajesh Verma (Index)",
+        "connected_entity": {
+          "type": "patient",
+          "id": 30,
+          "name": "Deepak Sharma",
+          "role_or_diagnosis": "Pyelonephritis"
+        },
+        "location": {
+          "type": "ward",
+          "id": 4,
+          "name": "Surgical Ward"
+        },
+        "start_time": "2026-08-07T20:00:00",
+        "end_time": "2026-08-11T22:00:00",
+        "overlap_minutes": 5880.0,
+        "evidence_source": [
+          "movements"
+        ],
+        "source_record_ids": {
+          "patient_1_movement_id": 4,
+          "patient_2_movement_id": 65,
+          "ward_id": 4
+        }
+      },
+      {
+        "event_id": "EVT-PP-2e47adc9cc0ff954",
+        "contact_type": "patient_patient",
+        "patient_id": 1,
+        "patient_name": "Rajesh Verma (Index)",
+        "connected_entity": {
+          "type": "patient",
+          "id": 34,
+          "name": "Divya Gupta",
+          "role_or_diagnosis": "Acute Coronary Syndrome"
+        },
+        "location": {
+          "type": "ward",
+          "id": 4,
+          "name": "Surgical Ward"
+        },
+        "start_time": "2026-08-07T20:00:00",
+        "end_time": "2026-08-11T22:00:00",
+        "overlap_minutes": 5880.0,
+        "evidence_source": [
+          "movements"
+        ],
+        "source_record_ids": {
+          "patient_1_movement_id": 4,
+          "patient_2_movement_id": 73,
+          "ward_id": 4
+        }
+      },
+      {
+        "event_id": "EVT-PP-23c3a3f2b891c6ab",
+        "contact_type": "patient_patient",
+        "patient_id": 1,
+        "patient_name": "Rajesh Verma (Index)",
+        "connected_entity": {
+          "type": "patient",
+          "id": 38,
+          "name": "Manoj Chopra",
+          "role_or_diagnosis": "Diabetic Ketoacidosis"
+        },
+        "location": {
+          "type": "ward",
+          "id": 4,
+          "name": "Surgical Ward"
+        },
+        "start_time": "2026-08-08T22:00:00",
+        "end_time": "2026-08-11T22:00:00",
+        "overlap_minutes": 4320.0,
+        "evidence_source": [
+          "movements"
+        ],
+        "source_record_ids": {
+          "patient_1_movement_id": 4,
+          "patient_2_movement_id": 81,
+          "ward_id": 4
+        }
+      },
+      {
+        "event_id": "EVT-PP-d467e1c1978fd2ef",
+        "contact_type": "patient_patient",
+        "patient_id": 1,
+        "patient_name": "Rajesh Verma (Index)",
+        "connected_entity": {
+          "type": "patient",
+          "id": 18,
+          "name": "Priya Sharma",
+          "role_or_diagnosis": "Cellulitis"
+        },
+        "location": {
+          "type": "ward",
+          "id": 4,
+          "name": "Surgical Ward"
+        },
+        "start_time": "2026-08-09T18:00:00",
+        "end_time": "2026-08-11T22:00:00",
+        "overlap_minutes": 3120.0,
+        "evidence_source": [
+          "movements"
+        ],
+        "source_record_ids": {
+          "patient_1_movement_id": 4,
+          "patient_2_movement_id": 41,
+          "ward_id": 4
+        }
+      }
+    ]
+  },
+  "index_patient_timeline": {
+    "patient_id": 1,
+    "patient_name": "Rajesh Verma (Index)",
+    "mrn": "MRN-2026-1001",
+    "admission_date": "2026-08-02T14:00:00",
+    "discharge_date": "2026-08-11T22:00:00",
+    "admitting_diagnosis": "Severe Sepsis & Respiratory Failure",
+    "events": [
+      {
+        "event_type": "admission",
+        "timestamp": "2026-08-02T14:00:00",
+        "end_timestamp": null,
+        "description": "Admitted with diagnosis: Severe Sepsis & Respiratory Failure",
+        "details": {
+          "admitting_diagnosis": "Severe Sepsis & Respiratory Failure"
+        }
+      },
+      {
+        "event_type": "movement",
+        "timestamp": "2026-08-02T14:00:00",
+        "end_timestamp": "2026-08-07T20:00:00",
+        "description": "Stay in BED: Bed INT-BED-01",
+        "details": {
+          "location_type": "bed",
+          "location_id": 1,
+          "location_name": "Bed INT-BED-01"
+        }
+      },
+      {
+        "event_type": "movement",
+        "timestamp": "2026-08-02T14:00:00",
+        "end_timestamp": "2026-08-07T20:00:00",
+        "description": "Stay in WARD: Intensive Care Unit (ICU)",
+        "details": {
+          "location_type": "ward",
+          "location_id": 1,
+          "location_name": "Intensive Care Unit (ICU)"
+        }
+      },
+      {
+        "event_type": "lab_report",
+        "timestamp": "2026-08-03T17:00:00",
+        "end_timestamp": "2026-08-05T19:00:00",
+        "description": "Microbiology Culture: Klebsiella pneumoniae (MDR) - Endotracheal Aspirate",
+        "details": {
+          "lab_report_id": 1,
+          "specimen_type": "Endotracheal Aspirate",
+          "organism": "Klebsiella pneumoniae",
+          "resistance_profile": "MDR",
+          "reported_at": "2026-08-05T19:00:00",
+          "status": "final"
+        }
+      },
+      {
+        "event_type": "procedure",
+        "timestamp": "2026-08-03T18:00:00",
+        "end_timestamp": "2026-08-03T19:30:00",
+        "description": "Procedure: Central Line Insertion",
+        "details": {
+          "procedure_type": "Central Line Insertion",
+          "staff_involved": [
+            "Nurse Anita Sharma"
+          ]
+        }
+      },
+      {
+        "event_type": "movement",
+        "timestamp": "2026-08-07T20:00:00",
+        "end_timestamp": "2026-08-11T22:00:00",
+        "description": "Stay in BED: Bed SUR-BED-01",
+        "details": {
+          "location_type": "bed",
+          "location_id": 16,
+          "location_name": "Bed SUR-BED-01"
+        }
+      },
+      {
+        "event_type": "movement",
+        "timestamp": "2026-08-07T20:00:00",
+        "end_timestamp": "2026-08-11T22:00:00",
+        "description": "Stay in WARD: Surgical Ward",
+        "details": {
+          "location_type": "ward",
+          "location_id": 4,
+          "location_name": "Surgical Ward"
+        }
+      },
+      {
+        "event_type": "discharge",
+        "timestamp": "2026-08-11T22:00:00",
+        "end_timestamp": null,
+        "description": "Discharged from hospital",
+        "details": {
+          "discharge_date": "2026-08-11T22:00:00"
+        }
+      }
+    ]
+  },
+  "mdr_klebsiella_cohort": {
+    "organism": "Klebsiella pneumoniae",
+    "resistance_profile": "MDR",
+    "total_patients": 4,
+    "patient_ids": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "lab_report_ids": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "reports_summary": [
+      {
+        "lab_report_id": 1,
+        "patient_id": 1,
+        "patient_name": "Rajesh Verma (Index)",
+        "organism": "Klebsiella pneumoniae",
+        "resistance_profile": "MDR",
+        "specimen_type": "Endotracheal Aspirate",
+        "collected_at": "2026-08-03T17:00:00",
+        "reported_at": "2026-08-05T19:00:00"
+      },
+      {
+        "lab_report_id": 2,
+        "patient_id": 2,
+        "patient_name": "Suresh Joshi (Downstream 1)",
+        "organism": "Klebsiella pneumoniae",
+        "resistance_profile": "MDR",
+        "specimen_type": "Sputum",
+        "collected_at": "2026-08-07T18:00:00",
+        "reported_at": "2026-08-09T22:00:00"
+      },
+      {
+        "lab_report_id": 3,
+        "patient_id": 3,
+        "patient_name": "Meenakshi Rao (Downstream 2)",
+        "organism": "Klebsiella pneumoniae",
+        "resistance_profile": "MDR",
+        "specimen_type": "Blood Culture",
+        "collected_at": "2026-08-08T19:00:00",
+        "reported_at": "2026-08-11T00:00:00"
+      },
+      {
+        "lab_report_id": 4,
+        "patient_id": 4,
+        "patient_name": "Tarun Agarwal (Downstream 3)",
+        "organism": "Klebsiella pneumoniae",
+        "resistance_profile": "MDR",
+        "specimen_type": "Wound Swab",
+        "collected_at": "2026-08-08T23:00:00",
+        "reported_at": "2026-08-11T02:00:00"
+      }
+    ]
+  },
+  "transmission_paths": {
+    "index_to_downstream_1": {
+      "source_patient_id": 1,
+      "target_patient_id": 2,
+      "path_found": true,
+      "hops_count": 2,
+      "path": [
+        {
+          "from_entity": {
+            "type": "patient",
+            "id": 1,
+            "name": "Rajesh Verma (Index)"
+          },
+          "to_entity": {
+            "type": "staff",
+            "id": 1,
+            "name": "Nurse Anita Sharma"
+          },
+          "contact_event": {
+            "event_id": "EVT-PS-0517515181c9b133",
+            "contact_type": "patient_staff",
+            "patient_id": 1,
+            "patient_name": "Rajesh Verma (Index)",
+            "connected_entity": {
+              "type": "staff",
+              "id": 1,
+              "name": "Nurse Anita Sharma",
+              "role_or_diagnosis": "nurse"
+            },
+            "location": {
+              "type": "ward",
+              "id": 1,
+              "name": "Intensive Care Unit (ICU)"
+            },
+            "start_time": "2026-08-03T16:00:00",
+            "end_time": "2026-08-04T04:00:00",
+            "overlap_minutes": 720.0,
+            "evidence_source": [
+              "movements"
+            ],
+            "source_record_ids": {
+              "patient_movement_id": 2,
+              "staff_movement_id": 5,
+              "ward_id": 1
+            }
+          }
+        },
+        {
+          "from_entity": {
+            "type": "staff",
+            "id": 1,
+            "name": "Nurse Anita Sharma"
+          },
+          "to_entity": {
+            "type": "patient",
+            "id": 2,
+            "name": "Suresh Joshi (Downstream 1)"
+          },
+          "contact_event": {
+            "event_id": "EVT-PS-74ec87b40b3594fa",
+            "contact_type": "patient_staff",
+            "patient_id": 2,
+            "patient_name": "Suresh Joshi (Downstream 1)",
+            "connected_entity": {
+              "type": "staff",
+              "id": 1,
+              "name": "Nurse Anita Sharma",
+              "role_or_diagnosis": "nurse"
+            },
+            "location": {
+              "type": "ward",
+              "id": 2,
+              "name": "General Medicine A"
+            },
+            "start_time": "2026-08-05T16:00:00",
+            "end_time": "2026-08-06T04:00:00",
+            "overlap_minutes": 720.0,
+            "evidence_source": [
+              "movements"
+            ],
+            "source_record_ids": {
+              "patient_movement_id": 9,
+              "staff_movement_id": 6,
+              "ward_id": 2
+            }
+          }
+        }
+      ],
+      "explanation": "Staff-mediated contact via Nurse Anita Sharma (ID: 1). First interacted with Rajesh Verma (Index) in Intensive Care Unit (ICU) at 2026-08-03T16:00:00, then interacted with Suresh Joshi (Downstream 1) in General Medicine A at 2026-08-05T16:00:00."
+    },
+    "index_to_downstream_2": {
+      "source_patient_id": 1,
+      "target_patient_id": 3,
+      "path_found": true,
+      "hops_count": 2,
+      "path": [
+        {
+          "from_entity": {
+            "type": "patient",
+            "id": 1,
+            "name": "Rajesh Verma (Index)"
+          },
+          "to_entity": {
+            "type": "staff",
+            "id": 1,
+            "name": "Nurse Anita Sharma"
+          },
+          "contact_event": {
+            "event_id": "EVT-PS-0517515181c9b133",
+            "contact_type": "patient_staff",
+            "patient_id": 1,
+            "patient_name": "Rajesh Verma (Index)",
+            "connected_entity": {
+              "type": "staff",
+              "id": 1,
+              "name": "Nurse Anita Sharma",
+              "role_or_diagnosis": "nurse"
+            },
+            "location": {
+              "type": "ward",
+              "id": 1,
+              "name": "Intensive Care Unit (ICU)"
+            },
+            "start_time": "2026-08-03T16:00:00",
+            "end_time": "2026-08-04T04:00:00",
+            "overlap_minutes": 720.0,
+            "evidence_source": [
+              "movements"
+            ],
+            "source_record_ids": {
+              "patient_movement_id": 2,
+              "staff_movement_id": 5,
+              "ward_id": 1
+            }
+          }
+        },
+        {
+          "from_entity": {
+            "type": "staff",
+            "id": 1,
+            "name": "Nurse Anita Sharma"
+          },
+          "to_entity": {
+            "type": "patient",
+            "id": 3,
+            "name": "Meenakshi Rao (Downstream 2)"
+          },
+          "contact_event": {
+            "event_id": "EVT-PS-58b0bfd608fd96f5",
+            "contact_type": "patient_staff",
+            "patient_id": 3,
+            "patient_name": "Meenakshi Rao (Downstream 2)",
+            "connected_entity": {
+              "type": "staff",
+              "id": 1,
+              "name": "Nurse Anita Sharma",
+              "role_or_diagnosis": "nurse"
+            },
+            "location": {
+              "type": "ward",
+              "id": 2,
+              "name": "General Medicine A"
+            },
+            "start_time": "2026-08-05T16:00:00",
+            "end_time": "2026-08-06T04:00:00",
+            "overlap_minutes": 720.0,
+            "evidence_source": [
+              "movements"
+            ],
+            "source_record_ids": {
+              "patient_movement_id": 11,
+              "staff_movement_id": 6,
+              "ward_id": 2
+            }
+          }
+        }
+      ],
+      "explanation": "Staff-mediated contact via Nurse Anita Sharma (ID: 1). First interacted with Rajesh Verma (Index) in Intensive Care Unit (ICU) at 2026-08-03T16:00:00, then interacted with Meenakshi Rao (Downstream 2) in General Medicine A at 2026-08-05T16:00:00."
+    },
+    "index_to_downstream_3": {
+      "source_patient_id": 1,
+      "target_patient_id": 4,
+      "path_found": true,
+      "hops_count": 2,
+      "path": [
+        {
+          "from_entity": {
+            "type": "patient",
+            "id": 1,
+            "name": "Rajesh Verma (Index)"
+          },
+          "to_entity": {
+            "type": "staff",
+            "id": 1,
+            "name": "Nurse Anita Sharma"
+          },
+          "contact_event": {
+            "event_id": "EVT-PS-0517515181c9b133",
+            "contact_type": "patient_staff",
+            "patient_id": 1,
+            "patient_name": "Rajesh Verma (Index)",
+            "connected_entity": {
+              "type": "staff",
+              "id": 1,
+              "name": "Nurse Anita Sharma",
+              "role_or_diagnosis": "nurse"
+            },
+            "location": {
+              "type": "ward",
+              "id": 1,
+              "name": "Intensive Care Unit (ICU)"
+            },
+            "start_time": "2026-08-03T16:00:00",
+            "end_time": "2026-08-04T04:00:00",
+            "overlap_minutes": 720.0,
+            "evidence_source": [
+              "movements"
+            ],
+            "source_record_ids": {
+              "patient_movement_id": 2,
+              "staff_movement_id": 5,
+              "ward_id": 1
+            }
+          }
+        },
+        {
+          "from_entity": {
+            "type": "staff",
+            "id": 1,
+            "name": "Nurse Anita Sharma"
+          },
+          "to_entity": {
+            "type": "patient",
+            "id": 4,
+            "name": "Tarun Agarwal (Downstream 3)"
+          },
+          "contact_event": {
+            "event_id": "EVT-PS-9cced15bea7d473d",
+            "contact_type": "patient_staff",
+            "patient_id": 4,
+            "patient_name": "Tarun Agarwal (Downstream 3)",
+            "connected_entity": {
+              "type": "staff",
+              "id": 1,
+              "name": "Nurse Anita Sharma",
+              "role_or_diagnosis": "nurse"
+            },
+            "location": {
+              "type": "ward",
+              "id": 2,
+              "name": "General Medicine A"
+            },
+            "start_time": "2026-08-05T16:00:00",
+            "end_time": "2026-08-06T04:00:00",
+            "overlap_minutes": 720.0,
+            "evidence_source": [
+              "movements"
+            ],
+            "source_record_ids": {
+              "patient_movement_id": 13,
+              "staff_movement_id": 6,
+              "ward_id": 2
+            }
+          }
+        }
+      ],
+      "explanation": "Staff-mediated contact via Nurse Anita Sharma (ID: 1). First interacted with Rajesh Verma (Index) in Intensive Care Unit (ICU) at 2026-08-03T16:00:00, then interacted with Tarun Agarwal (Downstream 3) in General Medicine A at 2026-08-05T16:00:00."
+    }
+  }
+}
