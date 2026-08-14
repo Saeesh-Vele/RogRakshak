@@ -1,152 +1,242 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { getProvider } from "@/lib/data-provider";
+import type { InvestigationCase, InvestigationStatus } from "@/types/api";
+import { useAppStore } from "@/lib/store";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { InvestigationCard } from "@/components/investigation/investigation-card";
+import { StatusBadge } from "@/components/investigation/status-badge";
+import {
+  Activity,
+  AlertTriangle,
+  ShieldAlert,
+  Users,
+  TrendingUp,
+} from "lucide-react";
 
-type HealthStatus = "loading" | "ok" | "error";
-
-interface HealthData {
-  status: string;
-  service: string;
-}
-
-export default function Home() {
-  const [healthStatus, setHealthStatus] = useState<HealthStatus>("loading");
-  const [healthData, setHealthData] = useState<HealthData | null>(null);
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
-
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+export default function DashboardPage() {
+  const [cases, setCases] = useState<InvestigationCase[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const mode = useAppStore((s) => s.mode);
 
   useEffect(() => {
-    let isMounted = true;
-
-    async function checkBackendHealth() {
+    let cancelled = false;
+    async function load() {
+      setLoading(true);
+      setError(null);
       try {
-        setHealthStatus("loading");
-        const response = await fetch(`${apiUrl}/health`, {
-          method: "GET",
-          headers: {
-            "Accept": "application/json",
-          },
-        });
-
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-
-        const data: HealthData = await response.json();
-        if (isMounted) {
-          setHealthData(data);
-          setHealthStatus("ok");
-          setErrorMessage(null);
-        }
+        const provider = getProvider();
+        const resp = await provider.list();
+        if (!cancelled) setCases(resp.cases);
       } catch (err: unknown) {
-        if (isMounted) {
-          setHealthStatus("error");
-          setErrorMessage(err instanceof Error ? err.message : "Failed to connect to backend");
-        }
+        if (!cancelled)
+          setError(err instanceof Error ? err.message : "Failed to load data");
+      } finally {
+        if (!cancelled) setLoading(false);
       }
     }
-
-    checkBackendHealth();
-
+    load();
     return () => {
-      isMounted = false;
+      cancelled = true;
     };
-  }, [apiUrl]);
+  }, [mode]);
+
+  // Derive metrics from loaded data
+  const statusCounts: Record<InvestigationStatus, number> = {
+    SUSPECTED_CLUSTER: 0,
+    HIGH_PRIORITY_INVESTIGATION: 0,
+    POTENTIAL_CONTACT: 0,
+    NO_SIGNAL: 0,
+  };
+  for (const c of cases) {
+    if (c.status in statusCounts) statusCounts[c.status]++;
+  }
+
+  const organismCounts: Record<string, number> = {};
+  for (const c of cases) {
+    organismCounts[c.organism] = (organismCounts[c.organism] || 0) + 1;
+  }
 
   return (
-    <main className="min-h-screen bg-slate-950 text-slate-100 flex flex-col items-center justify-center p-6 selection:bg-teal-500 selection:text-slate-950">
-      {/* Background glowing effects */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-40 -left-40 w-96 h-96 bg-teal-500/10 rounded-full blur-3xl" />
-        <div className="absolute -bottom-40 -right-40 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl" />
+    <div className="p-6 lg:p-8 space-y-8">
+      {/* Header */}
+      <div>
+        <h1 className="text-2xl font-bold text-slate-100">
+          Investigation Dashboard
+        </h1>
+        <p className="text-sm text-slate-400 mt-1">
+          Hospital-acquired infection surveillance overview
+        </p>
       </div>
 
-      <div className="relative z-10 max-w-2xl w-full bg-slate-900/80 border border-slate-800 rounded-2xl p-8 backdrop-blur-xl shadow-2xl space-y-6">
-        {/* Header */}
-        <div className="space-y-2 text-center">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-800/80 border border-slate-700 text-xs font-medium text-slate-300">
-            <span className="w-2 h-2 rounded-full bg-teal-400 animate-pulse" />
-            HAI Surveillance & Outbreak Tracing Platform
-          </div>
-          <h1 className="text-3xl sm:text-4xl font-bold tracking-tight bg-gradient-to-r from-teal-300 via-cyan-200 to-indigo-300 bg-clip-text text-transparent">
-            RogRakshak
-          </h1>
-          <p className="text-sm text-slate-400 max-w-md mx-auto">
-            Temporal graph transmission tracking, multi-agent outbreak reasoning, and contact exposure analysis.
-          </p>
+      {/* Loading / Error */}
+      {loading && (
+        <div className="flex items-center gap-3 text-slate-400">
+          <div className="w-5 h-5 border-2 border-teal-400 border-t-transparent rounded-full animate-spin" />
+          Loading investigations…
         </div>
+      )}
+      {error && (
+        <Card className="border-rose-500/30">
+          <CardContent className="p-4 flex items-center gap-3 text-rose-400">
+            <AlertTriangle className="w-5 h-5 shrink-0" />
+            <div>
+              <p className="text-sm font-medium">Failed to load data</p>
+              <p className="text-xs text-rose-400/70">{error}</p>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
-        {/* Backend Status Card */}
-        <div className="p-5 rounded-xl bg-slate-950/60 border border-slate-800/80 space-y-4">
-          <div className="flex items-center justify-between">
-            <span className="text-sm font-medium text-slate-300">Backend Connection</span>
-            {healthStatus === "loading" && (
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-amber-500/10 border border-amber-500/30 text-amber-300">
-                <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-ping" />
-                Checking...
-              </span>
-            )}
-            {healthStatus === "ok" && (
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 shadow-sm shadow-emerald-500/20">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-                Backend: OK
-              </span>
-            )}
-            {healthStatus === "error" && (
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-rose-500/10 border border-rose-500/30 text-rose-400">
-                <span className="w-1.5 h-1.5 rounded-full bg-rose-400" />
-                Backend: Offline
-              </span>
-            )}
+      {!loading && !error && (
+        <>
+          {/* Metric Cards */}
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            <MetricCard
+              icon={Activity}
+              label="Total Investigations"
+              value={cases.length}
+              color="teal"
+            />
+            <MetricCard
+              icon={ShieldAlert}
+              label="Suspected Clusters"
+              value={statusCounts.SUSPECTED_CLUSTER}
+              color="amber"
+            />
+            <MetricCard
+              icon={TrendingUp}
+              label="High Priority"
+              value={statusCounts.HIGH_PRIORITY_INVESTIGATION}
+              color="orange"
+            />
+            <MetricCard
+              icon={Users}
+              label="Potential Contacts"
+              value={statusCounts.POTENTIAL_CONTACT}
+              color="blue"
+            />
           </div>
 
-          <div className="text-xs font-mono text-slate-400 bg-slate-900/90 rounded-lg p-3 border border-slate-800 space-y-1">
-            <div className="flex justify-between">
-              <span className="text-slate-500">API Endpoint:</span>
-              <span className="text-slate-300">{apiUrl}/health</span>
-            </div>
-            {healthData && (
-              <>
-                <div className="flex justify-between">
-                  <span className="text-slate-500">Service:</span>
-                  <span className="text-slate-300">{healthData.service}</span>
+          {/* Status Distribution */}
+          {cases.length > 0 && (
+            <Card>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-base">
+                  Status Distribution
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="flex flex-wrap gap-3">
+                  {(Object.entries(statusCounts) as [InvestigationStatus, number][])
+                    .filter(([, count]) => count > 0)
+                    .map(([status, count]) => (
+                      <div
+                        key={status}
+                        className="flex items-center gap-2 px-3 py-2 rounded-lg bg-slate-900/50 border border-slate-800"
+                      >
+                        <StatusBadge status={status} />
+                        <span className="text-lg font-bold text-slate-200">
+                          {count}
+                        </span>
+                      </div>
+                    ))}
                 </div>
-                <div className="flex justify-between">
-                  <span className="text-slate-500">Status Response:</span>
-                  <span className="text-emerald-400 font-bold">{healthData.status}</span>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Organism Distribution */}
+          {Object.keys(organismCounts).length > 0 && (
+            <Card>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-base">
+                  Organism Distribution
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-2">
+                  {Object.entries(organismCounts).map(([org, count]) => (
+                    <div
+                      key={org}
+                      className="flex items-center justify-between text-sm"
+                    >
+                      <span className="text-slate-300 italic">{org}</span>
+                      <span className="text-slate-400 font-mono">{count}</span>
+                    </div>
+                  ))}
                 </div>
-              </>
-            )}
-            {errorMessage && (
-              <div className="flex justify-between text-rose-400">
-                <span className="text-slate-500">Error:</span>
-                <span>{errorMessage}</span>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Recent Investigations */}
+          <div>
+            <h2 className="text-lg font-semibold text-slate-200 mb-3">
+              Recent Investigations
+            </h2>
+            {cases.length === 0 ? (
+              <Card>
+                <CardContent className="p-6 text-center text-slate-500">
+                  No investigations found. Create a new investigation to get
+                  started.
+                </CardContent>
+              </Card>
+            ) : (
+              <div className="space-y-3">
+                {cases
+                  .sort(
+                    (a, b) =>
+                      new Date(b.generated_at).getTime() -
+                      new Date(a.generated_at).getTime()
+                  )
+                  .slice(0, 5)
+                  .map((c) => (
+                    <InvestigationCard key={c.case_id} investigation={c} />
+                  ))}
               </div>
             )}
           </div>
-        </div>
+        </>
+      )}
+    </div>
+  );
+}
 
-        {/* System Architecture Grid */}
-        <div className="grid grid-cols-2 gap-3 pt-2">
-          <div className="p-3 rounded-lg bg-slate-850/50 border border-slate-800 text-left space-y-1">
-            <div className="text-xs font-semibold text-slate-200">Postgres + Neo4j</div>
-            <div className="text-[11px] text-slate-400">Structured clinical logs & temporal contact graphs</div>
+function MetricCard({
+  icon: Icon,
+  label,
+  value,
+  color,
+}: {
+  icon: React.ComponentType<{ className?: string }>;
+  label: string;
+  value: number;
+  color: string;
+}) {
+  const colorMap: Record<string, string> = {
+    teal: "text-teal-400 bg-teal-500/10 border-teal-500/20",
+    amber: "text-amber-400 bg-amber-500/10 border-amber-500/20",
+    orange: "text-orange-400 bg-orange-500/10 border-orange-500/20",
+    blue: "text-blue-400 bg-blue-500/10 border-blue-500/20",
+  };
+  const classes = colorMap[color] || colorMap.teal;
+
+  return (
+    <Card>
+      <CardContent className="p-4">
+        <div className="flex items-center gap-3">
+          <div className={`p-2 rounded-lg border ${classes}`}>
+            <Icon className="w-5 h-5" />
           </div>
-          <div className="p-3 rounded-lg bg-slate-850/50 border border-slate-800 text-left space-y-1">
-            <div className="text-xs font-semibold text-slate-200">LangGraph + Gemini</div>
-            <div className="text-[11px] text-slate-400">Multi-agent investigation & transmission synthesis</div>
-          </div>
-          <div className="p-3 rounded-lg bg-slate-850/50 border border-slate-800 text-left space-y-1">
-            <div className="text-xs font-semibold text-slate-200">@xyflow/react</div>
-            <div className="text-[11px] text-slate-400">Interactive outbreak network graph view</div>
-          </div>
-          <div className="p-3 rounded-lg bg-slate-850/50 border border-slate-800 text-left space-y-1">
-            <div className="text-xs font-semibold text-slate-200">Plotly.js Timelines</div>
-            <div className="text-[11px] text-slate-400">Patient ward co-location journey tracks</div>
+          <div>
+            <p className="text-2xl font-bold text-slate-100">{value}</p>
+            <p className="text-xs text-slate-400">{label}</p>
           </div>
         </div>
-      </div>
-    </main>
+      </CardContent>
+    </Card>
   );
 }

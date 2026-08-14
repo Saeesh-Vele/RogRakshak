@@ -1,0 +1,74 @@
+/**
+ * Mock Investigation Data Provider.
+ *
+ * Loads data from the pre-computed fixture:
+ *   data/fixtures/mock_investigation_results.json
+ *
+ * Implements the same interface as the live API provider so UI components
+ * work identically in either mode.
+ */
+
+import type {
+  InvestigationListResponse,
+  InvestigationCase,
+  EvidenceItem,
+  InvestigationTimelineEntry,
+} from "@/types/api";
+
+// The fixture is bundled at build time via the JSON import.
+// This avoids fetching a file at runtime and guarantees type safety.
+import fixtureRaw from "@/data/mock_investigation_results.json";
+
+interface MockFixture {
+  metadata: Record<string, unknown>;
+  investigation: InvestigationCase;
+}
+
+const fixture = fixtureRaw as unknown as MockFixture;
+
+/** Simulates network latency for realistic loading states. */
+function delay(ms = 400): Promise<void> {
+  return new Promise((r) => setTimeout(r, ms));
+}
+
+export const mockProvider = {
+  async list(): Promise<InvestigationListResponse> {
+    await delay();
+    return {
+      total_cases: 1,
+      cases: [fixture.investigation],
+    };
+  },
+
+  async get(caseId: string): Promise<InvestigationCase | null> {
+    await delay();
+    if (caseId === fixture.investigation.case_id) {
+      return fixture.investigation;
+    }
+    return null;
+  },
+
+  async create(): Promise<InvestigationCase> {
+    await delay(800);
+    // Return the pre-computed investigation as though it was just created
+    return fixture.investigation;
+  },
+
+  async getEvidence(caseId: string): Promise<EvidenceItem[]> {
+    await delay();
+    if (caseId === fixture.investigation.case_id) {
+      return fixture.investigation.evidence;
+    }
+    return [];
+  },
+
+  async getTimeline(
+    caseId: string
+  ): Promise<InvestigationTimelineEntry[]> {
+    await delay();
+    if (caseId === fixture.investigation.case_id) {
+      return fixture.investigation.timeline;
+    }
+    return [];
+  },
+};

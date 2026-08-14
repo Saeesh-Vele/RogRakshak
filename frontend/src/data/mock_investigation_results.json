@@ -1,0 +1,661 @@
+{
+  "metadata": {
+    "description": "Pre-computed mock epidemiological outbreak investigation for Frontend Team",
+    "outbreak_cluster": "Planted MDR Klebsiella pneumoniae Outbreak",
+    "index_patient": "Rajesh Verma (Index, ID: 1)",
+    "vector_staff": "Nurse Anita Sharma (ID: 1)",
+    "downstream_patients": [
+      "Suresh Joshi (ID: 2)",
+      "Meenakshi Rao (ID: 3)",
+      "Tarun Agarwal (ID: 4)"
+    ]
+  },
+  "investigation": {
+    "case_id": "CASE-2026-001",
+    "status": "SUSPECTED_CLUSTER",
+    "organism": "Klebsiella pneumoniae",
+    "resistance_profile": "MDR",
+    "confidence": 0.964,
+    "scoring": {
+      "total_score": 0.964,
+      "normalized_confidence": 0.964,
+      "dimensions": [
+        {
+          "dimension": "Temporal Contact Overlap",
+          "raw_score": 0.92,
+          "weight": 0.3,
+          "weighted_score": 0.276,
+          "evidence_count": 6,
+          "description": "Evidence of physical co-location or continuous shift contact overlap."
+        },
+        {
+          "dimension": "Microbiological Match",
+          "raw_score": 1.0,
+          "weight": 0.25,
+          "weighted_score": 0.25,
+          "evidence_count": 3,
+          "description": "Concordant bacterial pathogen identification from validated culture."
+        },
+        {
+          "dimension": "Antimicrobial Resistance Phenotype",
+          "raw_score": 1.0,
+          "weight": 0.2,
+          "weighted_score": 0.2,
+          "evidence_count": 3,
+          "description": "Matching phenotypic resistance profile (e.g. MDR / XDR)."
+        },
+        {
+          "dimension": "Shared Clinical Intermediary",
+          "raw_score": 1.0,
+          "weight": 0.15,
+          "weighted_score": 0.15,
+          "evidence_count": 6,
+          "description": "Identified healthcare vector or shared clinical attendant."
+        },
+        {
+          "dimension": "Specimen Temporal Clustering",
+          "raw_score": 0.885,
+          "weight": 0.1,
+          "weighted_score": 0.088,
+          "evidence_count": 3,
+          "description": "Temporal clustering of positive culture collection dates."
+        }
+      ]
+    },
+    "index_patient": {
+      "id": 1,
+      "name": "Rajesh Verma (Index)",
+      "mrn": "MRN-2026-1001",
+      "role": "index",
+      "admission_date": "2026-08-02T14:00:00",
+      "discharge_date": "2026-08-11T22:00:00",
+      "admitting_diagnosis": "Severe Sepsis & Respiratory Failure",
+      "positive_culture_date": null
+    },
+    "patients": [
+      {
+        "id": 1,
+        "name": "Rajesh Verma (Index)",
+        "mrn": "MRN-2026-1001",
+        "role": "index",
+        "admission_date": "2026-08-03T17:00:00",
+        "discharge_date": null,
+        "admitting_diagnosis": null,
+        "positive_culture_date": "2026-08-03T17:00:00"
+      },
+      {
+        "id": 2,
+        "name": "Suresh Joshi (Downstream 1)",
+        "mrn": "MRN-2026-1002",
+        "role": "candidate",
+        "admission_date": "2026-08-07T18:00:00",
+        "discharge_date": null,
+        "admitting_diagnosis": null,
+        "positive_culture_date": "2026-08-07T18:00:00"
+      },
+      {
+        "id": 3,
+        "name": "Meenakshi Rao (Downstream 2)",
+        "mrn": "MRN-2026-1003",
+        "role": "candidate",
+        "admission_date": "2026-08-08T19:00:00",
+        "discharge_date": null,
+        "admitting_diagnosis": null,
+        "positive_culture_date": "2026-08-08T19:00:00"
+      },
+      {
+        "id": 4,
+        "name": "Tarun Agarwal (Downstream 3)",
+        "mrn": "MRN-2026-1004",
+        "role": "candidate",
+        "admission_date": "2026-08-08T23:00:00",
+        "discharge_date": null,
+        "admitting_diagnosis": null,
+        "positive_culture_date": "2026-08-08T23:00:00"
+      }
+    ],
+    "candidate_patients": [
+      {
+        "id": 2,
+        "name": "Suresh Joshi (Downstream 1)",
+        "mrn": "MRN-2026-1002",
+        "role": "candidate",
+        "admission_date": "2026-08-07T18:00:00",
+        "discharge_date": null,
+        "admitting_diagnosis": null,
+        "positive_culture_date": "2026-08-07T18:00:00"
+      },
+      {
+        "id": 3,
+        "name": "Meenakshi Rao (Downstream 2)",
+        "mrn": "MRN-2026-1003",
+        "role": "candidate",
+        "admission_date": "2026-08-08T19:00:00",
+        "discharge_date": null,
+        "admitting_diagnosis": null,
+        "positive_culture_date": "2026-08-08T19:00:00"
+      },
+      {
+        "id": 4,
+        "name": "Tarun Agarwal (Downstream 3)",
+        "mrn": "MRN-2026-1004",
+        "role": "candidate",
+        "admission_date": "2026-08-08T23:00:00",
+        "discharge_date": null,
+        "admitting_diagnosis": null,
+        "positive_culture_date": "2026-08-08T23:00:00"
+      }
+    ],
+    "evidence": [
+      {
+        "evidence_id": "EV-ORGA-bad4925f3baf",
+        "type": "same_organism",
+        "subject_patient_id": 1,
+        "object_patient_id": 2,
+        "mediator": null,
+        "location": null,
+        "start_time": null,
+        "end_time": null,
+        "overlap_minutes": null,
+        "source": "lab_reports",
+        "event_id": null,
+        "source_record_ids": {},
+        "strength": 0.9,
+        "explanation": "Both Patient 1 and Patient 2 tested positive for Klebsiella pneumoniae in validated microbiology cultures."
+      },
+      {
+        "evidence_id": "EV-RESI-f916ab5294d5",
+        "type": "same_resistance_profile",
+        "subject_patient_id": 1,
+        "object_patient_id": 2,
+        "mediator": null,
+        "location": null,
+        "start_time": null,
+        "end_time": null,
+        "overlap_minutes": null,
+        "source": "lab_reports",
+        "event_id": null,
+        "source_record_ids": {},
+        "strength": 0.95,
+        "explanation": "Identical antimicrobial resistance phenotype (MDR) confirmed across both patient isolates."
+      },
+      {
+        "evidence_id": "EV-LAB_-39661124b3a4",
+        "type": "temporal_lab_proximity",
+        "subject_patient_id": 1,
+        "object_patient_id": 2,
+        "mediator": null,
+        "location": null,
+        "start_time": "2026-08-03T17:00:00",
+        "end_time": "2026-08-07T18:00:00",
+        "overlap_minutes": null,
+        "source": "lab_reports",
+        "event_id": null,
+        "source_record_ids": {},
+        "strength": 0.8845238095238095,
+        "explanation": "Culture sample collection dates are temporally clustered within 4.0 days (2026-08-03 to 2026-08-07)."
+      },
+      {
+        "evidence_id": "EV-STAF-ba8be1d83e3f",
+        "type": "temporal_staff_overlap",
+        "subject_patient_id": 1,
+        "object_patient_id": 2,
+        "mediator": {
+          "type": "staff",
+          "id": 1,
+          "name": "Nurse Anita Sharma",
+          "role": "nurse"
+        },
+        "location": "Intensive Care Unit (ICU)",
+        "start_time": "2026-08-03T16:00:00",
+        "end_time": "2026-08-04T04:00:00",
+        "overlap_minutes": 720.0,
+        "source": "movements",
+        "event_id": "EVT-PS-0517515181c9b133",
+        "source_record_ids": {
+          "patient_movement_id": 2,
+          "staff_movement_id": 5,
+          "ward_id": 1
+        },
+        "strength": 0.92,
+        "explanation": "Index Patient 1 had 720m continuous contact with Nurse Anita Sharma (Staff ID: 1) in Intensive Care Unit (ICU) (2026-08-03T16:00:00 to 2026-08-04T04:00:00)."
+      },
+      {
+        "evidence_id": "EV-STAF-9ffd99ba2033",
+        "type": "temporal_staff_overlap",
+        "subject_patient_id": 1,
+        "object_patient_id": 2,
+        "mediator": {
+          "type": "staff",
+          "id": 1,
+          "name": "Nurse Anita Sharma",
+          "role": "nurse"
+        },
+        "location": "General Medicine A",
+        "start_time": "2026-08-05T16:00:00",
+        "end_time": "2026-08-06T04:00:00",
+        "overlap_minutes": 720.0,
+        "source": "movements",
+        "event_id": "EVT-PS-74ec87b40b3594fa",
+        "source_record_ids": {
+          "patient_movement_id": 9,
+          "staff_movement_id": 6,
+          "ward_id": 2
+        },
+        "strength": 0.92,
+        "explanation": "Candidate Patient 2 had 720m continuous contact with Nurse Anita Sharma (Staff ID: 1) in General Medicine A (2026-08-05T16:00:00 to 2026-08-06T04:00:00)."
+      },
+      {
+        "evidence_id": "EV-ORGA-53b838700a2a",
+        "type": "same_organism",
+        "subject_patient_id": 1,
+        "object_patient_id": 3,
+        "mediator": null,
+        "location": null,
+        "start_time": null,
+        "end_time": null,
+        "overlap_minutes": null,
+        "source": "lab_reports",
+        "event_id": null,
+        "source_record_ids": {},
+        "strength": 0.9,
+        "explanation": "Both Patient 1 and Patient 3 tested positive for Klebsiella pneumoniae in validated microbiology cultures."
+      },
+      {
+        "evidence_id": "EV-RESI-5b26bd5e03e9",
+        "type": "same_resistance_profile",
+        "subject_patient_id": 1,
+        "object_patient_id": 3,
+        "mediator": null,
+        "location": null,
+        "start_time": null,
+        "end_time": null,
+        "overlap_minutes": null,
+        "source": "lab_reports",
+        "event_id": null,
+        "source_record_ids": {},
+        "strength": 0.95,
+        "explanation": "Identical antimicrobial resistance phenotype (MDR) confirmed across both patient isolates."
+      },
+      {
+        "evidence_id": "EV-LAB_-cc900a99254a",
+        "type": "temporal_lab_proximity",
+        "subject_patient_id": 1,
+        "object_patient_id": 3,
+        "mediator": null,
+        "location": null,
+        "start_time": "2026-08-03T17:00:00",
+        "end_time": "2026-08-08T19:00:00",
+        "overlap_minutes": null,
+        "source": "lab_reports",
+        "event_id": null,
+        "source_record_ids": {},
+        "strength": 0.8547619047619047,
+        "explanation": "Culture sample collection dates are temporally clustered within 5.1 days (2026-08-03 to 2026-08-08)."
+      },
+      {
+        "evidence_id": "EV-STAF-83c5ca3b27a4",
+        "type": "temporal_staff_overlap",
+        "subject_patient_id": 1,
+        "object_patient_id": 3,
+        "mediator": {
+          "type": "staff",
+          "id": 1,
+          "name": "Nurse Anita Sharma",
+          "role": "nurse"
+        },
+        "location": "Intensive Care Unit (ICU)",
+        "start_time": "2026-08-03T16:00:00",
+        "end_time": "2026-08-04T04:00:00",
+        "overlap_minutes": 720.0,
+        "source": "movements",
+        "event_id": "EVT-PS-0517515181c9b133",
+        "source_record_ids": {
+          "patient_movement_id": 2,
+          "staff_movement_id": 5,
+          "ward_id": 1
+        },
+        "strength": 0.92,
+        "explanation": "Index Patient 1 had 720m continuous contact with Nurse Anita Sharma (Staff ID: 1) in Intensive Care Unit (ICU) (2026-08-03T16:00:00 to 2026-08-04T04:00:00)."
+      },
+      {
+        "evidence_id": "EV-STAF-8e012d6d8edf",
+        "type": "temporal_staff_overlap",
+        "subject_patient_id": 1,
+        "object_patient_id": 3,
+        "mediator": {
+          "type": "staff",
+          "id": 1,
+          "name": "Nurse Anita Sharma",
+          "role": "nurse"
+        },
+        "location": "General Medicine A",
+        "start_time": "2026-08-05T16:00:00",
+        "end_time": "2026-08-06T04:00:00",
+        "overlap_minutes": 720.0,
+        "source": "movements",
+        "event_id": "EVT-PS-58b0bfd608fd96f5",
+        "source_record_ids": {
+          "patient_movement_id": 11,
+          "staff_movement_id": 6,
+          "ward_id": 2
+        },
+        "strength": 0.92,
+        "explanation": "Candidate Patient 3 had 720m continuous contact with Nurse Anita Sharma (Staff ID: 1) in General Medicine A (2026-08-05T16:00:00 to 2026-08-06T04:00:00)."
+      },
+      {
+        "evidence_id": "EV-ORGA-9cccb1dda4af",
+        "type": "same_organism",
+        "subject_patient_id": 1,
+        "object_patient_id": 4,
+        "mediator": null,
+        "location": null,
+        "start_time": null,
+        "end_time": null,
+        "overlap_minutes": null,
+        "source": "lab_reports",
+        "event_id": null,
+        "source_record_ids": {},
+        "strength": 0.9,
+        "explanation": "Both Patient 1 and Patient 4 tested positive for Klebsiella pneumoniae in validated microbiology cultures."
+      },
+      {
+        "evidence_id": "EV-RESI-7355b9f74fe9",
+        "type": "same_resistance_profile",
+        "subject_patient_id": 1,
+        "object_patient_id": 4,
+        "mediator": null,
+        "location": null,
+        "start_time": null,
+        "end_time": null,
+        "overlap_minutes": null,
+        "source": "lab_reports",
+        "event_id": null,
+        "source_record_ids": {},
+        "strength": 0.95,
+        "explanation": "Identical antimicrobial resistance phenotype (MDR) confirmed across both patient isolates."
+      },
+      {
+        "evidence_id": "EV-LAB_-512173602053",
+        "type": "temporal_lab_proximity",
+        "subject_patient_id": 1,
+        "object_patient_id": 4,
+        "mediator": null,
+        "location": null,
+        "start_time": "2026-08-03T17:00:00",
+        "end_time": "2026-08-08T23:00:00",
+        "overlap_minutes": null,
+        "source": "lab_reports",
+        "event_id": null,
+        "source_record_ids": {},
+        "strength": 0.85,
+        "explanation": "Culture sample collection dates are temporally clustered within 5.2 days (2026-08-03 to 2026-08-08)."
+      },
+      {
+        "evidence_id": "EV-STAF-2dce82615b47",
+        "type": "temporal_staff_overlap",
+        "subject_patient_id": 1,
+        "object_patient_id": 4,
+        "mediator": {
+          "type": "staff",
+          "id": 1,
+          "name": "Nurse Anita Sharma",
+          "role": "nurse"
+        },
+        "location": "Intensive Care Unit (ICU)",
+        "start_time": "2026-08-03T16:00:00",
+        "end_time": "2026-08-04T04:00:00",
+        "overlap_minutes": 720.0,
+        "source": "movements",
+        "event_id": "EVT-PS-0517515181c9b133",
+        "source_record_ids": {
+          "patient_movement_id": 2,
+          "staff_movement_id": 5,
+          "ward_id": 1
+        },
+        "strength": 0.92,
+        "explanation": "Index Patient 1 had 720m continuous contact with Nurse Anita Sharma (Staff ID: 1) in Intensive Care Unit (ICU) (2026-08-03T16:00:00 to 2026-08-04T04:00:00)."
+      },
+      {
+        "evidence_id": "EV-STAF-bd06b81cd0ab",
+        "type": "temporal_staff_overlap",
+        "subject_patient_id": 1,
+        "object_patient_id": 4,
+        "mediator": {
+          "type": "staff",
+          "id": 1,
+          "name": "Nurse Anita Sharma",
+          "role": "nurse"
+        },
+        "location": "General Medicine A",
+        "start_time": "2026-08-05T16:00:00",
+        "end_time": "2026-08-06T04:00:00",
+        "overlap_minutes": 720.0,
+        "source": "movements",
+        "event_id": "EVT-PS-9cced15bea7d473d",
+        "source_record_ids": {
+          "patient_movement_id": 13,
+          "staff_movement_id": 6,
+          "ward_id": 2
+        },
+        "strength": 0.92,
+        "explanation": "Candidate Patient 4 had 720m continuous contact with Nurse Anita Sharma (Staff ID: 1) in General Medicine A (2026-08-05T16:00:00 to 2026-08-06T04:00:00)."
+      }
+    ],
+    "transmission_chains": [
+      {
+        "chain_id": "CHAIN-001",
+        "nodes": [
+          {
+            "type": "patient",
+            "id": 1,
+            "name": "Rajesh Verma (Index)",
+            "role": null
+          },
+          {
+            "type": "staff",
+            "id": 1,
+            "name": "Nurse Anita Sharma",
+            "role": "nurse"
+          },
+          {
+            "type": "patient",
+            "id": 2,
+            "name": "Suresh Joshi (Downstream 1)",
+            "role": null
+          }
+        ],
+        "hops": [
+          {
+            "from_id": 1,
+            "via_id": null,
+            "to_id": 1,
+            "overlap_minutes": 720.0,
+            "location": "Intensive Care Unit (ICU)",
+            "start_time": "2026-08-03T16:00:00",
+            "end_time": "2026-08-04T04:00:00",
+            "evidence_id": "EV-STAF-ba8be1d83e3f"
+          },
+          {
+            "from_id": 1,
+            "via_id": null,
+            "to_id": 2,
+            "overlap_minutes": 720.0,
+            "location": "General Medicine A",
+            "start_time": "2026-08-05T16:00:00",
+            "end_time": "2026-08-06T04:00:00",
+            "evidence_id": "EV-STAF-9ffd99ba2033"
+          }
+        ],
+        "total_overlap_minutes": 1440.0,
+        "confidence": 0.964,
+        "description": "Staff-mediated suspected transmission pathway from Rajesh Verma (Index) to Suresh Joshi (Downstream 1) via Nurse Anita Sharma (staff, ID: 1) across Intensive Care Unit (ICU) (720m) and General Medicine A (720m)."
+      },
+      {
+        "chain_id": "CHAIN-002",
+        "nodes": [
+          {
+            "type": "patient",
+            "id": 1,
+            "name": "Rajesh Verma (Index)",
+            "role": null
+          },
+          {
+            "type": "staff",
+            "id": 1,
+            "name": "Nurse Anita Sharma",
+            "role": "nurse"
+          },
+          {
+            "type": "patient",
+            "id": 3,
+            "name": "Meenakshi Rao (Downstream 2)",
+            "role": null
+          }
+        ],
+        "hops": [
+          {
+            "from_id": 1,
+            "via_id": null,
+            "to_id": 1,
+            "overlap_minutes": 720.0,
+            "location": "Intensive Care Unit (ICU)",
+            "start_time": "2026-08-03T16:00:00",
+            "end_time": "2026-08-04T04:00:00",
+            "evidence_id": "EV-STAF-83c5ca3b27a4"
+          },
+          {
+            "from_id": 1,
+            "via_id": null,
+            "to_id": 3,
+            "overlap_minutes": 720.0,
+            "location": "General Medicine A",
+            "start_time": "2026-08-05T16:00:00",
+            "end_time": "2026-08-06T04:00:00",
+            "evidence_id": "EV-STAF-8e012d6d8edf"
+          }
+        ],
+        "total_overlap_minutes": 1440.0,
+        "confidence": 0.964,
+        "description": "Staff-mediated suspected transmission pathway from Rajesh Verma (Index) to Meenakshi Rao (Downstream 2) via Nurse Anita Sharma (staff, ID: 1) across Intensive Care Unit (ICU) (720m) and General Medicine A (720m)."
+      },
+      {
+        "chain_id": "CHAIN-003",
+        "nodes": [
+          {
+            "type": "patient",
+            "id": 1,
+            "name": "Rajesh Verma (Index)",
+            "role": null
+          },
+          {
+            "type": "staff",
+            "id": 1,
+            "name": "Nurse Anita Sharma",
+            "role": "nurse"
+          },
+          {
+            "type": "patient",
+            "id": 4,
+            "name": "Tarun Agarwal (Downstream 3)",
+            "role": null
+          }
+        ],
+        "hops": [
+          {
+            "from_id": 1,
+            "via_id": null,
+            "to_id": 1,
+            "overlap_minutes": 720.0,
+            "location": "Intensive Care Unit (ICU)",
+            "start_time": "2026-08-03T16:00:00",
+            "end_time": "2026-08-04T04:00:00",
+            "evidence_id": "EV-STAF-2dce82615b47"
+          },
+          {
+            "from_id": 1,
+            "via_id": null,
+            "to_id": 4,
+            "overlap_minutes": 720.0,
+            "location": "General Medicine A",
+            "start_time": "2026-08-05T16:00:00",
+            "end_time": "2026-08-06T04:00:00",
+            "evidence_id": "EV-STAF-bd06b81cd0ab"
+          }
+        ],
+        "total_overlap_minutes": 1440.0,
+        "confidence": 0.964,
+        "description": "Staff-mediated suspected transmission pathway from Rajesh Verma (Index) to Tarun Agarwal (Downstream 3) via Nurse Anita Sharma (staff, ID: 1) across Intensive Care Unit (ICU) (720m) and General Medicine A (720m)."
+      }
+    ],
+    "timeline": [
+      {
+        "timestamp": "2026-08-02T14:00:00",
+        "event_type": "admission",
+        "patient_id": 1,
+        "patient_name": "Rajesh Verma (Index)",
+        "description": "Admitted with diagnosis: Severe Sepsis & Respiratory Failure",
+        "location": null
+      },
+      {
+        "timestamp": "2026-08-02T14:00:00",
+        "event_type": "movement",
+        "patient_id": 1,
+        "patient_name": "Rajesh Verma (Index)",
+        "description": "Stay in BED: Bed INT-BED-01",
+        "location": "Bed INT-BED-01"
+      },
+      {
+        "timestamp": "2026-08-02T14:00:00",
+        "event_type": "movement",
+        "patient_id": 1,
+        "patient_name": "Rajesh Verma (Index)",
+        "description": "Stay in WARD: Intensive Care Unit (ICU)",
+        "location": "Intensive Care Unit (ICU)"
+      },
+      {
+        "timestamp": "2026-08-03T17:00:00",
+        "event_type": "lab_report",
+        "patient_id": 1,
+        "patient_name": "Rajesh Verma (Index)",
+        "description": "Microbiology Culture: Klebsiella pneumoniae (MDR) - Endotracheal Aspirate",
+        "location": null
+      },
+      {
+        "timestamp": "2026-08-03T18:00:00",
+        "event_type": "procedure",
+        "patient_id": 1,
+        "patient_name": "Rajesh Verma (Index)",
+        "description": "Procedure: Central Line Insertion",
+        "location": null
+      },
+      {
+        "timestamp": "2026-08-07T20:00:00",
+        "event_type": "movement",
+        "patient_id": 1,
+        "patient_name": "Rajesh Verma (Index)",
+        "description": "Stay in BED: Bed SUR-BED-01",
+        "location": "Bed SUR-BED-01"
+      },
+      {
+        "timestamp": "2026-08-07T20:00:00",
+        "event_type": "movement",
+        "patient_id": 1,
+        "patient_name": "Rajesh Verma (Index)",
+        "description": "Stay in WARD: Surgical Ward",
+        "location": "Surgical Ward"
+      },
+      {
+        "timestamp": "2026-08-11T22:00:00",
+        "event_type": "discharge",
+        "patient_id": 1,
+        "patient_name": "Rajesh Verma (Index)",
+        "description": "Discharged from hospital",
+        "location": null
+      }
+    ],
+    "summary": "EPIDEMIOLOGICAL INVESTIGATION BRIEFING [SUSPECTED_CLUSTER]: An active cluster of Klebsiella pneumoniae (MDR) was identified centering on Rajesh Verma (Index) (ID: 1). Identified 3 linked candidate cases (Suresh Joshi (Downstream 1), Meenakshi Rao (Downstream 2), Tarun Agarwal (Downstream 3)). Deterministic contact tracing revealed 3 verified staff-mediated contact pathway(s) with high cumulative exposure duration. Overall investigation confidence score: 96.4%. Recommended actions: Enhanced barrier nursing, staff cohorting, environmental disinfection, and active surveillance cultures.",
+    "warnings": [],
+    "generated_at": "2026-08-14T19:35:21.491083+00:00"
+  }
+}
