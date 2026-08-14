@@ -38,3 +38,6 @@ testpaths = [
 pythonpath = [
     ".",
 ]
+
+[tool.setuptools.packages.find]
+include = ["app*"]
