@@ -10,6 +10,22 @@ from app.schemas.graph import (
     ContactPathHop,
     ContactPathResponse,
 )
+from app.schemas.detection import (
+    InvestigationStatus,
+    EvidenceType,
+    EvidenceMediator,
+    EvidenceItem,
+    ScoringDimension,
+    ScoringBreakdown,
+    TransmissionChainNode,
+    TransmissionChainHop,
+    TransmissionChain,
+    PatientSummary,
+    InvestigationTimelineEntry,
+    InvestigationCase,
+    InvestigationListResponse,
+    CreateInvestigationRequest,
+)
 
 __all__ = [
     "LabReportExtraction",
@@ -23,4 +39,18 @@ __all__ = [
     "OrganismPatientCohort",
     "ContactPathHop",
     "ContactPathResponse",
+    "InvestigationStatus",
+    "EvidenceType",
+    "EvidenceMediator",
+    "EvidenceItem",
+    "ScoringDimension",
+    "ScoringBreakdown",
+    "TransmissionChainNode",
+    "TransmissionChainHop",
+    "TransmissionChain",
+    "PatientSummary",
+    "InvestigationTimelineEntry",
+    "InvestigationCase",
+    "InvestigationListResponse",
+    "CreateInvestigationRequest",
 ]
