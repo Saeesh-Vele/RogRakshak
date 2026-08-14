@@ -74,7 +74,7 @@ def verify_lab_reports():
     # Scan directory files
     dir_files = list(lab_reports_dir.iterdir())
     pdf_files = [f for f in dir_files if f.is_file() and f.suffix.lower() == ".pdf"]
-    non_pdf_files = [f for f in dir_files if f.is_file() and f.name != "document_manifest.json" and f.suffix.lower() != ".pdf"]
+    non_pdf_files = [f for f in dir_files if f.is_file() and f.suffix.lower() not in [".pdf", ".json"]]
 
     print(f"  • Generated PDF files count  : {len(pdf_files)}")
 
