@@ -24,8 +24,10 @@ app.add_middleware(
 
 
 from app.api.graph import router as graph_router
+from app.api.investigations import router as investigations_router
 
 app.include_router(graph_router)
+app.include_router(investigations_router)
 
 
 class HealthResponse(BaseModel):
