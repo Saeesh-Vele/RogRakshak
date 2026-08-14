@@ -1,0 +1,77 @@
+{
+  "cluster_name": "ICU to General Medicine A - MDR Klebsiella pneumoniae Outbreak",
+  "organism": "Klebsiella pneumoniae",
+  "resistance_profile": "MDR",
+  "index_patient": {
+    "id": 1,
+    "name": "Rajesh Verma (Index)",
+    "mrn": "MRN-2026-1001",
+    "ward": "Intensive Care Unit (ICU)",
+    "positive_sample_collected_at": "2026-08-03T17:00:00",
+    "positive_report_reported_at": "2026-08-05T19:00:00"
+  },
+  "vector_staff": {
+    "id": 1,
+    "name": "Nurse Anita Sharma",
+    "role": "nurse",
+    "transmission_shifts": [
+      {
+        "ward": "Intensive Care Unit (ICU)",
+        "entry_time": "2026-08-03T16:00:00",
+        "exit_time": "2026-08-04T04:00:00",
+        "role_in_transmission": "Exposed to Index Patient in ICU during central line and clinical care"
+      },
+      {
+        "ward": "General Medicine A",
+        "entry_time": "2026-08-05T16:00:00",
+        "exit_time": "2026-08-06T04:00:00",
+        "role_in_transmission": "Rotated to General Medicine A, transmitting pathogen to downstream patients"
+      },
+      {
+        "ward": "General Medicine A",
+        "entry_time": "2026-08-06T16:00:00",
+        "exit_time": "2026-08-07T04:00:00",
+        "role_in_transmission": "Second consecutive shift in General Medicine A"
+      }
+    ]
+  },
+  "downstream_patients": [
+    {
+      "id": 2,
+      "name": "Suresh Joshi (Downstream 1)",
+      "mrn": "MRN-2026-1002",
+      "ward": "General Medicine A",
+      "overlap_window_with_vector": {
+        "start": "2026-08-05T16:00:00",
+        "end": "2026-08-06T04:00:00"
+      },
+      "positive_sample_collected_at": "2026-08-07T18:00:00",
+      "positive_report_reported_at": "2026-08-09T22:00:00"
+    },
+    {
+      "id": 3,
+      "name": "Meenakshi Rao (Downstream 2)",
+      "mrn": "MRN-2026-1003",
+      "ward": "General Medicine A",
+      "overlap_window_with_vector": {
+        "start": "2026-08-05T16:00:00",
+        "end": "2026-08-06T04:00:00"
+      },
+      "positive_sample_collected_at": "2026-08-08T19:00:00",
+      "positive_report_reported_at": "2026-08-11T00:00:00"
+    },
+    {
+      "id": 4,
+      "name": "Tarun Agarwal (Downstream 3)",
+      "mrn": "MRN-2026-1004",
+      "ward": "General Medicine A",
+      "overlap_window_with_vector": {
+        "start": "2026-08-05T16:00:00",
+        "end": "2026-08-06T04:00:00"
+      },
+      "positive_sample_collected_at": "2026-08-08T23:00:00",
+      "positive_report_reported_at": "2026-08-11T02:00:00"
+    }
+  ],
+  "transmission_timeline": "1. Day 1 (2026-08-02 06:00): Index Patient (Rajesh Verma) is admitted to ICU Bed 1 with severe sepsis.\n2. Day 2 (2026-08-03 08:00 - 20:00): Vector Nurse (Nurse Anita Sharma) works in ICU and cares for Index Patient. Sputum specimen collected shows Carbapenem-resistant Klebsiella pneumoniae (reported on Day 4).\n3. Day 4 (2026-08-05 08:00 - 20:00): Nurse Anita Sharma rotates to General Medicine A for a 12-hour shift. She attends to Suresh Joshi (Downstream 1), Meenakshi Rao (Downstream 2), and Tarun Agarwal (Downstream 3).\n4. Day 5 (2026-08-06 08:00 - 20:00): Nurse Anita Sharma works a second shift in General Medicine A with continued exposure.\n5. Days 6-7 (2026-08-07 to 2026-08-08): Downstream patients develop clinical symptoms; diagnostic cultures are collected.\n6. Days 8-9 (2026-08-09 to 2026-08-10): All three downstream patients test positive for the identical MDR Klebsiella pneumoniae strain."
+}

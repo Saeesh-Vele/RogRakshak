@@ -55,8 +55,30 @@ def reset_database():
     print("Database schema recreated successfully.")
 
 
+def clear_tables(session):
+    """Clean existing data from all application tables before seeding."""
+    print("Clearing existing synthetic data...")
+    try:
+        session.execute(text("TRUNCATE TABLE procedure_staff, lab_reports, procedures, movements, beds, patients, staff, wards RESTART IDENTITY CASCADE;"))
+        session.commit()
+    except Exception:
+        session.rollback()
+        # Fallback to DELETE in foreign-key dependency order
+        session.execute(text("DELETE FROM procedure_staff;"))
+        session.execute(text("DELETE FROM lab_reports;"))
+        session.execute(text("DELETE FROM procedures;"))
+        session.execute(text("DELETE FROM movements;"))
+        session.execute(text("DELETE FROM beds;"))
+        session.execute(text("DELETE FROM patients;"))
+        session.execute(text("DELETE FROM staff;"))
+        session.execute(text("DELETE FROM wards;"))
+        session.commit()
+    print("Existing data cleared successfully.")
+
+
 def generate_dataset(session):
     print("Generating synthetic hospital dataset...")
+    clear_tables(session)
 
     # -------------------------------------------------------------
     # 1. Wards & Beds
@@ -219,7 +241,7 @@ def generate_dataset(session):
     )
     # Index transfers to Surgical Ward bed later
     surg_bed_1 = ward_beds[surg_ward.id][0]
-    m_idx_stepdown = Movement(
+    m_idx_stepdown_bed = Movement(
         patient_id=index_patient.id,
         staff_id=None,
         location_type="bed",
@@ -227,7 +249,15 @@ def generate_dataset(session):
         entry_time=BASE_DATE + timedelta(days=6, hours=12),
         exit_time=index_patient.discharge_date,
     )
-    movements.extend([m_idx_bed, m_idx_ward, m_idx_stepdown])
+    m_idx_stepdown_ward = Movement(
+        patient_id=index_patient.id,
+        staff_id=None,
+        location_type="ward",
+        location_id=surg_ward.id,
+        entry_time=BASE_DATE + timedelta(days=6, hours=12),
+        exit_time=index_patient.discharge_date,
+    )
+    movements.extend([m_idx_bed, m_idx_ward, m_idx_stepdown_bed, m_idx_stepdown_ward])
 
     # B. Vector Nurse Shifts:
     # Shift 1: ICU on Day 2 (08:00 - 20:00) -> OVERLAPS Index Patient in ICU
@@ -284,9 +314,10 @@ def generate_dataset(session):
 
     # D. Other Patients Movements across Wards (with natural overlap and noise)
     other_wards = [gen_med_b, surg_ward, ped_ward, cardio_ward]
-    for p in patients[4:]:
-        assigned_ward = other_wards[p.id % len(other_wards)]
-        assigned_bed = ward_beds[assigned_ward.id][p.id % len(ward_beds[assigned_ward.id])]
+    for idx, p in enumerate(patients[4:], start=4):
+        assigned_ward = other_wards[idx % len(other_wards)]
+        beds_in_ward = ward_beds[assigned_ward.id]
+        assigned_bed = beds_in_ward[idx % len(beds_in_ward)]
         
         m_bed = Movement(
             patient_id=p.id,
@@ -307,8 +338,8 @@ def generate_dataset(session):
         movements.extend([m_bed, m_ward])
 
     # E. Other Staff Shifts across the 14 days
-    for s in staff_members[1:]:
-        s_ward = wards[s.id % len(wards)]
+    for idx, s in enumerate(staff_members[1:], start=1):
+        s_ward = wards[idx % len(wards)]
         # Generate 6 shifts per staff across the 14-day window
         for day in range(1, 14, 2):
             shift_start = BASE_DATE + timedelta(days=day, hours=random.choice([7, 8, 19, 20]))
@@ -342,13 +373,13 @@ def generate_dataset(session):
     p_proc1.staff_members.append(vector_nurse)
     procedures.append(p_proc1)
 
-    for i, p in enumerate(patients[1:12]):
+    for i, p in enumerate(patients[1:12], start=1):
         proc_type = proc_types[i % len(proc_types)]
         proc_start = p.admission_date + timedelta(days=1, hours=2)
         proc = Procedure(
             patient_id=p.id,
             procedure_type=proc_type,
-            location_id=wards[p.id % len(wards)].id,
+            location_id=wards[i % len(wards)].id,
             start_time=proc_start,
             end_time=proc_start + timedelta(hours=1),
         )
