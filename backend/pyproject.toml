@@ -19,6 +19,7 @@ dependencies = [
     "neo4j",
     "langgraph",
     "langchain-google-genai",
+    "reportlab",
     "pytest",
     "httpx",
 ]
@@ -38,6 +39,12 @@ testpaths = [
 pythonpath = [
     ".",
 ]
+<<<<<<< HEAD
 
 [tool.setuptools.packages.find]
 include = ["app*"]
+=======
+[tool.setuptools.packages.find]
+include = ["app*"]
+exclude = ["migrations*"]
+>>>>>>> 242566b42fbe7038232aa8be5e6d2758e3e5238e
