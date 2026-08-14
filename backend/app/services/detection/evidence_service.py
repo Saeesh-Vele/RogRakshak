@@ -126,17 +126,18 @@ class EvidenceAggregationService:
                     )
                 )
             elif contact_path.hops_count == 2:
-                # Staff Mediated Contact
+                # Staff Mediated Contact - Emit two distinct atomic EvidenceItems for each source contact event
                 hop1 = contact_path.path[0]
                 hop2 = contact_path.path[1]
                 staff_info = hop1.to_entity
                 ev1 = hop1.contact_event
                 ev2 = hop2.contact_event
 
-                ev_id = self.generate_evidence_id("staff_overlap", index_patient_id, candidate_patient_id, f"s{staff_info['id']}")
+                # Atomic Evidence Item 1: Index Patient <-> Staff Intermediary
+                ev1_id = self.generate_evidence_id("staff_overlap", index_patient_id, candidate_patient_id, f"{ev1.event_id}_h1")
                 evidence_list.append(
                     EvidenceItem(
-                        evidence_id=ev_id,
+                        evidence_id=ev1_id,
                         type="temporal_staff_overlap",
                         subject_patient_id=index_patient_id,
                         object_patient_id=candidate_patient_id,
@@ -146,16 +147,48 @@ class EvidenceAggregationService:
                             name=staff_info["name"],
                             role=staff_info.get("role", "nurse"),
                         ),
-                        location=f"{ev1.location.name} -> {ev2.location.name}",
+                        location=ev1.location.name,
                         start_time=ev1.start_time,
-                        end_time=ev2.end_time,
-                        overlap_minutes=ev1.overlap_minutes + ev2.overlap_minutes,
+                        end_time=ev1.end_time,
+                        overlap_minutes=ev1.overlap_minutes,
                         source="movements",
+                        event_id=ev1.event_id,
+                        source_record_ids=ev1.source_record_ids,
                         strength=0.92,
                         explanation=(
-                            f"Shared clinical contact mediated by {staff_info['name']} (Staff ID: {staff_info['id']}). "
-                            f"Interacted with Index in {ev1.location.name} ({ev1.overlap_minutes:.0f}m overlap) "
-                            f"followed by Candidate in {ev2.location.name} ({ev2.overlap_minutes:.0f}m overlap)."
+                            f"Index Patient {index_patient_id} had {ev1.overlap_minutes:.0f}m continuous contact with "
+                            f"{staff_info['name']} (Staff ID: {staff_info['id']}) in {ev1.location.name} "
+                            f"({ev1.start_time} to {ev1.end_time})."
+                        ),
+                    )
+                )
+
+                # Atomic Evidence Item 2: Staff Intermediary <-> Candidate Patient
+                ev2_id = self.generate_evidence_id("staff_overlap", index_patient_id, candidate_patient_id, f"{ev2.event_id}_h2")
+                evidence_list.append(
+                    EvidenceItem(
+                        evidence_id=ev2_id,
+                        type="temporal_staff_overlap",
+                        subject_patient_id=index_patient_id,
+                        object_patient_id=candidate_patient_id,
+                        mediator=EvidenceMediator(
+                            type="staff",
+                            id=staff_info["id"],
+                            name=staff_info["name"],
+                            role=staff_info.get("role", "nurse"),
+                        ),
+                        location=ev2.location.name,
+                        start_time=ev2.start_time,
+                        end_time=ev2.end_time,
+                        overlap_minutes=ev2.overlap_minutes,
+                        source="movements",
+                        event_id=ev2.event_id,
+                        source_record_ids=ev2.source_record_ids,
+                        strength=0.92,
+                        explanation=(
+                            f"Candidate Patient {candidate_patient_id} had {ev2.overlap_minutes:.0f}m continuous contact with "
+                            f"{staff_info['name']} (Staff ID: {staff_info['id']}) in {ev2.location.name} "
+                            f"({ev2.start_time} to {ev2.end_time})."
                         ),
                     )
                 )

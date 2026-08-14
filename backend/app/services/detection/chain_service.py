@@ -90,25 +90,50 @@ class TransmissionChainService:
                 TransmissionChainNode(type="patient", id=target_patient_id, name=target_patient_name)
             )
 
-            matching_ev = next((e for e in evidence_list if e.type == "temporal_staff_overlap"), None)
-            ev_id = matching_ev.evidence_id if matching_ev else "EV-STAFF"
+            # Match discrete atomic EvidenceItems
+            ev1_item = next(
+                (e for e in evidence_list if e.type == "temporal_staff_overlap" and e.location == ev1.location.name),
+                None,
+            )
+            ev2_item = next(
+                (e for e in evidence_list if e.type == "temporal_staff_overlap" and e.location == ev2.location.name),
+                None,
+            )
+            ev1_id = ev1_item.evidence_id if ev1_item else "EV-HOP1"
+            ev2_id = ev2_item.evidence_id if ev2_item else "EV-HOP2"
 
+            # Hop 1: Index Patient -> Staff Intermediary
             hops.append(
                 TransmissionChainHop(
                     from_id=index_patient_id,
-                    via_id=staff["id"],
-                    to_id=target_patient_id,
-                    overlap_minutes=ev1.overlap_minutes + ev2.overlap_minutes,
-                    location=f"{ev1.location.name} -> {ev2.location.name}",
+                    via_id=None,
+                    to_id=staff["id"],
+                    overlap_minutes=ev1.overlap_minutes,
+                    location=ev1.location.name,
                     start_time=ev1.start_time,
-                    end_time=ev2.end_time,
-                    evidence_id=ev_id,
+                    end_time=ev1.end_time,
+                    evidence_id=ev1_id,
                 )
             )
+
+            # Hop 2: Staff Intermediary -> Downstream Candidate
+            hops.append(
+                TransmissionChainHop(
+                    from_id=staff["id"],
+                    via_id=None,
+                    to_id=target_patient_id,
+                    overlap_minutes=ev2.overlap_minutes,
+                    location=ev2.location.name,
+                    start_time=ev2.start_time,
+                    end_time=ev2.end_time,
+                    evidence_id=ev2_id,
+                )
+            )
+
             desc = (
                 f"Staff-mediated suspected transmission pathway from {index_patient_name} to {target_patient_name} "
                 f"via {staff['name']} ({staff.get('role', 'staff')}, ID: {staff['id']}) across "
-                f"{ev1.location.name} and {ev2.location.name}."
+                f"{ev1.location.name} ({ev1.overlap_minutes:.0f}m) and {ev2.location.name} ({ev2.overlap_minutes:.0f}m)."
             )
 
         else:

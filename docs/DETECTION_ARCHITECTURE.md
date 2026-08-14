@@ -60,28 +60,53 @@ This document specifies the Detection / Investigation Layer (Phase 3B) of RogRak
 
 ## 3. Evidence Model
 
-Every finding is backed by explicit `EvidenceItem` instances:
+Every finding is backed by explicit, atomic `EvidenceItem` instances corresponding directly to underlying source contact events:
 
 ```json
-{
-  "evidence_id": "EV-STAF-87e2b10a9c14",
-  "type": "temporal_staff_overlap",
-  "subject_patient_id": 1,
-  "object_patient_id": 2,
-  "mediator": {
-    "type": "staff",
-    "id": 1,
-    "name": "Nurse Anita Sharma",
-    "role": "nurse"
+[
+  {
+    "evidence_id": "EV-STAF-87e2b10a9c14",
+    "type": "temporal_staff_overlap",
+    "subject_patient_id": 1,
+    "object_patient_id": 2,
+    "mediator": {
+      "type": "staff",
+      "id": 1,
+      "name": "Nurse Anita Sharma",
+      "role": "nurse"
+    },
+    "location": "Intensive Care Unit (ICU)",
+    "start_time": "2026-08-03T16:00:00",
+    "end_time": "2026-08-04T04:00:00",
+    "overlap_minutes": 720.0,
+    "source": "movements",
+    "event_id": "EVT-PS-8d19760773dcf068",
+    "source_record_ids": {"patient_movement_id": 1, "staff_movement_id": 161, "ward_id": 1},
+    "strength": 0.92,
+    "explanation": "Index Patient 1 had 720m continuous contact with Nurse Anita Sharma in Intensive Care Unit (ICU) (2026-08-03T16:00:00 to 2026-08-04T04:00:00)."
   },
-  "location": "Intensive Care Unit (ICU) -> General Medicine A",
-  "start_time": "2026-08-03T16:00:00",
-  "end_time": "2026-08-06T04:00:00",
-  "overlap_minutes": 1440.0,
-  "source": "movements",
-  "strength": 0.92,
-  "explanation": "Shared clinical contact mediated by Nurse Anita Sharma (Staff ID: 1). Interacted with Index in ICU (720m overlap) followed by Candidate in General Medicine A (720m overlap)."
-}
+  {
+    "evidence_id": "EV-STAF-91f4c32b11a5",
+    "type": "temporal_staff_overlap",
+    "subject_patient_id": 1,
+    "object_patient_id": 2,
+    "mediator": {
+      "type": "staff",
+      "id": 1,
+      "name": "Nurse Anita Sharma",
+      "role": "nurse"
+    },
+    "location": "General Medicine A",
+    "start_time": "2026-08-05T16:00:00",
+    "end_time": "2026-08-06T04:00:00",
+    "overlap_minutes": 720.0,
+    "source": "movements",
+    "event_id": "EVT-PS-b31a89d0124f5678",
+    "source_record_ids": {"patient_movement_id": 4, "staff_movement_id": 172, "ward_id": 2},
+    "strength": 0.92,
+    "explanation": "Candidate Patient 2 had 720m continuous contact with Nurse Anita Sharma in General Medicine A (2026-08-05T16:00:00 to 2026-08-06T04:00:00)."
+  }
+]
 ```
 
 ### Supported Evidence Types:

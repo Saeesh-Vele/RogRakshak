@@ -65,10 +65,25 @@ def test_evidence_aggregation_planted_cluster():
         assert "same_resistance_profile" in ev_types
         assert "temporal_staff_overlap" in ev_types
 
-        staff_ev = next(e for e in evidence if e.type == "temporal_staff_overlap")
-        assert staff_ev.mediator is not None
-        assert staff_ev.mediator.name == "Nurse Anita Sharma"
-        assert staff_ev.mediator.id == 1
+        # Verify atomic evidence provenance: TWO discrete 720-minute EvidenceItems
+        staff_evs = [e for e in evidence if e.type == "temporal_staff_overlap"]
+        assert len(staff_evs) == 2
+
+        # Hop 1: Index Patient in ICU
+        hop1_ev = staff_evs[0]
+        assert hop1_ev.mediator.name == "Nurse Anita Sharma"
+        assert hop1_ev.location == "Intensive Care Unit (ICU)"
+        assert hop1_ev.overlap_minutes == 720.0
+        assert hop1_ev.event_id is not None
+        assert "patient_movement_id" in hop1_ev.source_record_ids
+
+        # Hop 2: Candidate Patient in General Medicine A
+        hop2_ev = staff_evs[1]
+        assert hop2_ev.mediator.name == "Nurse Anita Sharma"
+        assert hop2_ev.location == "General Medicine A"
+        assert hop2_ev.overlap_minutes == 720.0
+        assert hop2_ev.event_id is not None
+        assert "patient_movement_id" in hop2_ev.source_record_ids
     finally:
         live_gp.close()
 
@@ -125,6 +140,19 @@ def test_transmission_chain_construction():
     assert chain.nodes[0].name == "Rajesh Verma (Index)"
     assert chain.nodes[1].name == "Nurse Anita Sharma"
     assert chain.nodes[2].name == "Suresh Joshi"
+
+    # Discrete hops linking to atomic evidence items
+    assert len(chain.hops) == 2
+    assert chain.hops[0].from_id == 1
+    assert chain.hops[0].to_id == 1  # Staff ID 1
+    assert chain.hops[0].overlap_minutes == 720.0
+    assert chain.hops[0].location == "Intensive Care Unit (ICU)"
+
+    assert chain.hops[1].from_id == 1  # Staff ID 1
+    assert chain.hops[1].to_id == 2  # Patient ID 2
+    assert chain.hops[1].overlap_minutes == 720.0
+    assert chain.hops[1].location == "General Medicine A"
+
     assert chain.total_overlap_minutes == 1440.0  # 720m + 720m
 
 

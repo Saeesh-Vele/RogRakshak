@@ -48,6 +48,10 @@ class EvidenceItem(BaseModel):
     end_time: Optional[str] = Field(default=None, description="ISO-8601 interval end")
     overlap_minutes: Optional[float] = Field(default=None, description="Overlap duration in minutes")
     source: str = Field(description="Provenance source (e.g. 'movements', 'lab_reports', 'procedures')")
+    event_id: Optional[str] = Field(default=None, description="Source graph contact event ID (e.g. 'EVT-PS-...')")
+    source_record_ids: Dict[str, Any] = Field(
+        default_factory=dict, description="Underlying database record IDs for provenance"
+    )
     strength: float = Field(ge=0.0, le=1.0, description="Normalized evidence strength [0.0, 1.0]")
     explanation: str = Field(description="Objective factual statement describing the evidence")
 

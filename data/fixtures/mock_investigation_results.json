@@ -25,7 +25,7 @@
           "raw_score": 0.92,
           "weight": 0.3,
           "weighted_score": 0.276,
-          "evidence_count": 3,
+          "evidence_count": 6,
           "description": "Evidence of physical co-location or continuous shift contact overlap."
         },
         {
@@ -49,7 +49,7 @@
           "raw_score": 1.0,
           "weight": 0.15,
           "weighted_score": 0.15,
-          "evidence_count": 3,
+          "evidence_count": 6,
           "description": "Identified healthcare vector or shared clinical attendant."
         },
         {
@@ -158,6 +158,8 @@
         "end_time": null,
         "overlap_minutes": null,
         "source": "lab_reports",
+        "event_id": null,
+        "source_record_ids": {},
         "strength": 0.9,
         "explanation": "Both Patient 1 and Patient 2 tested positive for Klebsiella pneumoniae in validated microbiology cultures."
       },
@@ -172,6 +174,8 @@
         "end_time": null,
         "overlap_minutes": null,
         "source": "lab_reports",
+        "event_id": null,
+        "source_record_ids": {},
         "strength": 0.95,
         "explanation": "Identical antimicrobial resistance phenotype (MDR) confirmed across both patient isolates."
       },
@@ -186,11 +190,13 @@
         "end_time": "2026-08-07T18:00:00",
         "overlap_minutes": null,
         "source": "lab_reports",
+        "event_id": null,
+        "source_record_ids": {},
         "strength": 0.8845238095238095,
         "explanation": "Culture sample collection dates are temporally clustered within 4.0 days (2026-08-03 to 2026-08-07)."
       },
       {
-        "evidence_id": "EV-STAF-3059db8c8709",
+        "evidence_id": "EV-STAF-ba8be1d83e3f",
         "type": "temporal_staff_overlap",
         "subject_patient_id": 1,
         "object_patient_id": 2,
@@ -200,13 +206,44 @@
           "name": "Nurse Anita Sharma",
           "role": "nurse"
         },
-        "location": "Intensive Care Unit (ICU) -> General Medicine A",
+        "location": "Intensive Care Unit (ICU)",
         "start_time": "2026-08-03T16:00:00",
-        "end_time": "2026-08-06T04:00:00",
-        "overlap_minutes": 1440.0,
+        "end_time": "2026-08-04T04:00:00",
+        "overlap_minutes": 720.0,
         "source": "movements",
+        "event_id": "EVT-PS-0517515181c9b133",
+        "source_record_ids": {
+          "patient_movement_id": 2,
+          "staff_movement_id": 5,
+          "ward_id": 1
+        },
         "strength": 0.92,
-        "explanation": "Shared clinical contact mediated by Nurse Anita Sharma (Staff ID: 1). Interacted with Index in Intensive Care Unit (ICU) (720m overlap) followed by Candidate in General Medicine A (720m overlap)."
+        "explanation": "Index Patient 1 had 720m continuous contact with Nurse Anita Sharma (Staff ID: 1) in Intensive Care Unit (ICU) (2026-08-03T16:00:00 to 2026-08-04T04:00:00)."
+      },
+      {
+        "evidence_id": "EV-STAF-9ffd99ba2033",
+        "type": "temporal_staff_overlap",
+        "subject_patient_id": 1,
+        "object_patient_id": 2,
+        "mediator": {
+          "type": "staff",
+          "id": 1,
+          "name": "Nurse Anita Sharma",
+          "role": "nurse"
+        },
+        "location": "General Medicine A",
+        "start_time": "2026-08-05T16:00:00",
+        "end_time": "2026-08-06T04:00:00",
+        "overlap_minutes": 720.0,
+        "source": "movements",
+        "event_id": "EVT-PS-74ec87b40b3594fa",
+        "source_record_ids": {
+          "patient_movement_id": 9,
+          "staff_movement_id": 6,
+          "ward_id": 2
+        },
+        "strength": 0.92,
+        "explanation": "Candidate Patient 2 had 720m continuous contact with Nurse Anita Sharma (Staff ID: 1) in General Medicine A (2026-08-05T16:00:00 to 2026-08-06T04:00:00)."
       },
       {
         "evidence_id": "EV-ORGA-53b838700a2a",
@@ -219,6 +256,8 @@
         "end_time": null,
         "overlap_minutes": null,
         "source": "lab_reports",
+        "event_id": null,
+        "source_record_ids": {},
         "strength": 0.9,
         "explanation": "Both Patient 1 and Patient 3 tested positive for Klebsiella pneumoniae in validated microbiology cultures."
       },
@@ -233,6 +272,8 @@
         "end_time": null,
         "overlap_minutes": null,
         "source": "lab_reports",
+        "event_id": null,
+        "source_record_ids": {},
         "strength": 0.95,
         "explanation": "Identical antimicrobial resistance phenotype (MDR) confirmed across both patient isolates."
       },
@@ -247,11 +288,13 @@
         "end_time": "2026-08-08T19:00:00",
         "overlap_minutes": null,
         "source": "lab_reports",
+        "event_id": null,
+        "source_record_ids": {},
         "strength": 0.8547619047619047,
         "explanation": "Culture sample collection dates are temporally clustered within 5.1 days (2026-08-03 to 2026-08-08)."
       },
       {
-        "evidence_id": "EV-STAF-77b36c89f06c",
+        "evidence_id": "EV-STAF-83c5ca3b27a4",
         "type": "temporal_staff_overlap",
         "subject_patient_id": 1,
         "object_patient_id": 3,
@@ -261,13 +304,44 @@
           "name": "Nurse Anita Sharma",
           "role": "nurse"
         },
-        "location": "Intensive Care Unit (ICU) -> General Medicine A",
+        "location": "Intensive Care Unit (ICU)",
         "start_time": "2026-08-03T16:00:00",
-        "end_time": "2026-08-06T04:00:00",
-        "overlap_minutes": 1440.0,
+        "end_time": "2026-08-04T04:00:00",
+        "overlap_minutes": 720.0,
         "source": "movements",
+        "event_id": "EVT-PS-0517515181c9b133",
+        "source_record_ids": {
+          "patient_movement_id": 2,
+          "staff_movement_id": 5,
+          "ward_id": 1
+        },
         "strength": 0.92,
-        "explanation": "Shared clinical contact mediated by Nurse Anita Sharma (Staff ID: 1). Interacted with Index in Intensive Care Unit (ICU) (720m overlap) followed by Candidate in General Medicine A (720m overlap)."
+        "explanation": "Index Patient 1 had 720m continuous contact with Nurse Anita Sharma (Staff ID: 1) in Intensive Care Unit (ICU) (2026-08-03T16:00:00 to 2026-08-04T04:00:00)."
+      },
+      {
+        "evidence_id": "EV-STAF-8e012d6d8edf",
+        "type": "temporal_staff_overlap",
+        "subject_patient_id": 1,
+        "object_patient_id": 3,
+        "mediator": {
+          "type": "staff",
+          "id": 1,
+          "name": "Nurse Anita Sharma",
+          "role": "nurse"
+        },
+        "location": "General Medicine A",
+        "start_time": "2026-08-05T16:00:00",
+        "end_time": "2026-08-06T04:00:00",
+        "overlap_minutes": 720.0,
+        "source": "movements",
+        "event_id": "EVT-PS-58b0bfd608fd96f5",
+        "source_record_ids": {
+          "patient_movement_id": 11,
+          "staff_movement_id": 6,
+          "ward_id": 2
+        },
+        "strength": 0.92,
+        "explanation": "Candidate Patient 3 had 720m continuous contact with Nurse Anita Sharma (Staff ID: 1) in General Medicine A (2026-08-05T16:00:00 to 2026-08-06T04:00:00)."
       },
       {
         "evidence_id": "EV-ORGA-9cccb1dda4af",
@@ -280,6 +354,8 @@
         "end_time": null,
         "overlap_minutes": null,
         "source": "lab_reports",
+        "event_id": null,
+        "source_record_ids": {},
         "strength": 0.9,
         "explanation": "Both Patient 1 and Patient 4 tested positive for Klebsiella pneumoniae in validated microbiology cultures."
       },
@@ -294,6 +370,8 @@
         "end_time": null,
         "overlap_minutes": null,
         "source": "lab_reports",
+        "event_id": null,
+        "source_record_ids": {},
         "strength": 0.95,
         "explanation": "Identical antimicrobial resistance phenotype (MDR) confirmed across both patient isolates."
       },
@@ -308,11 +386,13 @@
         "end_time": "2026-08-08T23:00:00",
         "overlap_minutes": null,
         "source": "lab_reports",
+        "event_id": null,
+        "source_record_ids": {},
         "strength": 0.85,
         "explanation": "Culture sample collection dates are temporally clustered within 5.2 days (2026-08-03 to 2026-08-08)."
       },
       {
-        "evidence_id": "EV-STAF-47939ae0c91d",
+        "evidence_id": "EV-STAF-2dce82615b47",
         "type": "temporal_staff_overlap",
         "subject_patient_id": 1,
         "object_patient_id": 4,
@@ -322,13 +402,44 @@
           "name": "Nurse Anita Sharma",
           "role": "nurse"
         },
-        "location": "Intensive Care Unit (ICU) -> General Medicine A",
+        "location": "Intensive Care Unit (ICU)",
         "start_time": "2026-08-03T16:00:00",
-        "end_time": "2026-08-06T04:00:00",
-        "overlap_minutes": 1440.0,
+        "end_time": "2026-08-04T04:00:00",
+        "overlap_minutes": 720.0,
         "source": "movements",
+        "event_id": "EVT-PS-0517515181c9b133",
+        "source_record_ids": {
+          "patient_movement_id": 2,
+          "staff_movement_id": 5,
+          "ward_id": 1
+        },
         "strength": 0.92,
-        "explanation": "Shared clinical contact mediated by Nurse Anita Sharma (Staff ID: 1). Interacted with Index in Intensive Care Unit (ICU) (720m overlap) followed by Candidate in General Medicine A (720m overlap)."
+        "explanation": "Index Patient 1 had 720m continuous contact with Nurse Anita Sharma (Staff ID: 1) in Intensive Care Unit (ICU) (2026-08-03T16:00:00 to 2026-08-04T04:00:00)."
+      },
+      {
+        "evidence_id": "EV-STAF-bd06b81cd0ab",
+        "type": "temporal_staff_overlap",
+        "subject_patient_id": 1,
+        "object_patient_id": 4,
+        "mediator": {
+          "type": "staff",
+          "id": 1,
+          "name": "Nurse Anita Sharma",
+          "role": "nurse"
+        },
+        "location": "General Medicine A",
+        "start_time": "2026-08-05T16:00:00",
+        "end_time": "2026-08-06T04:00:00",
+        "overlap_minutes": 720.0,
+        "source": "movements",
+        "event_id": "EVT-PS-9cced15bea7d473d",
+        "source_record_ids": {
+          "patient_movement_id": 13,
+          "staff_movement_id": 6,
+          "ward_id": 2
+        },
+        "strength": 0.92,
+        "explanation": "Candidate Patient 4 had 720m continuous contact with Nurse Anita Sharma (Staff ID: 1) in General Medicine A (2026-08-05T16:00:00 to 2026-08-06T04:00:00)."
       }
     ],
     "transmission_chains": [
@@ -357,18 +468,28 @@
         "hops": [
           {
             "from_id": 1,
-            "via_id": 1,
-            "to_id": 2,
-            "overlap_minutes": 1440.0,
-            "location": "Intensive Care Unit (ICU) -> General Medicine A",
+            "via_id": null,
+            "to_id": 1,
+            "overlap_minutes": 720.0,
+            "location": "Intensive Care Unit (ICU)",
             "start_time": "2026-08-03T16:00:00",
+            "end_time": "2026-08-04T04:00:00",
+            "evidence_id": "EV-STAF-ba8be1d83e3f"
+          },
+          {
+            "from_id": 1,
+            "via_id": null,
+            "to_id": 2,
+            "overlap_minutes": 720.0,
+            "location": "General Medicine A",
+            "start_time": "2026-08-05T16:00:00",
             "end_time": "2026-08-06T04:00:00",
-            "evidence_id": "EV-STAF-3059db8c8709"
+            "evidence_id": "EV-STAF-9ffd99ba2033"
           }
         ],
         "total_overlap_minutes": 1440.0,
         "confidence": 0.964,
-        "description": "Staff-mediated suspected transmission pathway from Rajesh Verma (Index) to Suresh Joshi (Downstream 1) via Nurse Anita Sharma (staff, ID: 1) across Intensive Care Unit (ICU) and General Medicine A."
+        "description": "Staff-mediated suspected transmission pathway from Rajesh Verma (Index) to Suresh Joshi (Downstream 1) via Nurse Anita Sharma (staff, ID: 1) across Intensive Care Unit (ICU) (720m) and General Medicine A (720m)."
       },
       {
         "chain_id": "CHAIN-002",
@@ -395,18 +516,28 @@
         "hops": [
           {
             "from_id": 1,
-            "via_id": 1,
-            "to_id": 3,
-            "overlap_minutes": 1440.0,
-            "location": "Intensive Care Unit (ICU) -> General Medicine A",
+            "via_id": null,
+            "to_id": 1,
+            "overlap_minutes": 720.0,
+            "location": "Intensive Care Unit (ICU)",
             "start_time": "2026-08-03T16:00:00",
+            "end_time": "2026-08-04T04:00:00",
+            "evidence_id": "EV-STAF-83c5ca3b27a4"
+          },
+          {
+            "from_id": 1,
+            "via_id": null,
+            "to_id": 3,
+            "overlap_minutes": 720.0,
+            "location": "General Medicine A",
+            "start_time": "2026-08-05T16:00:00",
             "end_time": "2026-08-06T04:00:00",
-            "evidence_id": "EV-STAF-77b36c89f06c"
+            "evidence_id": "EV-STAF-8e012d6d8edf"
           }
         ],
         "total_overlap_minutes": 1440.0,
         "confidence": 0.964,
-        "description": "Staff-mediated suspected transmission pathway from Rajesh Verma (Index) to Meenakshi Rao (Downstream 2) via Nurse Anita Sharma (staff, ID: 1) across Intensive Care Unit (ICU) and General Medicine A."
+        "description": "Staff-mediated suspected transmission pathway from Rajesh Verma (Index) to Meenakshi Rao (Downstream 2) via Nurse Anita Sharma (staff, ID: 1) across Intensive Care Unit (ICU) (720m) and General Medicine A (720m)."
       },
       {
         "chain_id": "CHAIN-003",
@@ -433,18 +564,28 @@
         "hops": [
           {
             "from_id": 1,
-            "via_id": 1,
-            "to_id": 4,
-            "overlap_minutes": 1440.0,
-            "location": "Intensive Care Unit (ICU) -> General Medicine A",
+            "via_id": null,
+            "to_id": 1,
+            "overlap_minutes": 720.0,
+            "location": "Intensive Care Unit (ICU)",
             "start_time": "2026-08-03T16:00:00",
+            "end_time": "2026-08-04T04:00:00",
+            "evidence_id": "EV-STAF-2dce82615b47"
+          },
+          {
+            "from_id": 1,
+            "via_id": null,
+            "to_id": 4,
+            "overlap_minutes": 720.0,
+            "location": "General Medicine A",
+            "start_time": "2026-08-05T16:00:00",
             "end_time": "2026-08-06T04:00:00",
-            "evidence_id": "EV-STAF-47939ae0c91d"
+            "evidence_id": "EV-STAF-bd06b81cd0ab"
           }
         ],
         "total_overlap_minutes": 1440.0,
         "confidence": 0.964,
-        "description": "Staff-mediated suspected transmission pathway from Rajesh Verma (Index) to Tarun Agarwal (Downstream 3) via Nurse Anita Sharma (staff, ID: 1) across Intensive Care Unit (ICU) and General Medicine A."
+        "description": "Staff-mediated suspected transmission pathway from Rajesh Verma (Index) to Tarun Agarwal (Downstream 3) via Nurse Anita Sharma (staff, ID: 1) across Intensive Care Unit (ICU) (720m) and General Medicine A (720m)."
       }
     ],
     "timeline": [
@@ -515,6 +656,6 @@
     ],
     "summary": "EPIDEMIOLOGICAL INVESTIGATION BRIEFING [SUSPECTED_CLUSTER]: An active cluster of Klebsiella pneumoniae (MDR) was identified centering on Rajesh Verma (Index) (ID: 1). Identified 3 linked candidate cases (Suresh Joshi (Downstream 1), Meenakshi Rao (Downstream 2), Tarun Agarwal (Downstream 3)). Deterministic contact tracing revealed 3 verified staff-mediated contact pathway(s) with high cumulative exposure duration. Overall investigation confidence score: 96.4%. Recommended actions: Enhanced barrier nursing, staff cohorting, environmental disinfection, and active surveillance cultures.",
     "warnings": [],
-    "generated_at": "2026-08-14T19:21:57.481360+00:00"
+    "generated_at": "2026-08-14T19:35:21.491083+00:00"
   }
 }
