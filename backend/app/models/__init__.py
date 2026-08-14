@@ -8,6 +8,7 @@ from app.models.models import (
     Procedure,
     procedure_staff,
     LabReport,
+    LabReportAntibiotic,
 )
 
 __all__ = [
@@ -20,4 +21,5 @@ __all__ = [
     "Procedure",
     "procedure_staff",
     "LabReport",
+    "LabReportAntibiotic",
 ]
