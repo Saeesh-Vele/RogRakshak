@@ -12,7 +12,8 @@ from pathlib import Path
 from typing import Optional, Union, Dict, Any
 from dotenv import load_dotenv
 
-import google.generativeai as genai
+from google import genai
+from google.genai import types
 
 # Ensure backend package imports work
 from app.schemas.lab_report import LabReportExtraction
@@ -29,6 +30,14 @@ elif _root_env.exists():
     load_dotenv(_root_env)
 else:
     load_dotenv()
+
+
+# Pinned deliberately rather than tracking a floating alias such as
+# "gemini-flash-latest": this is the version the extraction oracle in
+# data/lab_reports/extracted_reports.json was validated against, and letting the
+# alias drift silently changes extraction output. Override with GEMINI_MODEL
+# only alongside a re-validation run.
+DEFAULT_GEMINI_MODEL = "gemini-2.5-flash"
 
 
 EXTRACTION_PROMPT = """You are extracting structured information from a synthetic hospital microbiology laboratory report.
@@ -75,14 +84,14 @@ class LabReportExtractionService:
                 "Please set a valid GOOGLE_API_KEY in backend/.env"
             )
 
-        genai.configure(api_key=api_key)
-        self.model_name = model_name or os.getenv("GEMINI_MODEL", "gemini-flash-latest")
-        self.model = genai.GenerativeModel(
-            model_name=self.model_name,
-            generation_config={
-                "response_mime_type": "application/json",
-                "temperature": 0.0,
-            },
+        # google-genai replaces the module-level configure() with a client
+        # instance; generation settings move from the model object onto each
+        # request as a GenerateContentConfig.
+        self.client = genai.Client(api_key=api_key)
+        self.model_name = model_name or os.getenv("GEMINI_MODEL", DEFAULT_GEMINI_MODEL)
+        self.generation_config = types.GenerateContentConfig(
+            response_mime_type="application/json",
+            temperature=0.0,
         )
 
     def extract_from_pdf(self, pdf_path: Union[str, Path]) -> LabReportExtraction:
@@ -97,16 +106,18 @@ class LabReportExtractionService:
         with open(pdf_path, "rb") as f:
             pdf_bytes = f.read()
 
+        # Inline binary parts are now typed Part objects rather than raw dicts.
         contents = [
-            {
-                "mime_type": "application/pdf",
-                "data": pdf_bytes,
-            },
+            types.Part.from_bytes(data=pdf_bytes, mime_type="application/pdf"),
             EXTRACTION_PROMPT,
         ]
 
-        response = self.model.generate_content(contents)
-        raw_text = response.text.strip()
+        response = self.client.models.generate_content(
+            model=self.model_name,
+            contents=contents,
+            config=self.generation_config,
+        )
+        raw_text = (response.text or "").strip()
 
         # Parse JSON
         try:

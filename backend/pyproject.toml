@@ -19,6 +19,7 @@ dependencies = [
     "neo4j",
     "langgraph",
     "langchain-google-genai",
+    "google-genai",
     "reportlab",
     "pytest",
     "httpx",

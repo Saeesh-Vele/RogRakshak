@@ -1,35 +1,30 @@
-"use client";
-
-import type { InvestigationStatus } from "@/types/api";
 import { Badge } from "@/components/ui/badge";
+import type { InvestigationStatus } from "@/types/api";
 
-const statusConfig: Record<
+const STATUS_META: Record<
   InvestigationStatus,
   { label: string; variant: "cluster" | "highPriority" | "potential" | "noSignal" }
 > = {
+  HIGH_PRIORITY_INVESTIGATION: { label: "High Priority", variant: "highPriority" },
   SUSPECTED_CLUSTER: { label: "Suspected Cluster", variant: "cluster" },
-  HIGH_PRIORITY_INVESTIGATION: {
-    label: "High Priority Investigation",
-    variant: "highPriority",
-  },
   POTENTIAL_CONTACT: { label: "Potential Contact", variant: "potential" },
   NO_SIGNAL: { label: "No Signal", variant: "noSignal" },
 };
 
-interface StatusBadgeProps {
+export function StatusBadge({
+  status,
+  className,
+}: {
   status: InvestigationStatus;
   className?: string;
-}
-
-export function StatusBadge({ status, className }: StatusBadgeProps) {
-  const config = statusConfig[status] ?? {
+}) {
+  const meta = STATUS_META[status] ?? {
     label: status,
     variant: "noSignal" as const,
   };
-
   return (
-    <Badge variant={config.variant} className={className}>
-      {config.label}
+    <Badge variant={meta.variant} className={className}>
+      {meta.label}
     </Badge>
   );
 }

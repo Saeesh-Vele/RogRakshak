@@ -163,6 +163,39 @@ export interface CreateInvestigationRequest {
   use_mock_graph: boolean;
 }
 
+// --- Graph endpoints (/graph/*) ---
+
+export interface PatientGraphEventDetails {
+  location_type?: string | null;
+  location_id?: number | null;
+  location_name?: string | null;
+  [key: string]: unknown;
+}
+
+export interface PatientGraphEvent {
+  event_type: string;
+  timestamp: string;
+  end_timestamp?: string | null;
+  description: string;
+  details?: PatientGraphEventDetails | null;
+}
+
+export interface PatientTimelineResponse {
+  patient_id: number;
+  patient_name: string;
+  mrn: string;
+  admission_date?: string | null;
+  discharge_date?: string | null;
+  admitting_diagnosis?: string | null;
+  events: PatientGraphEvent[];
+}
+
+/** Ward / bed placement derived from a patient's movement events. */
+export interface PatientPlacement {
+  ward?: string | null;
+  bed?: string | null;
+}
+
 // --- Health Check ---
 
 export interface HealthResponse {

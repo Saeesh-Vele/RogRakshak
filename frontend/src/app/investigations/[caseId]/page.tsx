@@ -2,28 +2,24 @@
 
 import { useEffect, useState, useCallback } from "react";
 import { useParams } from "next/navigation";
+import Link from "next/link";
 import { getProvider } from "@/lib/data-provider";
 import type { InvestigationCase } from "@/types/api";
 import { useAppStore } from "@/lib/store";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
-import { StatusBadge } from "@/components/investigation/status-badge";
-import { ConfidenceGauge } from "@/components/investigation/confidence-gauge";
+import { CaseHeader } from "@/components/investigation/case-header";
 import { ScoringBreakdownView } from "@/components/investigation/scoring-breakdown";
 import { EvidenceCard } from "@/components/investigation/evidence-card";
 import { TransmissionGraph } from "@/components/investigation/transmission-graph";
 import { TimelineView } from "@/components/investigation/timeline-view";
-import { PatientCard } from "@/components/investigation/patient-card";
-import {
-  AlertTriangle,
-  ArrowLeft,
-  FlaskConical,
-  ShieldAlert,
-  FileText,
-  Users,
-  Clock,
-} from "lucide-react";
-import Link from "next/link";
+import { DiscoveredContacts } from "@/components/investigation/discovered-contacts";
+import { ReportCard } from "@/components/investigation/report-card";
+import { GraphLegend } from "@/components/investigation/transmission-graph";
+import { evidenceTier } from "@/lib/risk";
+import { fetchPatientPlacements } from "@/lib/patient-placement";
+import type { PatientPlacement } from "@/types/api";
+import { AlertTriangle, ArrowLeft } from "lucide-react";
 
 export default function InvestigationDetailPage() {
   const params = useParams();
@@ -33,70 +29,113 @@ export default function InvestigationDetailPage() {
   );
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [rerunning, setRerunning] = useState(false);
+  const [placements, setPlacements] = useState<Record<number, PatientPlacement>>(
+    {}
+  );
 
   const mode = useAppStore((s) => s.mode);
 
-  useEffect(() => {
-    let cancelled = false;
-    async function load() {
-      setLoading(true);
-      setError(null);
-      try {
-        const result = await getProvider().get(caseId);
-        if (!cancelled) {
-          if (result) {
-            setInvestigation(result);
-          } else {
-            setError(`Investigation case '${caseId}' not found.`);
-          }
-        }
-      } catch (err: unknown) {
-        if (!cancelled)
-          setError(err instanceof Error ? err.message : "Failed to load");
-      } finally {
-        if (!cancelled) setLoading(false);
-      }
+  const load = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const result = await getProvider().get(caseId);
+      if (result) setInvestigation(result);
+      else setError(`Investigation case '${caseId}' not found.`);
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Failed to load");
+    } finally {
+      setLoading(false);
     }
-    load();
+  }, [caseId]);
+
+  useEffect(() => {
+    void load();
+  }, [load, mode]);
+
+  // Ward/bed for the graph cards lives on /graph/patient/{id}/timeline, not on
+  // the investigation payload. Loaded separately so a failure here degrades to
+  // cards without a placement line rather than blocking the page.
+  useEffect(() => {
+    if (!investigation || mode === "mock") return;
+    let cancelled = false;
+    const ids = [
+      investigation.index_patient.id,
+      ...investigation.candidate_patients.map((p) => p.id),
+    ];
+    fetchPatientPlacements(ids)
+      .then((p) => {
+        if (!cancelled) setPlacements(p);
+      })
+      .catch(() => undefined);
     return () => {
       cancelled = true;
     };
-  }, [caseId, mode]);
+  }, [investigation, mode]);
+
+  /**
+   * Re-runs the workflow for this case's index patient. The backend derives
+   * case_id from the patient id, so this refreshes the same case in place —
+   * it uses the existing POST endpoint, nothing new.
+   */
+  const onRerun = useCallback(async () => {
+    if (!investigation) return;
+    setRerunning(true);
+    setError(null);
+    try {
+      const updated = await getProvider().create({
+        target_patient_id: investigation.index_patient.id,
+        organism: investigation.organism,
+        resistance_profile: investigation.resistance_profile ?? null,
+        use_mock_graph: false,
+      });
+      setInvestigation(updated);
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Re-run failed");
+    } finally {
+      setRerunning(false);
+    }
+  }, [investigation]);
 
   const onSelectEvidence = useCallback((evidenceId: string) => {
     const el = document.getElementById(`evidence-${evidenceId}`);
     if (el) {
       el.scrollIntoView({ behavior: "smooth", block: "center" });
-      el.classList.add("ring-2", "ring-teal-400");
-      setTimeout(() => el.classList.remove("ring-2", "ring-teal-400"), 2000);
+      el.classList.add("ring-2", "ring-primary");
+      setTimeout(() => el.classList.remove("ring-2", "ring-primary"), 2000);
     }
   }, []);
 
   if (loading) {
     return (
-      <div className="p-6 lg:p-8 flex items-center gap-3 text-slate-400">
-        <div className="w-5 h-5 border-2 border-teal-400 border-t-transparent rounded-full animate-spin" />
-        Loading investigation…
+      <div className="mx-auto max-w-[1400px] p-6 lg:p-8">
+        <div className="flex items-center gap-3 py-16 text-sm text-muted-foreground">
+          <div className="h-4 w-4 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+          Loading investigation…
+        </div>
       </div>
     );
   }
 
   if (error || !investigation) {
     return (
-      <div className="p-6 lg:p-8 space-y-4">
+      <div className="mx-auto max-w-[1400px] space-y-4 p-6 lg:p-8">
         <Link
           href="/investigations"
-          className="flex items-center gap-1 text-sm text-slate-400 hover:text-slate-200"
+          className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground"
         >
-          <ArrowLeft className="w-4 h-4" /> Back to Investigations
+          <ArrowLeft className="h-4 w-4" /> Back to Investigations
         </Link>
-        <Card className="border-rose-500/30">
-          <CardContent className="p-6 flex items-center gap-3 text-rose-400">
-            <AlertTriangle className="w-5 h-5 shrink-0" />
+        <Card>
+          <CardContent className="flex items-start gap-3 p-6">
+            <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-risk-high-foreground" />
             <div>
-              <p className="font-medium">{error || "Investigation not found"}</p>
-              <p className="text-xs text-rose-400/70 mt-1">
-                The case may not exist or the backend may be unavailable.
+              <p className="font-semibold text-foreground">
+                {error || "Investigation not found"}
+              </p>
+              <p className="mt-1 text-sm text-muted-foreground">
+                The case may not exist, or the backend may be unavailable.
               </p>
             </div>
           </CardContent>
@@ -107,69 +146,26 @@ export default function InvestigationDetailPage() {
 
   const inv = investigation;
 
-  // Group evidence by type for the evidence section
-  const staffEvidence = inv.evidence.filter(
-    (e) => e.type === "temporal_staff_overlap"
-  );
-  const labEvidence = inv.evidence.filter(
-    (e) =>
-      e.type === "same_organism" ||
-      e.type === "same_resistance_profile" ||
-      e.type === "temporal_lab_proximity"
-  );
-  const otherEvidence = inv.evidence.filter(
-    (e) =>
-      !staffEvidence.includes(e) && !labEvidence.includes(e)
+  const TIER_RANK = { HIGH: 0, MEDIUM: 1, LOW: 2 } as const;
+  const sortedEvidence = [...inv.evidence].sort(
+    (a, b) =>
+      TIER_RANK[evidenceTier(a)] - TIER_RANK[evidenceTier(b)] ||
+      b.strength - a.strength
   );
 
   return (
-    <div className="p-6 lg:p-8 space-y-8">
-      {/* Back nav */}
-      <Link
-        href="/investigations"
-        className="flex items-center gap-1 text-sm text-slate-400 hover:text-slate-200 transition-colors"
-      >
-        <ArrowLeft className="w-4 h-4" /> Back to Investigations
-      </Link>
+    <div className="mx-auto max-w-[1400px] space-y-6 p-6 lg:p-8">
+      <CaseHeader investigation={inv} onRerun={onRerun} rerunning={rerunning} />
 
-      {/* === HEADER === */}
-      <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-6">
-        <div className="space-y-2 flex-1">
-          <div className="flex items-center gap-3 flex-wrap">
-            <h1 className="text-2xl font-bold text-slate-100">
-              {inv.case_id}
-            </h1>
-            <StatusBadge status={inv.status} />
-          </div>
-          <div className="flex items-center gap-4 text-sm">
-            <span className="flex items-center gap-1.5 text-slate-300">
-              <FlaskConical className="w-4 h-4 text-teal-400" />
-              <em>{inv.organism}</em>
-            </span>
-            {inv.resistance_profile && (
-              <span className="flex items-center gap-1.5 text-slate-300">
-                <ShieldAlert className="w-4 h-4 text-amber-400" />
-                {inv.resistance_profile}
-              </span>
-            )}
-          </div>
-          <p className="text-sm text-slate-400 max-w-2xl leading-relaxed mt-2">
-            {inv.summary}
-          </p>
-        </div>
-        <ConfidenceGauge confidence={inv.confidence} />
-      </div>
-
-      {/* Warnings */}
       {inv.warnings.length > 0 && (
-        <Card className="border-amber-500/20">
-          <CardContent className="p-4 space-y-1">
+        <Card>
+          <CardContent className="space-y-1.5 p-4">
             {inv.warnings.map((w, i) => (
               <div
                 key={i}
-                className="flex items-start gap-2 text-xs text-amber-300"
+                className="flex items-start gap-2 text-sm text-risk-medium-foreground"
               >
-                <AlertTriangle className="w-3 h-3 mt-0.5 shrink-0" />
+                <AlertTriangle className="mt-0.5 h-3.5 w-3.5 shrink-0" />
                 <span>{w}</span>
               </div>
             ))}
@@ -177,107 +173,62 @@ export default function InvestigationDetailPage() {
         </Card>
       )}
 
-      {/* === SCORING === */}
-      <ScoringBreakdownView scoring={inv.scoring} />
+      {/* Timeline + ranked contacts */}
+      <div className="grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,1fr)_400px]">
+        <TimelineView entries={inv.timeline} />
+        <DiscoveredContacts investigation={inv} />
+      </div>
 
-      {/* === TRANSMISSION GRAPH === */}
-      <TransmissionGraph
-        chains={inv.transmission_chains}
-        onSelectEvidence={onSelectEvidence}
-      />
-
-      {/* === PATIENTS === */}
-      <Card>
-        <CardHeader className="pb-3">
-          <CardTitle className="text-base flex items-center gap-2">
-            <Users className="w-4 h-4 text-teal-400" />
-            Patients ({inv.patients.length})
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-            <PatientCard patient={inv.index_patient} />
-            {inv.candidate_patients.map((p) => (
-              <PatientCard key={p.id} patient={p} />
-            ))}
+      <Card className="overflow-hidden">
+        <CardHeader className="gap-3 pb-4">
+          <div className="flex flex-wrap items-start justify-between gap-3">
+            <div>
+              <CardTitle>Transmission Graph</CardTitle>
+              <p className="text-sm text-muted-foreground">
+                {inv.transmission_chains.length} evidence-supported pathway
+                {inv.transmission_chains.length !== 1 ? "s" : ""} · click an edge
+                to jump to its evidence
+              </p>
+            </div>
+            <Link
+              href={`/graph?case=${encodeURIComponent(inv.case_id)}`}
+              className="text-sm font-medium text-primary hover:underline"
+            >
+              Open in Graph Explorer →
+            </Link>
           </div>
-        </CardContent>
+          <GraphLegend />
+        </CardHeader>
+        <div className="border-t border-border">
+          <TransmissionGraph
+            investigation={inv}
+            chains={inv.transmission_chains}
+            placements={placements}
+            onSelectEvidence={onSelectEvidence}
+          />
+        </div>
       </Card>
 
-      {/* === EVIDENCE === */}
+      {/* Evidence, strongest tier first */}
       <Card>
-        <CardHeader className="pb-3">
-          <CardTitle className="text-base flex items-center gap-2">
-            <FileText className="w-4 h-4 text-teal-400" />
-            Evidence ({inv.evidence.length} items)
-          </CardTitle>
-          <p className="text-xs text-slate-400">
-            Each item represents an atomic, verifiable piece of epidemiological
-            evidence. Staff contact hops are displayed separately to preserve
-            provenance.
+        <CardHeader className="pb-4">
+          <CardTitle>Evidence ({inv.evidence.length})</CardTitle>
+          <p className="text-sm text-muted-foreground">
+            Each item is an atomic, independently verifiable observation.
           </p>
         </CardHeader>
-        <CardContent className="space-y-6">
-          {/* Contact / Temporal Evidence */}
-          {staffEvidence.length > 0 && (
-            <div>
-              <h3 className="text-sm font-medium text-slate-300 mb-2">
-                Contact Evidence
-              </h3>
-              <div className="space-y-3">
-                {staffEvidence.map((e) => (
-                  <div key={e.evidence_id} id={`evidence-${e.evidence_id}`} className="transition-all rounded-lg">
-                    <EvidenceCard item={e} />
-                  </div>
-                ))}
-              </div>
+        <CardContent className="grid grid-cols-1 gap-3 lg:grid-cols-2">
+          {sortedEvidence.map((e) => (
+            <div key={e.evidence_id} id={`evidence-${e.evidence_id}`} className="rounded-xl">
+              <EvidenceCard item={e} />
             </div>
-          )}
-
-          {/* Laboratory Evidence */}
-          {labEvidence.length > 0 && (
-            <div>
-              <h3 className="text-sm font-medium text-slate-300 mb-2">
-                Laboratory Evidence
-              </h3>
-              <div className="space-y-3">
-                {labEvidence.map((e) => (
-                  <div key={e.evidence_id} id={`evidence-${e.evidence_id}`} className="transition-all rounded-lg">
-                    <EvidenceCard item={e} />
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Other Evidence */}
-          {otherEvidence.length > 0 && (
-            <div>
-              <h3 className="text-sm font-medium text-slate-300 mb-2">
-                Other Evidence
-              </h3>
-              <div className="space-y-3">
-                {otherEvidence.map((e) => (
-                  <div key={e.evidence_id} id={`evidence-${e.evidence_id}`} className="transition-all rounded-lg">
-                    <EvidenceCard item={e} />
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
+          ))}
         </CardContent>
       </Card>
 
-      {/* === TIMELINE === */}
-      <TimelineView entries={inv.timeline} />
-
-      {/* === META === */}
-      <div className="flex items-center gap-2 text-xs text-slate-600">
-        <Clock className="w-3 h-3" />
-        <span>
-          Generated:{" "}
-          {new Date(inv.generated_at).toLocaleString("en-IN")}
-        </span>
+      <div className="grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,1fr)_420px]">
+        <ReportCard investigation={inv} />
+        <ScoringBreakdownView scoring={inv.scoring} />
       </div>
     </div>
   );

@@ -13,6 +13,7 @@ import type {
   EvidenceItem,
   InvestigationTimelineEntry,
   HealthResponse,
+  PatientTimelineResponse,
 } from "@/types/api";
 
 // --- Error types ---
@@ -129,6 +130,26 @@ export const investigationsApi = {
   async health(): Promise<HealthResponse> {
     try {
       const { data } = await client.get<HealthResponse>("/health");
+      return data;
+    } catch (err) {
+      return handleError(err);
+    }
+  },
+};
+
+/**
+ * Graph endpoints (/graph/*).
+ *
+ * Read-only. Used to enrich transmission-graph nodes with ward/bed placement,
+ * which the investigation payload does not carry.
+ */
+export const graphApi = {
+  /** GET /graph/patient/{id}/timeline */
+  async getPatientTimeline(patientId: number): Promise<PatientTimelineResponse> {
+    try {
+      const { data } = await client.get<PatientTimelineResponse>(
+        `/graph/patient/${patientId}/timeline`
+      );
       return data;
     } catch (err) {
       return handleError(err);
