@@ -13,6 +13,7 @@ import {
 import { useAppStore } from "@/lib/store";
 import { cn } from "@/lib/utils";
 import { ModeToggle } from "@/components/layout/mode-toggle";
+import { Wordmark } from "@/components/layout/wordmark";
 
 /**
  * Only routes that actually exist — no placeholder destinations.
@@ -20,28 +21,11 @@ import { ModeToggle } from "@/components/layout/mode-toggle";
  * investigation detail page, selected by case picker rather than route param.
  */
 const navItems = [
-  { href: "/", label: "Dashboard", icon: LayoutDashboard, exact: true },
+  { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard, exact: true },
   { href: "/investigations", label: "Investigations", icon: FolderSearch },
   { href: "/investigations/new", label: "New Investigation", icon: PlusCircle, exact: true },
   { href: "/graph", label: "Graph Explorer", icon: Network },
 ];
-
-function Wordmark() {
-  return (
-    <Link href="/" className="flex items-center gap-2.5">
-      <span
-        aria-hidden
-        className="relative grid h-8 w-8 place-items-center rounded-lg bg-primary"
-      >
-        <span className="absolute left-1.5 top-1.5 h-2 w-2 rounded-full bg-white/95" />
-        <span className="absolute bottom-1.5 right-1.5 h-2.5 w-2.5 rounded-full bg-[#F97362]" />
-      </span>
-      <span className="text-lg font-bold tracking-tight text-foreground">
-        RogRakshak
-      </span>
-    </Link>
-  );
-}
 
 export function Sidebar() {
   const pathname = usePathname();

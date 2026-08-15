@@ -4,13 +4,15 @@ import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Bell, Search } from "lucide-react";
 import { SearchInput } from "@/components/ui/input";
+import { UserMenu } from "@/components/layout/user-menu";
+import type { DoctorIdentity } from "@/lib/auth";
 
 /**
  * Search is real, not decorative: it drives the same client-side filter the
  * investigations list already implements, via the `q` query param. There is no
  * backend search endpoint, so it deliberately does not pretend to be one.
  */
-export function Topbar() {
+export function Topbar({ doctor }: { doctor: DoctorIdentity | null }) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -52,12 +54,7 @@ export function Topbar() {
         >
           <Bell className="h-[19px] w-[19px]" />
         </button>
-        <div
-          aria-label="Signed in user"
-          className="grid h-9 w-9 place-items-center rounded-full bg-muted text-[0.8125rem] font-semibold text-muted-foreground"
-        >
-          DR
-        </div>
+        <UserMenu doctor={doctor} />
       </div>
     </header>
   );

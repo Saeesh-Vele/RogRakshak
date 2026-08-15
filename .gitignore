@@ -28,6 +28,10 @@ pnpm-debug.log*
 # Environment Variables
 .env
 .env.local
+# Supabase service_role key used by scripts/create_doctor.py. Already covered by
+# the .env.local pattern above; spelled out because leaking this key would hand
+# over every user record in the project.
+scripts/.env.local
 .env.development.local
 .env.test.local
 .env.production.local
