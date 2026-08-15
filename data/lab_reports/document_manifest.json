@@ -1,0 +1,162 @@
+[
+  {
+    "lab_report_id": 1,
+    "patient_id": 1,
+    "document_path": "data/lab_reports/lab_report_001.pdf",
+    "organism": "Klebsiella pneumoniae",
+    "resistance_profile": "MDR",
+    "specimen_type": "Endotracheal Aspirate",
+    "collected_at": "2026-08-03T17:00:00",
+    "reported_at": "2026-08-05T19:00:00"
+  },
+  {
+    "lab_report_id": 2,
+    "patient_id": 2,
+    "document_path": "data/lab_reports/lab_report_002.pdf",
+    "organism": "Klebsiella pneumoniae",
+    "resistance_profile": "MDR",
+    "specimen_type": "Sputum",
+    "collected_at": "2026-08-07T18:00:00",
+    "reported_at": "2026-08-09T22:00:00"
+  },
+  {
+    "lab_report_id": 3,
+    "patient_id": 3,
+    "document_path": "data/lab_reports/lab_report_003.pdf",
+    "organism": "Klebsiella pneumoniae",
+    "resistance_profile": "MDR",
+    "specimen_type": "Blood Culture",
+    "collected_at": "2026-08-08T19:00:00",
+    "reported_at": "2026-08-11T00:00:00"
+  },
+  {
+    "lab_report_id": 4,
+    "patient_id": 4,
+    "document_path": "data/lab_reports/lab_report_004.pdf",
+    "organism": "Klebsiella pneumoniae",
+    "resistance_profile": "MDR",
+    "specimen_type": "Wound Swab",
+    "collected_at": "2026-08-08T23:00:00",
+    "reported_at": "2026-08-11T02:00:00"
+  },
+  {
+    "lab_report_id": 5,
+    "patient_id": 6,
+    "document_path": "data/lab_reports/lab_report_005.pdf",
+    "organism": "Escherichia coli",
+    "resistance_profile": "susceptible",
+    "specimen_type": "Urine",
+    "collected_at": "2026-08-05T19:00:00",
+    "reported_at": "2026-08-07T23:00:00"
+  },
+  {
+    "lab_report_id": 6,
+    "patient_id": 7,
+    "document_path": "data/lab_reports/lab_report_006.pdf",
+    "organism": "Staphylococcus aureus",
+    "resistance_profile": "susceptible",
+    "specimen_type": "Wound Swab",
+    "collected_at": "2026-08-04T02:00:00",
+    "reported_at": "2026-08-06T06:00:00"
+  },
+  {
+    "lab_report_id": 7,
+    "patient_id": 8,
+    "document_path": "data/lab_reports/lab_report_007.pdf",
+    "organism": "Pseudomonas aeruginosa",
+    "resistance_profile": "susceptible",
+    "specimen_type": "Sputum",
+    "collected_at": "2026-08-02T18:00:00",
+    "reported_at": "2026-08-04T22:00:00"
+  },
+  {
+    "lab_report_id": 8,
+    "patient_id": 9,
+    "document_path": "data/lab_reports/lab_report_008.pdf",
+    "organism": "Enterococcus faecalis",
+    "resistance_profile": "susceptible",
+    "specimen_type": "Urine",
+    "collected_at": "2026-08-11T02:00:00",
+    "reported_at": "2026-08-13T06:00:00"
+  },
+  {
+    "lab_report_id": 9,
+    "patient_id": 10,
+    "document_path": "data/lab_reports/lab_report_009.pdf",
+    "organism": "Streptococcus pneumoniae",
+    "resistance_profile": "susceptible",
+    "specimen_type": "Blood Culture",
+    "collected_at": "2026-08-06T04:00:00",
+    "reported_at": "2026-08-08T08:00:00"
+  },
+  {
+    "lab_report_id": 10,
+    "patient_id": 11,
+    "document_path": "data/lab_reports/lab_report_010.pdf",
+    "organism": "Candida albicans",
+    "resistance_profile": "susceptible",
+    "specimen_type": "Urine",
+    "collected_at": "2026-08-06T00:00:00",
+    "reported_at": "2026-08-08T04:00:00"
+  },
+  {
+    "lab_report_id": 11,
+    "patient_id": 12,
+    "document_path": "data/lab_reports/lab_report_011.pdf",
+    "organism": "Escherichia coli",
+    "resistance_profile": "susceptible",
+    "specimen_type": "Urine",
+    "collected_at": "2026-08-03T05:00:00",
+    "reported_at": "2026-08-05T09:00:00"
+  },
+  {
+    "lab_report_id": 12,
+    "patient_id": 13,
+    "document_path": "data/lab_reports/lab_report_012.pdf",
+    "organism": "Staphylococcus aureus",
+    "resistance_profile": "susceptible",
+    "specimen_type": "Wound Swab",
+    "collected_at": "2026-08-07T21:00:00",
+    "reported_at": "2026-08-10T01:00:00"
+  },
+  {
+    "lab_report_id": 13,
+    "patient_id": 14,
+    "document_path": "data/lab_reports/lab_report_013.pdf",
+    "organism": "Pseudomonas aeruginosa",
+    "resistance_profile": "susceptible",
+    "specimen_type": "Sputum",
+    "collected_at": "2026-08-07T18:00:00",
+    "reported_at": "2026-08-09T22:00:00"
+  },
+  {
+    "lab_report_id": 14,
+    "patient_id": 15,
+    "document_path": "data/lab_reports/lab_report_014.pdf",
+    "organism": "Enterococcus faecalis",
+    "resistance_profile": "susceptible",
+    "specimen_type": "Urine",
+    "collected_at": "2026-08-03T22:00:00",
+    "reported_at": "2026-08-06T02:00:00"
+  },
+  {
+    "lab_report_id": 15,
+    "patient_id": 16,
+    "document_path": "data/lab_reports/lab_report_015.pdf",
+    "organism": "Streptococcus pneumoniae",
+    "resistance_profile": "susceptible",
+    "specimen_type": "Blood Culture",
+    "collected_at": "2026-08-07T05:00:00",
+    "reported_at": "2026-08-09T09:00:00"
+  },
+  {
+    "lab_report_id": 16,
+    "patient_id": 17,
+    "document_path": "data/lab_reports/lab_report_016.pdf",
+    "organism": "Candida albicans",
+    "resistance_profile": "susceptible",
+    "specimen_type": "Urine",
+    "collected_at": "2026-08-10T18:00:00",
+    "reported_at": "2026-08-12T22:00:00"
+  }
+]

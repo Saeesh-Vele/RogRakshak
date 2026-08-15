@@ -1,0 +1,2116 @@
+{
+  "summary": {
+    "total_extracted_reports": 16,
+    "database_total_reports": 16,
+    "validation_passed": 16,
+    "validation_failed": 0,
+    "missing_reports": 0,
+    "exact_validated_matches": 16,
+    "exact_match_rate": 100.0
+  },
+  "field_validation": {
+    "report_id": {
+      "matched": 16,
+      "total": 16,
+      "accuracy_percent": 100.0
+    },
+    "patient_id": {
+      "matched": 16,
+      "total": 16,
+      "accuracy_percent": 100.0
+    },
+    "patient_name": {
+      "matched": 16,
+      "total": 16,
+      "accuracy_percent": 100.0
+    },
+    "mrn": {
+      "matched": 16,
+      "total": 16,
+      "accuracy_percent": 100.0
+    },
+    "specimen_type": {
+      "matched": 16,
+      "total": 16,
+      "accuracy_percent": 100.0
+    },
+    "organism": {
+      "matched": 16,
+      "total": 16,
+      "accuracy_percent": 100.0
+    },
+    "resistance_profile": {
+      "matched": 16,
+      "total": 16,
+      "accuracy_percent": 100.0
+    },
+    "collected_at": {
+      "matched": 16,
+      "total": 16,
+      "accuracy_percent": 100.0
+    },
+    "reported_at": {
+      "matched": 16,
+      "total": 16,
+      "accuracy_percent": 100.0
+    }
+  },
+  "reports": [
+    {
+      "report_id": 1,
+      "source_document": "data/lab_reports/lab_report_001.pdf",
+      "validation_status": "passed",
+      "field_results": {
+        "report_id": {
+          "expected": 1,
+          "actual": 1,
+          "match": true
+        },
+        "patient_id": {
+          "expected": 1,
+          "actual": 1,
+          "match": true
+        },
+        "patient_name": {
+          "expected": "Rajesh Verma (Index)",
+          "actual": "Rajesh Verma (Index)",
+          "match": true
+        },
+        "mrn": {
+          "expected": "MRN-2026-1001",
+          "actual": "MRN-2026-1001",
+          "match": true
+        },
+        "specimen_type": {
+          "expected": "Endotracheal Aspirate",
+          "actual": "Endotracheal Aspirate",
+          "match": true
+        },
+        "organism": {
+          "expected": "Klebsiella pneumoniae",
+          "actual": "Klebsiella pneumoniae",
+          "match": true
+        },
+        "resistance_profile": {
+          "expected": "MDR",
+          "actual": "MDR",
+          "match": true
+        },
+        "collected_at": {
+          "expected": "2026-08-03T17:00:00",
+          "actual": "2026-08-03T17:00:00",
+          "match": true
+        },
+        "reported_at": {
+          "expected": "2026-08-05T19:00:00",
+          "actual": "2026-08-05T19:00:00",
+          "match": true
+        }
+      },
+      "mismatches": [],
+      "extracted_data": {
+        "report_id": 1,
+        "patient_name": "Rajesh Verma (Index)",
+        "patient_id": 1,
+        "mrn": "MRN-2026-1001",
+        "specimen_type": "Endotracheal Aspirate",
+        "collected_at": "2026-08-03T17:00:00",
+        "received_at": "2026-08-03T17:45:00",
+        "reported_at": "2026-08-05T19:00:00",
+        "organism": "Klebsiella pneumoniae",
+        "resistance_profile": "MDR",
+        "culture_result": "Significant Pure Growth: > 10^5 CFU/mL isolated on selective and non-selective media.",
+        "antimicrobial_susceptibility": [
+          {
+            "antibiotic": "Ampicillin",
+            "result": "Resistant (R)",
+            "mic": "> 32 ug/mL",
+            "interp": "R"
+          },
+          {
+            "antibiotic": "Amoxicillin / Clavulanate",
+            "result": "Resistant (R)",
+            "mic": "> 32/16 ug/mL",
+            "interp": "R"
+          },
+          {
+            "antibiotic": "Piperacillin / Tazobactam",
+            "result": "Resistant (R)",
+            "mic": "> 128/4 ug/mL",
+            "interp": "R"
+          },
+          {
+            "antibiotic": "Ceftriaxone",
+            "result": "Resistant (R)",
+            "mic": "> 64 ug/mL",
+            "interp": "R"
+          },
+          {
+            "antibiotic": "Ceftazidime",
+            "result": "Resistant (R)",
+            "mic": "> 64 ug/mL",
+            "interp": "R"
+          },
+          {
+            "antibiotic": "Cefepime",
+            "result": "Resistant (R)",
+            "mic": "> 32 ug/mL",
+            "interp": "R"
+          },
+          {
+            "antibiotic": "Meropenem",
+            "result": "Resistant (R)",
+            "mic": "> 16 ug/mL",
+            "interp": "R"
+          },
+          {
+            "antibiotic": "Imipenem",
+            "result": "Resistant (R)",
+            "mic": "> 16 ug/mL",
+            "interp": "R"
+          },
+          {
+            "antibiotic": "Ertapenem",
+            "result": "Resistant (R)",
+            "mic": "> 8 ug/mL",
+            "interp": "R"
+          },
+          {
+            "antibiotic": "Ciprofloxacin",
+            "result": "Resistant (R)",
+            "mic": "> 4 ug/mL",
+            "interp": "R"
+          },
+          {
+            "antibiotic": "Levofloxacin",
+            "result": "Resistant (R)",
+            "mic": "> 8 ug/mL",
+            "interp": "R"
+          },
+          {
+            "antibiotic": "Gentamicin",
+            "result": "Resistant (R)",
+            "mic": "> 16 ug/mL",
+            "interp": "R"
+          },
+          {
+            "antibiotic": "Amikacin",
+            "result": "Intermediate (I)",
+            "mic": "32 ug/mL",
+            "interp": "I"
+          },
+          {
+            "antibiotic": "Trimethoprim / Sulfamethoxazole",
+            "result": "Resistant (R)",
+            "mic": "> 4/76 ug/mL",
+            "interp": "R"
+          },
+          {
+            "antibiotic": "Colistin",
+            "result": "Susceptible (S)",
+            "mic": "<= 0.5 ug/mL",
+            "interp": "S"
+          },
+          {
+            "antibiotic": "Tigecycline",
+            "result": "Susceptible (S)",
+            "mic": "<= 0.5 ug/mL",
+            "interp": "S"
+          }
+        ],
+        "interpretation": "*** INFECTION CONTROL ALERT: MULTIDRUG-RESISTANT ORGANISM DETECTED ***\nIsolated organism Klebsiella pneumoniae demonstrates resistance to multiple antimicrobial classes including extended-spectrum beta-lactams, carbapenems, fluoroquinolones, and aminoglycosides.\nRecommendation: Place patient under STRICT CONTACT PRECAUTIONS. Notify Hospital Infection Control Committee (HICC).\nAntimicrobial stewardship consultation advised.",
+        "status": "FINAL"
+      }
+    },
+    {
+      "report_id": 2,
+      "source_document": "data/lab_reports/lab_report_002.pdf",
+      "validation_status": "passed",
+      "field_results": {
+        "report_id": {
+          "expected": 2,
+          "actual": 2,
+          "match": true
+        },
+        "patient_id": {
+          "expected": 2,
+          "actual": 2,
+          "match": true
+        },
+        "patient_name": {
+          "expected": "Suresh Joshi (Downstream 1)",
+          "actual": "Suresh Joshi (Downstream 1)",
+          "match": true
+        },
+        "mrn": {
+          "expected": "MRN-2026-1002",
+          "actual": "MRN-2026-1002",
+          "match": true
+        },
+        "specimen_type": {
+          "expected": "Sputum",
+          "actual": "Sputum",
+          "match": true
+        },
+        "organism": {
+          "expected": "Klebsiella pneumoniae",
+          "actual": "Klebsiella pneumoniae",
+          "match": true
+        },
+        "resistance_profile": {
+          "expected": "MDR",
+          "actual": "MDR",
+          "match": true
+        },
+        "collected_at": {
+          "expected": "2026-08-07T18:00:00",
+          "actual": "2026-08-07T18:00:00",
+          "match": true
+        },
+        "reported_at": {
+          "expected": "2026-08-09T22:00:00",
+          "actual": "2026-08-09T22:00:00",
+          "match": true
+        }
+      },
+      "mismatches": [],
+      "extracted_data": {
+        "report_id": 2,
+        "patient_name": "Suresh Joshi (Downstream 1)",
+        "patient_id": 2,
+        "mrn": "MRN-2026-1002",
+        "specimen_type": "Sputum",
+        "collected_at": "2026-08-07T18:00:00",
+        "received_at": "2026-08-07T18:45:00",
+        "reported_at": "2026-08-09T22:00:00",
+        "organism": "Klebsiella pneumoniae",
+        "resistance_profile": "MDR",
+        "culture_result": "Significant Pure Growth: > 10^5 CFU/mL isolated on selective and non-selective media.",
+        "antimicrobial_susceptibility": [
+          {
+            "antibiotic": "Ampicillin",
+            "result": "Resistant (R)",
+            "mic": "> 32 ug/mL",
+            "interp": "R"
+          },
+          {
+            "antibiotic": "Amoxicillin / Clavulanate",
+            "result": "Resistant (R)",
+            "mic": "> 32/16 ug/mL",
+            "interp": "R"
+          },
+          {
+            "antibiotic": "Piperacillin / Tazobactam",
+            "result": "Resistant (R)",
+            "mic": "> 128/4 ug/mL",
+            "interp": "R"
+          },
+          {
+            "antibiotic": "Ceftriaxone",
+            "result": "Resistant (R)",
+            "mic": "> 64 ug/mL",
+            "interp": "R"
+          },
+          {
+            "antibiotic": "Ceftazidime",
+            "result": "Resistant (R)",
+            "mic": "> 64 ug/mL",
+            "interp": "R"
+          },
+          {
+            "antibiotic": "Cefepime",
+            "result": "Resistant (R)",
+            "mic": "> 32 ug/mL",
+            "interp": "R"
+          },
+          {
+            "antibiotic": "Meropenem",
+            "result": "Resistant (R)",
+            "mic": "> 16 ug/mL",
+            "interp": "R"
+          },
+          {
+            "antibiotic": "Imipenem",
+            "result": "Resistant (R)",
+            "mic": "> 16 ug/mL",
+            "interp": "R"
+          },
+          {
+            "antibiotic": "Ertapenem",
+            "result": "Resistant (R)",
+            "mic": "> 8 ug/mL",
+            "interp": "R"
+          },
+          {
+            "antibiotic": "Ciprofloxacin",
+            "result": "Resistant (R)",
+            "mic": "> 4 ug/mL",
+            "interp": "R"
+          },
+          {
+            "antibiotic": "Levofloxacin",
+            "result": "Resistant (R)",
+            "mic": "> 8 ug/mL",
+            "interp": "R"
+          },
+          {
+            "antibiotic": "Gentamicin",
+            "result": "Resistant (R)",
+            "mic": "> 16 ug/mL",
+            "interp": "R"
+          },
+          {
+            "antibiotic": "Amikacin",
+            "result": "Intermediate (I)",
+            "mic": "32 ug/mL",
+            "interp": "I"
+          },
+          {
+            "antibiotic": "Trimethoprim / Sulfamethoxazole",
+            "result": "Resistant (R)",
+            "mic": "> 4/76 ug/mL",
+            "interp": "R"
+          },
+          {
+            "antibiotic": "Colistin",
+            "result": "Susceptible (S)",
+            "mic": "<= 0.5 ug/mL",
+            "interp": "S"
+          },
+          {
+            "antibiotic": "Tigecycline",
+            "result": "Susceptible (S)",
+            "mic": "<= 0.5 ug/mL",
+            "interp": "S"
+          }
+        ],
+        "interpretation": "*** INFECTION CONTROL ALERT: MULTIDRUG-RESISTANT ORGANISM DETECTED *** Isolated organism Klebsiella pneumoniae demonstrates resistance to multiple antimicrobial classes including extended-spectrum beta-lactams, carbapenems, fluoroquinolones, and aminoglycosides. Recommendation: Place patient under STRICT CONTACT PRECAUTIONS. Notify Hospital Infection Control Committee (HICC). Antimicrobial stewardship consultation advised.",
+        "status": "FINAL"
+      }
+    },
+    {
+      "report_id": 3,
+      "source_document": "data/lab_reports/lab_report_003.pdf",
+      "validation_status": "passed",
+      "field_results": {
+        "report_id": {
+          "expected": 3,
+          "actual": 3,
+          "match": true
+        },
+        "patient_id": {
+          "expected": 3,
+          "actual": 3,
+          "match": true
+        },
+        "patient_name": {
+          "expected": "Meenakshi Rao (Downstream 2)",
+          "actual": "Meenakshi Rao (Downstream 2)",
+          "match": true
+        },
+        "mrn": {
+          "expected": "MRN-2026-1003",
+          "actual": "MRN-2026-1003",
+          "match": true
+        },
+        "specimen_type": {
+          "expected": "Blood Culture",
+          "actual": "Blood Culture",
+          "match": true
+        },
+        "organism": {
+          "expected": "Klebsiella pneumoniae",
+          "actual": "Klebsiella pneumoniae",
+          "match": true
+        },
+        "resistance_profile": {
+          "expected": "MDR",
+          "actual": "MDR",
+          "match": true
+        },
+        "collected_at": {
+          "expected": "2026-08-08T19:00:00",
+          "actual": "2026-08-08T19:00:00",
+          "match": true
+        },
+        "reported_at": {
+          "expected": "2026-08-11T00:00:00",
+          "actual": "2026-08-11T00:00:00",
+          "match": true
+        }
+      },
+      "mismatches": [],
+      "extracted_data": {
+        "report_id": 3,
+        "patient_name": "Meenakshi Rao (Downstream 2)",
+        "patient_id": 3,
+        "mrn": "MRN-2026-1003",
+        "specimen_type": "Blood Culture",
+        "collected_at": "2026-08-08T19:00:00",
+        "received_at": "2026-08-08T19:45:00",
+        "reported_at": "2026-08-11T00:00:00",
+        "organism": "Klebsiella pneumoniae",
+        "resistance_profile": "MDR",
+        "culture_result": "Significant Pure Growth: > 10^5 CFU/mL isolated on selective and non-selective media.",
+        "antimicrobial_susceptibility": [
+          {
+            "antibiotic": "Ampicillin",
+            "result": "Resistant (R)",
+            "mic": "> 32 ug/mL",
+            "interp": "R"
+          },
+          {
+            "antibiotic": "Amoxicillin / Clavulanate",
+            "result": "Resistant (R)",
+            "mic": "> 32/16 ug/mL",
+            "interp": "R"
+          },
+          {
+            "antibiotic": "Piperacillin / Tazobactam",
+            "result": "Resistant (R)",
+            "mic": "> 128/4 ug/mL",
+            "interp": "R"
+          },
+          {
+            "antibiotic": "Ceftriaxone",
+            "result": "Resistant (R)",
+            "mic": "> 64 ug/mL",
+            "interp": "R"
+          },
+          {
+            "antibiotic": "Ceftazidime",
+            "result": "Resistant (R)",
+            "mic": "> 64 ug/mL",
+            "interp": "R"
+          },
+          {
+            "antibiotic": "Cefepime",
+            "result": "Resistant (R)",
+            "mic": "> 32 ug/mL",
+            "interp": "R"
+          },
+          {
+            "antibiotic": "Meropenem",
+            "result": "Resistant (R)",
+            "mic": "> 16 ug/mL",
+            "interp": "R"
+          },
+          {
+            "antibiotic": "Imipenem",
+            "result": "Resistant (R)",
+            "mic": "> 16 ug/mL",
+            "interp": "R"
+          },
+          {
+            "antibiotic": "Ertapenem",
+            "result": "Resistant (R)",
+            "mic": "> 8 ug/mL",
+            "interp": "R"
+          },
+          {
+            "antibiotic": "Ciprofloxacin",
+            "result": "Resistant (R)",
+            "mic": "> 4 ug/mL",
+            "interp": "R"
+          },
+          {
+            "antibiotic": "Levofloxacin",
+            "result": "Resistant (R)",
+            "mic": "> 8 ug/mL",
+            "interp": "R"
+          },
+          {
+            "antibiotic": "Gentamicin",
+            "result": "Resistant (R)",
+            "mic": "> 16 ug/mL",
+            "interp": "R"
+          },
+          {
+            "antibiotic": "Amikacin",
+            "result": "Intermediate (I)",
+            "mic": "32 ug/mL",
+            "interp": "I"
+          },
+          {
+            "antibiotic": "Trimethoprim / Sulfamethoxazole",
+            "result": "Resistant (R)",
+            "mic": "> 4/76 ug/mL",
+            "interp": "R"
+          },
+          {
+            "antibiotic": "Colistin",
+            "result": "Susceptible (S)",
+            "mic": "<= 0.5 ug/mL",
+            "interp": "S"
+          },
+          {
+            "antibiotic": "Tigecycline",
+            "result": "Susceptible (S)",
+            "mic": "<= 0.5 ug/mL",
+            "interp": "S"
+          }
+        ],
+        "interpretation": "*** INFECTION CONTROL ALERT: MULTIDRUG-RESISTANT ORGANISM DETECTED ***\nIsolated organism Klebsiella pneumoniae demonstrates resistance to multiple antimicrobial classes including extended-spectrum beta-lactams, carbapenems, fluoroquinolones, and aminoglycosides.\nRecommendation: Place patient under STRICT CONTACT PRECAUTIONS. Notify Hospital Infection Control Committee (HICC).\nAntimicrobial stewardship consultation advised.",
+        "status": "FINAL"
+      }
+    },
+    {
+      "report_id": 4,
+      "source_document": "data/lab_reports/lab_report_004.pdf",
+      "validation_status": "passed",
+      "field_results": {
+        "report_id": {
+          "expected": 4,
+          "actual": 4,
+          "match": true
+        },
+        "patient_id": {
+          "expected": 4,
+          "actual": 4,
+          "match": true
+        },
+        "patient_name": {
+          "expected": "Tarun Agarwal (Downstream 3)",
+          "actual": "Tarun Agarwal (Downstream 3)",
+          "match": true
+        },
+        "mrn": {
+          "expected": "MRN-2026-1004",
+          "actual": "MRN-2026-1004",
+          "match": true
+        },
+        "specimen_type": {
+          "expected": "Wound Swab",
+          "actual": "Wound Swab",
+          "match": true
+        },
+        "organism": {
+          "expected": "Klebsiella pneumoniae",
+          "actual": "Klebsiella pneumoniae",
+          "match": true
+        },
+        "resistance_profile": {
+          "expected": "MDR",
+          "actual": "MDR",
+          "match": true
+        },
+        "collected_at": {
+          "expected": "2026-08-08T23:00:00",
+          "actual": "2026-08-08T23:00:00",
+          "match": true
+        },
+        "reported_at": {
+          "expected": "2026-08-11T02:00:00",
+          "actual": "2026-08-11T02:00:00",
+          "match": true
+        }
+      },
+      "mismatches": [],
+      "extracted_data": {
+        "report_id": 4,
+        "patient_name": "Tarun Agarwal (Downstream 3)",
+        "patient_id": 4,
+        "mrn": "MRN-2026-1004",
+        "specimen_type": "Wound Swab",
+        "collected_at": "2026-08-08T23:00:00",
+        "received_at": "2026-08-08T23:45:00",
+        "reported_at": "2026-08-11T02:00:00",
+        "organism": "Klebsiella pneumoniae",
+        "resistance_profile": "MDR",
+        "culture_result": "Significant Pure Growth: > 10^5 CFU/mL isolated on selective and non-selective media.",
+        "antimicrobial_susceptibility": [
+          {
+            "antibiotic": "Ampicillin",
+            "result": "Resistant (R)",
+            "mic": "> 32 ug/mL",
+            "interp": "R"
+          },
+          {
+            "antibiotic": "Amoxicillin / Clavulanate",
+            "result": "Resistant (R)",
+            "mic": "> 32/16 ug/mL",
+            "interp": "R"
+          },
+          {
+            "antibiotic": "Piperacillin / Tazobactam",
+            "result": "Resistant (R)",
+            "mic": "> 128/4 ug/mL",
+            "interp": "R"
+          },
+          {
+            "antibiotic": "Ceftriaxone",
+            "result": "Resistant (R)",
+            "mic": "> 64 ug/mL",
+            "interp": "R"
+          },
+          {
+            "antibiotic": "Ceftazidime",
+            "result": "Resistant (R)",
+            "mic": "> 64 ug/mL",
+            "interp": "R"
+          },
+          {
+            "antibiotic": "Cefepime",
+            "result": "Resistant (R)",
+            "mic": "> 32 ug/mL",
+            "interp": "R"
+          },
+          {
+            "antibiotic": "Meropenem",
+            "result": "Resistant (R)",
+            "mic": "> 16 ug/mL",
+            "interp": "R"
+          },
+          {
+            "antibiotic": "Imipenem",
+            "result": "Resistant (R)",
+            "mic": "> 16 ug/mL",
+            "interp": "R"
+          },
+          {
+            "antibiotic": "Ertapenem",
+            "result": "Resistant (R)",
+            "mic": "> 8 ug/mL",
+            "interp": "R"
+          },
+          {
+            "antibiotic": "Ciprofloxacin",
+            "result": "Resistant (R)",
+            "mic": "> 4 ug/mL",
+            "interp": "R"
+          },
+          {
+            "antibiotic": "Levofloxacin",
+            "result": "Resistant (R)",
+            "mic": "> 8 ug/mL",
+            "interp": "R"
+          },
+          {
+            "antibiotic": "Gentamicin",
+            "result": "Resistant (R)",
+            "mic": "> 16 ug/mL",
+            "interp": "R"
+          },
+          {
+            "antibiotic": "Amikacin",
+            "result": "Intermediate (I)",
+            "mic": "32 ug/mL",
+            "interp": "I"
+          },
+          {
+            "antibiotic": "Trimethoprim / Sulfamethoxazole",
+            "result": "Resistant (R)",
+            "mic": "> 4/76 ug/mL",
+            "interp": "R"
+          },
+          {
+            "antibiotic": "Colistin",
+            "result": "Susceptible (S)",
+            "mic": "<= 0.5 ug/mL",
+            "interp": "S"
+          },
+          {
+            "antibiotic": "Tigecycline",
+            "result": "Susceptible (S)",
+            "mic": "<= 0.5 ug/mL",
+            "interp": "S"
+          }
+        ],
+        "interpretation": "*** INFECTION CONTROL ALERT: MULTIDRUG-RESISTANT ORGANISM DETECTED ***\nIsolated organism Klebsiella pneumoniae demonstrates resistance to multiple antimicrobial classes including extended-spectrum beta-lactams, carbapenems, fluoroquinolones, and aminoglycosides.\nRecommendation: Place patient under STRICT CONTACT PRECAUTIONS. Notify Hospital Infection Control Committee (HICC).\nAntimicrobial stewardship consultation advised.",
+        "status": "FINAL"
+      }
+    },
+    {
+      "report_id": 5,
+      "source_document": "data/lab_reports/lab_report_005.pdf",
+      "validation_status": "passed",
+      "field_results": {
+        "report_id": {
+          "expected": 5,
+          "actual": 5,
+          "match": true
+        },
+        "patient_id": {
+          "expected": 6,
+          "actual": 6,
+          "match": true
+        },
+        "patient_name": {
+          "expected": "Kavita Sharma",
+          "actual": "Kavita Sharma",
+          "match": true
+        },
+        "mrn": {
+          "expected": "MRN-2026-1006",
+          "actual": "MRN-2026-1006",
+          "match": true
+        },
+        "specimen_type": {
+          "expected": "Urine",
+          "actual": "Urine",
+          "match": true
+        },
+        "organism": {
+          "expected": "Escherichia coli",
+          "actual": "Escherichia coli",
+          "match": true
+        },
+        "resistance_profile": {
+          "expected": "susceptible",
+          "actual": "susceptible",
+          "match": true
+        },
+        "collected_at": {
+          "expected": "2026-08-05T19:00:00",
+          "actual": "2026-08-05T19:00:00",
+          "match": true
+        },
+        "reported_at": {
+          "expected": "2026-08-07T23:00:00",
+          "actual": "2026-08-07T23:00:00",
+          "match": true
+        }
+      },
+      "mismatches": [],
+      "extracted_data": {
+        "report_id": 5,
+        "patient_name": "Kavita Sharma",
+        "patient_id": 6,
+        "mrn": "MRN-2026-1006",
+        "specimen_type": "Urine",
+        "collected_at": "2026-08-05T19:00:00",
+        "received_at": "2026-08-05T19:45:00",
+        "reported_at": "2026-08-07T23:00:00",
+        "organism": "Escherichia coli",
+        "resistance_profile": "susceptible",
+        "culture_result": "Significant Pure Growth: > 10^5 CFU/mL isolated on selective and non-selective media.",
+        "antimicrobial_susceptibility": [
+          {
+            "antibiotic": "Ampicillin",
+            "result": "Susceptible (S)",
+            "mic": "<= 2 ug/mL",
+            "interp": "S"
+          },
+          {
+            "antibiotic": "Amoxicillin / Clavulanate",
+            "result": "Susceptible (S)",
+            "mic": "<= 4/2 ug/mL",
+            "interp": "S"
+          },
+          {
+            "antibiotic": "Ceftriaxone",
+            "result": "Susceptible (S)",
+            "mic": "<= 0.5 ug/mL",
+            "interp": "S"
+          },
+          {
+            "antibiotic": "Cefepime",
+            "result": "Susceptible (S)",
+            "mic": "<= 1 ug/mL",
+            "interp": "S"
+          },
+          {
+            "antibiotic": "Meropenem",
+            "result": "Susceptible (S)",
+            "mic": "<= 0.25 ug/mL",
+            "interp": "S"
+          },
+          {
+            "antibiotic": "Ciprofloxacin",
+            "result": "Susceptible (S)",
+            "mic": "<= 0.25 ug/mL",
+            "interp": "S"
+          },
+          {
+            "antibiotic": "Gentamicin",
+            "result": "Susceptible (S)",
+            "mic": "<= 1 ug/mL",
+            "interp": "S"
+          },
+          {
+            "antibiotic": "Nitrofurantoin",
+            "result": "Susceptible (S)",
+            "mic": "<= 16 ug/mL",
+            "interp": "S"
+          },
+          {
+            "antibiotic": "Trimethoprim / Sulfamethoxazole",
+            "result": "Susceptible (S)",
+            "mic": "<= 1/19 ug/mL",
+            "interp": "S"
+          }
+        ],
+        "interpretation": "Isolated strain of Escherichia coli exhibits standard wild-type susceptible antimicrobial profile. No high-level or extended-spectrum acquired resistance detected. Therapy should be directed based on documented clinical susceptibility and site of infection.",
+        "status": "FINAL"
+      }
+    },
+    {
+      "report_id": 6,
+      "source_document": "data/lab_reports/lab_report_006.pdf",
+      "validation_status": "passed",
+      "field_results": {
+        "report_id": {
+          "expected": 6,
+          "actual": 6,
+          "match": true
+        },
+        "patient_id": {
+          "expected": 7,
+          "actual": 7,
+          "match": true
+        },
+        "patient_name": {
+          "expected": "Gaurav Gupta",
+          "actual": "Gaurav Gupta",
+          "match": true
+        },
+        "mrn": {
+          "expected": "MRN-2026-1007",
+          "actual": "MRN-2026-1007",
+          "match": true
+        },
+        "specimen_type": {
+          "expected": "Wound Swab",
+          "actual": "Wound Swab",
+          "match": true
+        },
+        "organism": {
+          "expected": "Staphylococcus aureus",
+          "actual": "Staphylococcus aureus",
+          "match": true
+        },
+        "resistance_profile": {
+          "expected": "susceptible",
+          "actual": "susceptible",
+          "match": true
+        },
+        "collected_at": {
+          "expected": "2026-08-04T02:00:00",
+          "actual": "2026-08-04T02:00:00",
+          "match": true
+        },
+        "reported_at": {
+          "expected": "2026-08-06T06:00:00",
+          "actual": "2026-08-06T06:00:00",
+          "match": true
+        }
+      },
+      "mismatches": [],
+      "extracted_data": {
+        "report_id": 6,
+        "patient_name": "Gaurav Gupta",
+        "patient_id": 7,
+        "mrn": "MRN-2026-1007",
+        "specimen_type": "Wound Swab",
+        "collected_at": "2026-08-04T02:00:00",
+        "received_at": "2026-08-04T02:45:00",
+        "reported_at": "2026-08-06T06:00:00",
+        "organism": "Staphylococcus aureus",
+        "resistance_profile": "susceptible",
+        "culture_result": "Significant Pure Growth: > 10^5 CFU/mL isolated on selective and non-selective media.",
+        "antimicrobial_susceptibility": [
+          {
+            "antibiotic": "Penicillin G",
+            "result": "Resistant (R)",
+            "mic": ">= 0.25 ug/mL",
+            "interp": "R"
+          },
+          {
+            "antibiotic": "Oxacillin",
+            "result": "Susceptible (S)",
+            "mic": "<= 0.5 ug/mL",
+            "interp": "S"
+          },
+          {
+            "antibiotic": "Cefoxitin Screen",
+            "result": "Susceptible (S)",
+            "mic": "Negative",
+            "interp": "S"
+          },
+          {
+            "antibiotic": "Vancomycin",
+            "result": "Susceptible (S)",
+            "mic": "1.0 ug/mL",
+            "interp": "S"
+          },
+          {
+            "antibiotic": "Daptomycin",
+            "result": "Susceptible (S)",
+            "mic": "0.5 ug/mL",
+            "interp": "S"
+          },
+          {
+            "antibiotic": "Linezolid",
+            "result": "Susceptible (S)",
+            "mic": "1.5 ug/mL",
+            "interp": "S"
+          },
+          {
+            "antibiotic": "Clindamycin",
+            "result": "Susceptible (S)",
+            "mic": "<= 0.25 ug/mL",
+            "interp": "S"
+          },
+          {
+            "antibiotic": "Erythromycin",
+            "result": "Susceptible (S)",
+            "mic": "<= 0.5 ug/mL",
+            "interp": "S"
+          },
+          {
+            "antibiotic": "Levofloxacin",
+            "result": "Susceptible (S)",
+            "mic": "<= 0.5 ug/mL",
+            "interp": "S"
+          }
+        ],
+        "interpretation": "Isolated strain of Staphylococcus aureus exhibits standard wild-type susceptible antimicrobial profile. No high-level or extended-spectrum acquired resistance detected. Therapy should be directed based on documented clinical susceptibility and site of infection.",
+        "status": "FINAL"
+      }
+    },
+    {
+      "report_id": 7,
+      "source_document": "data/lab_reports/lab_report_007.pdf",
+      "validation_status": "passed",
+      "field_results": {
+        "report_id": {
+          "expected": 7,
+          "actual": 7,
+          "match": true
+        },
+        "patient_id": {
+          "expected": 8,
+          "actual": 8,
+          "match": true
+        },
+        "patient_name": {
+          "expected": "Rohan Chopra",
+          "actual": "Rohan Chopra",
+          "match": true
+        },
+        "mrn": {
+          "expected": "MRN-2026-1008",
+          "actual": "MRN-2026-1008",
+          "match": true
+        },
+        "specimen_type": {
+          "expected": "Sputum",
+          "actual": "Sputum",
+          "match": true
+        },
+        "organism": {
+          "expected": "Pseudomonas aeruginosa",
+          "actual": "Pseudomonas aeruginosa",
+          "match": true
+        },
+        "resistance_profile": {
+          "expected": "susceptible",
+          "actual": "susceptible",
+          "match": true
+        },
+        "collected_at": {
+          "expected": "2026-08-02T18:00:00",
+          "actual": "2026-08-02T18:00:00",
+          "match": true
+        },
+        "reported_at": {
+          "expected": "2026-08-04T22:00:00",
+          "actual": "2026-08-04T22:00:00",
+          "match": true
+        }
+      },
+      "mismatches": [],
+      "extracted_data": {
+        "report_id": 7,
+        "patient_name": "Rohan Chopra",
+        "patient_id": 8,
+        "mrn": "MRN-2026-1008",
+        "specimen_type": "Sputum",
+        "collected_at": "2026-08-02T18:00:00",
+        "received_at": "2026-08-02T18:45:00",
+        "reported_at": "2026-08-04T22:00:00",
+        "organism": "Pseudomonas aeruginosa",
+        "resistance_profile": "susceptible",
+        "culture_result": "Significant Pure Growth: > 10^5 CFU/mL isolated on selective and non-selective media.",
+        "antimicrobial_susceptibility": [
+          {
+            "antibiotic": "Piperacillin / Tazobactam",
+            "result": "Susceptible (S)",
+            "mic": "<= 8/4 ug/mL",
+            "interp": "S"
+          },
+          {
+            "antibiotic": "Ceftazidime",
+            "result": "Susceptible (S)",
+            "mic": "<= 2 ug/mL",
+            "interp": "S"
+          },
+          {
+            "antibiotic": "Cefepime",
+            "result": "Susceptible (S)",
+            "mic": "<= 2 ug/mL",
+            "interp": "S"
+          },
+          {
+            "antibiotic": "Meropenem",
+            "result": "Susceptible (S)",
+            "mic": "<= 1 ug/mL",
+            "interp": "S"
+          },
+          {
+            "antibiotic": "Imipenem",
+            "result": "Susceptible (S)",
+            "mic": "<= 1 ug/mL",
+            "interp": "S"
+          },
+          {
+            "antibiotic": "Ciprofloxacin",
+            "result": "Susceptible (S)",
+            "mic": "<= 0.25 ug/mL",
+            "interp": "S"
+          },
+          {
+            "antibiotic": "Levofloxacin",
+            "result": "Susceptible (S)",
+            "mic": "<= 0.5 ug/mL",
+            "interp": "S"
+          },
+          {
+            "antibiotic": "Amikacin",
+            "result": "Susceptible (S)",
+            "mic": "<= 4 ug/mL",
+            "interp": "S"
+          },
+          {
+            "antibiotic": "Tobramycin",
+            "result": "Susceptible (S)",
+            "mic": "<= 1 ug/mL",
+            "interp": "S"
+          }
+        ],
+        "interpretation": "Isolated strain of Pseudomonas aeruginosa exhibits standard wild-type susceptible antimicrobial profile. No high-level or extended-spectrum acquired resistance detected. Therapy should be directed based on documented clinical susceptibility and site of infection.",
+        "status": "FINAL"
+      }
+    },
+    {
+      "report_id": 8,
+      "source_document": "data/lab_reports/lab_report_008.pdf",
+      "validation_status": "passed",
+      "field_results": {
+        "report_id": {
+          "expected": 8,
+          "actual": 8,
+          "match": true
+        },
+        "patient_id": {
+          "expected": 9,
+          "actual": 9,
+          "match": true
+        },
+        "patient_name": {
+          "expected": "Divya Sharma",
+          "actual": "Divya Sharma",
+          "match": true
+        },
+        "mrn": {
+          "expected": "MRN-2026-1009",
+          "actual": "MRN-2026-1009",
+          "match": true
+        },
+        "specimen_type": {
+          "expected": "Urine",
+          "actual": "Urine",
+          "match": true
+        },
+        "organism": {
+          "expected": "Enterococcus faecalis",
+          "actual": "Enterococcus faecalis",
+          "match": true
+        },
+        "resistance_profile": {
+          "expected": "susceptible",
+          "actual": "susceptible",
+          "match": true
+        },
+        "collected_at": {
+          "expected": "2026-08-11T02:00:00",
+          "actual": "2026-08-11T02:00:00",
+          "match": true
+        },
+        "reported_at": {
+          "expected": "2026-08-13T06:00:00",
+          "actual": "2026-08-13T06:00:00",
+          "match": true
+        }
+      },
+      "mismatches": [],
+      "extracted_data": {
+        "report_id": 8,
+        "patient_name": "Divya Sharma",
+        "patient_id": 9,
+        "mrn": "MRN-2026-1009",
+        "specimen_type": "Urine",
+        "collected_at": "2026-08-11T02:00:00",
+        "received_at": "2026-08-11T02:45:00",
+        "reported_at": "2026-08-13T06:00:00",
+        "organism": "Enterococcus faecalis",
+        "resistance_profile": "susceptible",
+        "culture_result": "Significant Pure Growth: > 10^5 CFU/mL isolated on selective and non-selective media.",
+        "antimicrobial_susceptibility": [
+          {
+            "antibiotic": "Ampicillin",
+            "result": "Susceptible (S)",
+            "mic": "<= 2 ug/mL",
+            "interp": "S"
+          },
+          {
+            "antibiotic": "Penicillin G",
+            "result": "Susceptible (S)",
+            "mic": "<= 4 ug/mL",
+            "interp": "S"
+          },
+          {
+            "antibiotic": "Vancomycin",
+            "result": "Susceptible (S)",
+            "mic": "2.0 ug/mL",
+            "interp": "S"
+          },
+          {
+            "antibiotic": "Linezolid",
+            "result": "Susceptible (S)",
+            "mic": "2.0 ug/mL",
+            "interp": "S"
+          },
+          {
+            "antibiotic": "Daptomycin",
+            "result": "Susceptible (S)",
+            "mic": "2.0 ug/mL",
+            "interp": "S"
+          },
+          {
+            "antibiotic": "High-Level Gentamicin Screen",
+            "result": "Susceptible (S)",
+            "mic": "Synergistic",
+            "interp": "S"
+          },
+          {
+            "antibiotic": "Nitrofurantoin",
+            "result": "Susceptible (S)",
+            "mic": "<= 16 ug/mL",
+            "interp": "S"
+          }
+        ],
+        "interpretation": "Isolated strain of Enterococcus faecalis exhibits standard wild-type susceptible antimicrobial profile. No high-level or extended-spectrum acquired resistance detected. Therapy should be directed based on documented clinical susceptibility and site of infection.",
+        "status": "final"
+      }
+    },
+    {
+      "report_id": 9,
+      "source_document": "data/lab_reports/lab_report_009.pdf",
+      "validation_status": "passed",
+      "field_results": {
+        "report_id": {
+          "expected": 9,
+          "actual": 9,
+          "match": true
+        },
+        "patient_id": {
+          "expected": 10,
+          "actual": 10,
+          "match": true
+        },
+        "patient_name": {
+          "expected": "Rahul Gupta",
+          "actual": "Rahul Gupta",
+          "match": true
+        },
+        "mrn": {
+          "expected": "MRN-2026-1010",
+          "actual": "MRN-2026-1010",
+          "match": true
+        },
+        "specimen_type": {
+          "expected": "Blood Culture",
+          "actual": "Blood Culture",
+          "match": true
+        },
+        "organism": {
+          "expected": "Streptococcus pneumoniae",
+          "actual": "Streptococcus pneumoniae",
+          "match": true
+        },
+        "resistance_profile": {
+          "expected": "susceptible",
+          "actual": "susceptible",
+          "match": true
+        },
+        "collected_at": {
+          "expected": "2026-08-06T04:00:00",
+          "actual": "2026-08-06T04:00:00",
+          "match": true
+        },
+        "reported_at": {
+          "expected": "2026-08-08T08:00:00",
+          "actual": "2026-08-08T08:00:00",
+          "match": true
+        }
+      },
+      "mismatches": [],
+      "extracted_data": {
+        "report_id": 9,
+        "patient_name": "Rahul Gupta",
+        "patient_id": 10,
+        "mrn": "MRN-2026-1010",
+        "specimen_type": "Blood Culture",
+        "collected_at": "2026-08-06T04:00:00",
+        "received_at": "2026-08-06T04:45:00",
+        "reported_at": "2026-08-08T08:00:00",
+        "organism": "Streptococcus pneumoniae",
+        "resistance_profile": "susceptible",
+        "culture_result": "Significant Pure Growth: > 10^5 CFU/mL isolated on selective and non-selective media.",
+        "antimicrobial_susceptibility": [
+          {
+            "antibiotic": "Penicillin (Non-meningitis)",
+            "result": "S",
+            "mic": "<= 0.06 ug/mL",
+            "interp": "S"
+          },
+          {
+            "antibiotic": "Ceftriaxone (Non-meningitis)",
+            "result": "S",
+            "mic": "<= 0.5 ug/mL",
+            "interp": "S"
+          },
+          {
+            "antibiotic": "Levofloxacin",
+            "result": "S",
+            "mic": "<= 0.5 ug/mL",
+            "interp": "S"
+          },
+          {
+            "antibiotic": "Vancomycin",
+            "result": "S",
+            "mic": "0.5 ug/mL",
+            "interp": "S"
+          },
+          {
+            "antibiotic": "Erythromycin",
+            "result": "S",
+            "mic": "<= 0.25 ug/mL",
+            "interp": "S"
+          },
+          {
+            "antibiotic": "Moxifloxacin",
+            "result": "S",
+            "mic": "<= 0.25 ug/mL",
+            "interp": "S"
+          }
+        ],
+        "interpretation": "Isolated strain of Streptococcus pneumoniae exhibits standard wild-type susceptible antimicrobial profile. No high-level or extended-spectrum acquired resistance detected. Therapy should be directed based on documented clinical susceptibility and site of infection.",
+        "status": "FINAL"
+      }
+    },
+    {
+      "report_id": 10,
+      "source_document": "data/lab_reports/lab_report_010.pdf",
+      "validation_status": "passed",
+      "field_results": {
+        "report_id": {
+          "expected": 10,
+          "actual": 10,
+          "match": true
+        },
+        "patient_id": {
+          "expected": 11,
+          "actual": 11,
+          "match": true
+        },
+        "patient_name": {
+          "expected": "Rajesh Chopra",
+          "actual": "Rajesh Chopra",
+          "match": true
+        },
+        "mrn": {
+          "expected": "MRN-2026-1011",
+          "actual": "MRN-2026-1011",
+          "match": true
+        },
+        "specimen_type": {
+          "expected": "Urine",
+          "actual": "Urine",
+          "match": true
+        },
+        "organism": {
+          "expected": "Candida albicans",
+          "actual": "Candida albicans",
+          "match": true
+        },
+        "resistance_profile": {
+          "expected": "susceptible",
+          "actual": "susceptible",
+          "match": true
+        },
+        "collected_at": {
+          "expected": "2026-08-06T00:00:00",
+          "actual": "2026-08-06T00:00:00",
+          "match": true
+        },
+        "reported_at": {
+          "expected": "2026-08-08T04:00:00",
+          "actual": "2026-08-08T04:00:00",
+          "match": true
+        }
+      },
+      "mismatches": [],
+      "extracted_data": {
+        "report_id": 10,
+        "patient_name": "Rajesh Chopra",
+        "patient_id": 11,
+        "mrn": "MRN-2026-1011",
+        "specimen_type": "Urine",
+        "collected_at": "2026-08-06T00:00:00",
+        "received_at": "2026-08-06T00:45:00",
+        "reported_at": "2026-08-08T04:00:00",
+        "organism": "Candida albicans",
+        "resistance_profile": "susceptible",
+        "culture_result": "Significant Pure Growth: > 10^5 CFU/mL isolated on selective and non-selective media.",
+        "antimicrobial_susceptibility": [
+          {
+            "antibiotic": "Fluconazole",
+            "result": "Susceptible (S)",
+            "mic": "<= 0.5 ug/mL",
+            "interp": "S"
+          },
+          {
+            "antibiotic": "Voriconazole",
+            "result": "Susceptible (S)",
+            "mic": "<= 0.06 ug/mL",
+            "interp": "S"
+          },
+          {
+            "antibiotic": "Posaconazole",
+            "result": "Susceptible (S)",
+            "mic": "<= 0.06 ug/mL",
+            "interp": "S"
+          },
+          {
+            "antibiotic": "Caspofungin",
+            "result": "Susceptible (S)",
+            "mic": "<= 0.25 ug/mL",
+            "interp": "S"
+          },
+          {
+            "antibiotic": "Micafungin",
+            "result": "Susceptible (S)",
+            "mic": "<= 0.06 ug/mL",
+            "interp": "S"
+          },
+          {
+            "antibiotic": "Amphotericin B",
+            "result": "Susceptible (S)",
+            "mic": "0.50 ug/mL",
+            "interp": "S"
+          }
+        ],
+        "interpretation": "Isolated strain of Candida albicans exhibits standard wild-type susceptible antimicrobial profile. No high-level or extended-spectrum acquired resistance detected. Therapy should be directed based on documented clinical susceptibility and site of infection.",
+        "status": "FINAL"
+      }
+    },
+    {
+      "report_id": 11,
+      "source_document": "data/lab_reports/lab_report_011.pdf",
+      "validation_status": "passed",
+      "field_results": {
+        "report_id": {
+          "expected": 11,
+          "actual": 11,
+          "match": true
+        },
+        "patient_id": {
+          "expected": 12,
+          "actual": 12,
+          "match": true
+        },
+        "patient_name": {
+          "expected": "Pooja Sharma",
+          "actual": "Pooja Sharma",
+          "match": true
+        },
+        "mrn": {
+          "expected": "MRN-2026-1012",
+          "actual": "MRN-2026-1012",
+          "match": true
+        },
+        "specimen_type": {
+          "expected": "Urine",
+          "actual": "Urine",
+          "match": true
+        },
+        "organism": {
+          "expected": "Escherichia coli",
+          "actual": "Escherichia coli",
+          "match": true
+        },
+        "resistance_profile": {
+          "expected": "susceptible",
+          "actual": "susceptible",
+          "match": true
+        },
+        "collected_at": {
+          "expected": "2026-08-03T05:00:00",
+          "actual": "2026-08-03T05:00:00",
+          "match": true
+        },
+        "reported_at": {
+          "expected": "2026-08-05T09:00:00",
+          "actual": "2026-08-05T09:00:00",
+          "match": true
+        }
+      },
+      "mismatches": [],
+      "extracted_data": {
+        "report_id": 11,
+        "patient_name": "Pooja Sharma",
+        "patient_id": 12,
+        "mrn": "MRN-2026-1012",
+        "specimen_type": "Urine",
+        "collected_at": "2026-08-03T05:00:00",
+        "received_at": "2026-08-03T05:45:00",
+        "reported_at": "2026-08-05T09:00:00",
+        "organism": "Escherichia coli",
+        "resistance_profile": "susceptible",
+        "culture_result": "Significant Pure Growth: > 10^5 CFU/mL isolated on selective and non-selective media.",
+        "antimicrobial_susceptibility": [
+          {
+            "antibiotic": "Ampicillin",
+            "result": "S",
+            "mic": "<= 2 ug/mL",
+            "interp": "S"
+          },
+          {
+            "antibiotic": "Amoxicillin / Clavulanate",
+            "result": "S",
+            "mic": "<= 4/2 ug/mL",
+            "interp": "S"
+          },
+          {
+            "antibiotic": "Ceftriaxone",
+            "result": "S",
+            "mic": "<= 0.5 ug/mL",
+            "interp": "S"
+          },
+          {
+            "antibiotic": "Cefepime",
+            "result": "S",
+            "mic": "<= 1 ug/mL",
+            "interp": "S"
+          },
+          {
+            "antibiotic": "Meropenem",
+            "result": "S",
+            "mic": "<= 0.25 ug/mL",
+            "interp": "S"
+          },
+          {
+            "antibiotic": "Ciprofloxacin",
+            "result": "S",
+            "mic": "<= 0.25 ug/mL",
+            "interp": "S"
+          },
+          {
+            "antibiotic": "Gentamicin",
+            "result": "S",
+            "mic": "<= 1 ug/mL",
+            "interp": "S"
+          },
+          {
+            "antibiotic": "Nitrofurantoin",
+            "result": "S",
+            "mic": "<= 16 ug/mL",
+            "interp": "S"
+          },
+          {
+            "antibiotic": "Trimethoprim / Sulfamethoxazole",
+            "result": "S",
+            "mic": "<= 1/19 ug/mL",
+            "interp": "S"
+          }
+        ],
+        "interpretation": "Isolated strain of Escherichia coli exhibits standard wild-type susceptible antimicrobial profile. No high-level or extended-spectrum acquired resistance detected. Therapy should be directed based on documented clinical susceptibility and site of infection.",
+        "status": "FINAL"
+      }
+    },
+    {
+      "report_id": 12,
+      "source_document": "data/lab_reports/lab_report_012.pdf",
+      "validation_status": "passed",
+      "field_results": {
+        "report_id": {
+          "expected": 12,
+          "actual": 12,
+          "match": true
+        },
+        "patient_id": {
+          "expected": 13,
+          "actual": 13,
+          "match": true
+        },
+        "patient_name": {
+          "expected": "Manoj Gupta",
+          "actual": "Manoj Gupta",
+          "match": true
+        },
+        "mrn": {
+          "expected": "MRN-2026-1013",
+          "actual": "MRN-2026-1013",
+          "match": true
+        },
+        "specimen_type": {
+          "expected": "Wound Swab",
+          "actual": "Wound Swab",
+          "match": true
+        },
+        "organism": {
+          "expected": "Staphylococcus aureus",
+          "actual": "Staphylococcus aureus",
+          "match": true
+        },
+        "resistance_profile": {
+          "expected": "susceptible",
+          "actual": "susceptible",
+          "match": true
+        },
+        "collected_at": {
+          "expected": "2026-08-07T21:00:00",
+          "actual": "2026-08-07T21:00:00",
+          "match": true
+        },
+        "reported_at": {
+          "expected": "2026-08-10T01:00:00",
+          "actual": "2026-08-10T01:00:00",
+          "match": true
+        }
+      },
+      "mismatches": [],
+      "extracted_data": {
+        "report_id": 12,
+        "patient_name": "Manoj Gupta",
+        "patient_id": 13,
+        "mrn": "MRN-2026-1013",
+        "specimen_type": "Wound Swab",
+        "collected_at": "2026-08-07T21:00:00",
+        "received_at": "2026-08-07T21:45:00",
+        "reported_at": "2026-08-10T01:00:00",
+        "organism": "Staphylococcus aureus",
+        "resistance_profile": "susceptible",
+        "culture_result": "Significant Pure Growth: > 10^5 CFU/mL isolated on selective and non-selective media.",
+        "antimicrobial_susceptibility": [
+          {
+            "antibiotic": "Penicillin G",
+            "result": "Resistant (R)",
+            "mic": ">= 0.25 ug/mL",
+            "interp": "R"
+          },
+          {
+            "antibiotic": "Oxacillin",
+            "result": "Susceptible (S)",
+            "mic": "<= 0.5 ug/mL",
+            "interp": "S"
+          },
+          {
+            "antibiotic": "Cefoxitin Screen",
+            "result": "Susceptible (S)",
+            "mic": "Negative",
+            "interp": "S"
+          },
+          {
+            "antibiotic": "Vancomycin",
+            "result": "Susceptible (S)",
+            "mic": "1.0 ug/mL",
+            "interp": "S"
+          },
+          {
+            "antibiotic": "Daptomycin",
+            "result": "Susceptible (S)",
+            "mic": "0.5 ug/mL",
+            "interp": "S"
+          },
+          {
+            "antibiotic": "Linezolid",
+            "result": "Susceptible (S)",
+            "mic": "1.5 ug/mL",
+            "interp": "S"
+          },
+          {
+            "antibiotic": "Clindamycin",
+            "result": "Susceptible (S)",
+            "mic": "<= 0.25 ug/mL",
+            "interp": "S"
+          },
+          {
+            "antibiotic": "Erythromycin",
+            "result": "Susceptible (S)",
+            "mic": "<= 0.5 ug/mL",
+            "interp": "S"
+          },
+          {
+            "antibiotic": "Levofloxacin",
+            "result": "Susceptible (S)",
+            "mic": "<= 0.5 ug/mL",
+            "interp": "S"
+          }
+        ],
+        "interpretation": "Isolated strain of Staphylococcus aureus exhibits standard wild-type susceptible antimicrobial profile. No high-level or extended-spectrum acquired resistance detected. Therapy should be directed based on documented clinical susceptibility and site of infection.",
+        "status": "FINAL"
+      }
+    },
+    {
+      "report_id": 13,
+      "source_document": "data/lab_reports/lab_report_013.pdf",
+      "validation_status": "passed",
+      "field_results": {
+        "report_id": {
+          "expected": 13,
+          "actual": 13,
+          "match": true
+        },
+        "patient_id": {
+          "expected": 14,
+          "actual": 14,
+          "match": true
+        },
+        "patient_name": {
+          "expected": "Nisha Chopra",
+          "actual": "Nisha Chopra",
+          "match": true
+        },
+        "mrn": {
+          "expected": "MRN-2026-1014",
+          "actual": "MRN-2026-1014",
+          "match": true
+        },
+        "specimen_type": {
+          "expected": "Sputum",
+          "actual": "Sputum",
+          "match": true
+        },
+        "organism": {
+          "expected": "Pseudomonas aeruginosa",
+          "actual": "Pseudomonas aeruginosa",
+          "match": true
+        },
+        "resistance_profile": {
+          "expected": "susceptible",
+          "actual": "susceptible",
+          "match": true
+        },
+        "collected_at": {
+          "expected": "2026-08-07T18:00:00",
+          "actual": "2026-08-07T18:00:00",
+          "match": true
+        },
+        "reported_at": {
+          "expected": "2026-08-09T22:00:00",
+          "actual": "2026-08-09T22:00:00",
+          "match": true
+        }
+      },
+      "mismatches": [],
+      "extracted_data": {
+        "report_id": 13,
+        "patient_name": "Nisha Chopra",
+        "patient_id": 14,
+        "mrn": "MRN-2026-1014",
+        "specimen_type": "Sputum",
+        "collected_at": "2026-08-07T18:00:00",
+        "received_at": "2026-08-07T18:45:00",
+        "reported_at": "2026-08-09T22:00:00",
+        "organism": "Pseudomonas aeruginosa",
+        "resistance_profile": "susceptible",
+        "culture_result": "Significant Pure Growth: > 10^5 CFU/mL isolated on selective and non-selective media.",
+        "antimicrobial_susceptibility": [
+          {
+            "antibiotic": "Piperacillin / Tazobactam",
+            "result": "Susceptible (S)",
+            "mic": "<= 8/4 ug/mL",
+            "interp": "S"
+          },
+          {
+            "antibiotic": "Ceftazidime",
+            "result": "Susceptible (S)",
+            "mic": "<= 2 ug/mL",
+            "interp": "S"
+          },
+          {
+            "antibiotic": "Cefepime",
+            "result": "Susceptible (S)",
+            "mic": "<= 2 ug/mL",
+            "interp": "S"
+          },
+          {
+            "antibiotic": "Meropenem",
+            "result": "Susceptible (S)",
+            "mic": "<= 1 ug/mL",
+            "interp": "S"
+          },
+          {
+            "antibiotic": "Imipenem",
+            "result": "Susceptible (S)",
+            "mic": "<= 1 ug/mL",
+            "interp": "S"
+          },
+          {
+            "antibiotic": "Ciprofloxacin",
+            "result": "Susceptible (S)",
+            "mic": "<= 0.25 ug/mL",
+            "interp": "S"
+          },
+          {
+            "antibiotic": "Levofloxacin",
+            "result": "Susceptible (S)",
+            "mic": "<= 0.5 ug/mL",
+            "interp": "S"
+          },
+          {
+            "antibiotic": "Amikacin",
+            "result": "Susceptible (S)",
+            "mic": "<= 4 ug/mL",
+            "interp": "S"
+          },
+          {
+            "antibiotic": "Tobramycin",
+            "result": "Susceptible (S)",
+            "mic": "<= 1 ug/mL",
+            "interp": "S"
+          }
+        ],
+        "interpretation": "Isolated strain of Pseudomonas aeruginosa exhibits standard wild-type susceptible antimicrobial profile. No high-level or extended-spectrum acquired resistance detected. Therapy should be directed based on documented clinical susceptibility and site of infection.",
+        "status": "FINAL"
+      }
+    },
+    {
+      "report_id": 14,
+      "source_document": "data/lab_reports/lab_report_014.pdf",
+      "validation_status": "passed",
+      "field_results": {
+        "report_id": {
+          "expected": 14,
+          "actual": 14,
+          "match": true
+        },
+        "patient_id": {
+          "expected": 15,
+          "actual": 15,
+          "match": true
+        },
+        "patient_name": {
+          "expected": "Ananya Sharma",
+          "actual": "Ananya Sharma",
+          "match": true
+        },
+        "mrn": {
+          "expected": "MRN-2026-1015",
+          "actual": "MRN-2026-1015",
+          "match": true
+        },
+        "specimen_type": {
+          "expected": "Urine",
+          "actual": "Urine",
+          "match": true
+        },
+        "organism": {
+          "expected": "Enterococcus faecalis",
+          "actual": "Enterococcus faecalis",
+          "match": true
+        },
+        "resistance_profile": {
+          "expected": "susceptible",
+          "actual": "susceptible",
+          "match": true
+        },
+        "collected_at": {
+          "expected": "2026-08-03T22:00:00",
+          "actual": "2026-08-03T22:00:00",
+          "match": true
+        },
+        "reported_at": {
+          "expected": "2026-08-06T02:00:00",
+          "actual": "2026-08-06T02:00:00",
+          "match": true
+        }
+      },
+      "mismatches": [],
+      "extracted_data": {
+        "report_id": 14,
+        "patient_name": "Ananya Sharma",
+        "patient_id": 15,
+        "mrn": "MRN-2026-1015",
+        "specimen_type": "Urine",
+        "collected_at": "2026-08-03T22:00:00",
+        "received_at": "2026-08-03T22:45:00",
+        "reported_at": "2026-08-06T02:00:00",
+        "organism": "Enterococcus faecalis",
+        "resistance_profile": "susceptible",
+        "culture_result": "Significant Pure Growth: > 10^5 CFU/mL isolated on selective and non-selective media.",
+        "antimicrobial_susceptibility": [
+          {
+            "antibiotic": "Ampicillin",
+            "result": "Susceptible (S)",
+            "mic": "<= 2 ug/mL",
+            "interp": "S"
+          },
+          {
+            "antibiotic": "Penicillin G",
+            "result": "Susceptible (S)",
+            "mic": "<= 4 ug/mL",
+            "interp": "S"
+          },
+          {
+            "antibiotic": "Vancomycin",
+            "result": "Susceptible (S)",
+            "mic": "2.0 ug/mL",
+            "interp": "S"
+          },
+          {
+            "antibiotic": "Linezolid",
+            "result": "Susceptible (S)",
+            "mic": "2.0 ug/mL",
+            "interp": "S"
+          },
+          {
+            "antibiotic": "Daptomycin",
+            "result": "Susceptible (S)",
+            "mic": "2.0 ug/mL",
+            "interp": "S"
+          },
+          {
+            "antibiotic": "High-Level Gentamicin Screen",
+            "result": "Susceptible (S)",
+            "mic": "Synergistic",
+            "interp": "S"
+          },
+          {
+            "antibiotic": "Nitrofurantoin",
+            "result": "Susceptible (S)",
+            "mic": "<= 16 ug/mL",
+            "interp": "S"
+          }
+        ],
+        "interpretation": "Isolated strain of Enterococcus faecalis exhibits standard wild-type susceptible antimicrobial profile. No high-level or extended-spectrum acquired resistance detected. Therapy should be directed based on documented clinical susceptibility and site of infection.",
+        "status": "FINAL"
+      }
+    },
+    {
+      "report_id": 15,
+      "source_document": "data/lab_reports/lab_report_015.pdf",
+      "validation_status": "passed",
+      "field_results": {
+        "report_id": {
+          "expected": 15,
+          "actual": 15,
+          "match": true
+        },
+        "patient_id": {
+          "expected": 16,
+          "actual": 16,
+          "match": true
+        },
+        "patient_name": {
+          "expected": "Karan Gupta",
+          "actual": "Karan Gupta",
+          "match": true
+        },
+        "mrn": {
+          "expected": "MRN-2026-1016",
+          "actual": "MRN-2026-1016",
+          "match": true
+        },
+        "specimen_type": {
+          "expected": "Blood Culture",
+          "actual": "Blood Culture",
+          "match": true
+        },
+        "organism": {
+          "expected": "Streptococcus pneumoniae",
+          "actual": "Streptococcus pneumoniae",
+          "match": true
+        },
+        "resistance_profile": {
+          "expected": "susceptible",
+          "actual": "susceptible",
+          "match": true
+        },
+        "collected_at": {
+          "expected": "2026-08-07T05:00:00",
+          "actual": "2026-08-07T05:00:00",
+          "match": true
+        },
+        "reported_at": {
+          "expected": "2026-08-09T09:00:00",
+          "actual": "2026-08-09T09:00:00",
+          "match": true
+        }
+      },
+      "mismatches": [],
+      "extracted_data": {
+        "report_id": 15,
+        "patient_name": "Karan Gupta",
+        "patient_id": 16,
+        "mrn": "MRN-2026-1016",
+        "specimen_type": "Blood Culture",
+        "collected_at": "2026-08-07T05:00:00",
+        "received_at": "2026-08-07T05:45:00",
+        "reported_at": "2026-08-09T09:00:00",
+        "organism": "Streptococcus pneumoniae",
+        "resistance_profile": "susceptible",
+        "culture_result": "Significant Pure Growth: > 10^5 CFU/mL isolated on selective and non-selective media.",
+        "antimicrobial_susceptibility": [
+          {
+            "antibiotic": "Penicillin (Non-meningitis)",
+            "result": "Susceptible (S)",
+            "mic": "<= 0.06 ug/mL",
+            "interp": "S"
+          },
+          {
+            "antibiotic": "Ceftriaxone (Non-meningitis)",
+            "result": "Susceptible (S)",
+            "mic": "<= 0.5 ug/mL",
+            "interp": "S"
+          },
+          {
+            "antibiotic": "Levofloxacin",
+            "result": "Susceptible (S)",
+            "mic": "<= 0.5 ug/mL",
+            "interp": "S"
+          },
+          {
+            "antibiotic": "Vancomycin",
+            "result": "Susceptible (S)",
+            "mic": "0.5 ug/mL",
+            "interp": "S"
+          },
+          {
+            "antibiotic": "Erythromycin",
+            "result": "Susceptible (S)",
+            "mic": "<= 0.25 ug/mL",
+            "interp": "S"
+          },
+          {
+            "antibiotic": "Moxifloxacin",
+            "result": "Susceptible (S)",
+            "mic": "<= 0.25 ug/mL",
+            "interp": "S"
+          }
+        ],
+        "interpretation": "Isolated strain of Streptococcus pneumoniae exhibits standard wild-type susceptible antimicrobial profile. No high-level or extended-spectrum acquired resistance detected. Therapy should be directed based on documented clinical susceptibility and site of infection.",
+        "status": "FINAL"
+      }
+    },
+    {
+      "report_id": 16,
+      "source_document": "data/lab_reports/lab_report_016.pdf",
+      "validation_status": "passed",
+      "field_results": {
+        "report_id": {
+          "expected": 16,
+          "actual": 16,
+          "match": true
+        },
+        "patient_id": {
+          "expected": 17,
+          "actual": 17,
+          "match": true
+        },
+        "patient_name": {
+          "expected": "Ritu Chopra",
+          "actual": "Ritu Chopra",
+          "match": true
+        },
+        "mrn": {
+          "expected": "MRN-2026-1017",
+          "actual": "MRN-2026-1017",
+          "match": true
+        },
+        "specimen_type": {
+          "expected": "Urine",
+          "actual": "Urine",
+          "match": true
+        },
+        "organism": {
+          "expected": "Candida albicans",
+          "actual": "Candida albicans",
+          "match": true
+        },
+        "resistance_profile": {
+          "expected": "susceptible",
+          "actual": "susceptible",
+          "match": true
+        },
+        "collected_at": {
+          "expected": "2026-08-10T18:00:00",
+          "actual": "2026-08-10T18:00:00",
+          "match": true
+        },
+        "reported_at": {
+          "expected": "2026-08-12T22:00:00",
+          "actual": "2026-08-12T22:00:00",
+          "match": true
+        }
+      },
+      "mismatches": [],
+      "extracted_data": {
+        "report_id": 16,
+        "patient_name": "Ritu Chopra",
+        "patient_id": 17,
+        "mrn": "MRN-2026-1017",
+        "specimen_type": "Urine",
+        "collected_at": "2026-08-10T18:00:00",
+        "received_at": "2026-08-10T18:45:00",
+        "reported_at": "2026-08-12T22:00:00",
+        "organism": "Candida albicans",
+        "resistance_profile": "susceptible",
+        "culture_result": "Significant Pure Growth: > 10^5 CFU/mL isolated on selective and non-selective media.",
+        "antimicrobial_susceptibility": [
+          {
+            "antibiotic": "Fluconazole",
+            "result": "Susceptible (S)",
+            "mic": "<= 0.5 ug/mL",
+            "interp": "S"
+          },
+          {
+            "antibiotic": "Voriconazole",
+            "result": "Susceptible (S)",
+            "mic": "<= 0.06 ug/mL",
+            "interp": "S"
+          },
+          {
+            "antibiotic": "Posaconazole",
+            "result": "Susceptible (S)",
+            "mic": "<= 0.06 ug/mL",
+            "interp": "S"
+          },
+          {
+            "antibiotic": "Caspofungin",
+            "result": "Susceptible (S)",
+            "mic": "<= 0.25 ug/mL",
+            "interp": "S"
+          },
+          {
+            "antibiotic": "Micafungin",
+            "result": "Susceptible (S)",
+            "mic": "<= 0.06 ug/mL",
+            "interp": "S"
+          },
+          {
+            "antibiotic": "Amphotericin B",
+            "result": "Susceptible (S)",
+            "mic": "0.50 ug/mL",
+            "interp": "S"
+          }
+        ],
+        "interpretation": "Isolated strain of Candida albicans exhibits standard wild-type susceptible antimicrobial profile. No high-level or extended-spectrum acquired resistance detected. Therapy should be directed based on documented clinical susceptibility and site of infection.",
+        "status": "FINAL"
+      }
+    }
+  ]
+}

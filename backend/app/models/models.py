@@ -124,3 +124,18 @@ class LabReport(Base):
 
     # Relationships
     patient = relationship("Patient", back_populates="lab_reports")
+    antibiotics = relationship("LabReportAntibiotic", back_populates="lab_report", cascade="all, delete-orphan")
+
+
+class LabReportAntibiotic(Base):
+    __tablename__ = "lab_report_antibiotics"
+
+    id = Column(Integer, primary_key=True, index=True, autoincrement=True)
+    lab_report_id = Column(Integer, ForeignKey("lab_reports.id", ondelete="CASCADE"), nullable=False, index=True)
+    antibiotic = Column(String(128), nullable=False)
+    result = Column(String(64), nullable=False)
+    mic = Column(String(64), nullable=True)
+    interp = Column(String(16), nullable=True)
+
+    # Relationships
+    lab_report = relationship("LabReport", back_populates="antibiotics")

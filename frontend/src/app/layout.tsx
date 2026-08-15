@@ -1,7 +1,10 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
+import { Suspense } from "react";
 import "./globals.css";
 import { cn } from "@/lib/utils";
+import { Sidebar } from "@/components/layout/sidebar";
+import { Topbar } from "@/components/layout/topbar";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
 
@@ -17,8 +20,14 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={cn("font-sans", inter.variable)}>
-      <body className="antialiased bg-slate-950 text-slate-100">
-        {children}
+      <body className="antialiased">
+        <Sidebar />
+        <div className="flex min-h-screen flex-col md:ml-[248px]">
+          <Suspense fallback={<div className="h-[72px] border-b border-border bg-card" />}>
+            <Topbar />
+          </Suspense>
+          <main className="flex-1">{children}</main>
+        </div>
       </body>
     </html>
   );

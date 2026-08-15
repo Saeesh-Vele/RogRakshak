@@ -1,152 +1,270 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import Link from "next/link";
+import { getProvider } from "@/lib/data-provider";
+import type { InvestigationCase } from "@/types/api";
+import { useAppStore } from "@/lib/store";
+import {
+  deriveMetrics,
+  deriveFlaggedLocations,
+  deriveTrend,
+  caseStartedAt,
+} from "@/lib/metrics";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { StatCard } from "@/components/dashboard/stat-card";
+import { TrendChart } from "@/components/dashboard/trend-chart";
+import { StatusBadge } from "@/components/investigation/status-badge";
+import { AlertTriangle } from "lucide-react";
 
-type HealthStatus = "loading" | "ok" | "error";
-
-interface HealthData {
-  status: string;
-  service: string;
+function formatDay(iso: string) {
+  return new Date(iso).toLocaleDateString("en-GB", {
+    day: "2-digit",
+    month: "short",
+  });
 }
 
-export default function Home() {
-  const [healthStatus, setHealthStatus] = useState<HealthStatus>("loading");
-  const [healthData, setHealthData] = useState<HealthData | null>(null);
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
-
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+export default function DashboardPage() {
+  const [cases, setCases] = useState<InvestigationCase[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const mode = useAppStore((s) => s.mode);
 
   useEffect(() => {
-    let isMounted = true;
-
-    async function checkBackendHealth() {
+    let cancelled = false;
+    async function load() {
+      setLoading(true);
+      setError(null);
       try {
-        setHealthStatus("loading");
-        const response = await fetch(`${apiUrl}/health`, {
-          method: "GET",
-          headers: {
-            "Accept": "application/json",
-          },
-        });
-
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-
-        const data: HealthData = await response.json();
-        if (isMounted) {
-          setHealthData(data);
-          setHealthStatus("ok");
-          setErrorMessage(null);
-        }
+        const provider = getProvider();
+        const resp = await provider.list();
+        if (!cancelled) setCases(resp.cases);
       } catch (err: unknown) {
-        if (isMounted) {
-          setHealthStatus("error");
-          setErrorMessage(err instanceof Error ? err.message : "Failed to connect to backend");
-        }
+        if (!cancelled)
+          setError(err instanceof Error ? err.message : "Failed to load data");
+      } finally {
+        if (!cancelled) setLoading(false);
       }
     }
-
-    checkBackendHealth();
-
+    load();
     return () => {
-      isMounted = false;
+      cancelled = true;
     };
-  }, [apiUrl]);
+  }, [mode]);
+
+  const metrics = useMemo(() => deriveMetrics(cases), [cases]);
+  const locations = useMemo(() => deriveFlaggedLocations(cases), [cases]);
+  const trend = useMemo(() => deriveTrend(cases), [cases]);
+
+  const sorted = useMemo(
+    () =>
+      [...cases].sort(
+        (a, b) =>
+          new Date(b.generated_at).getTime() - new Date(a.generated_at).getTime()
+      ),
+    [cases]
+  );
 
   return (
-    <main className="min-h-screen bg-slate-950 text-slate-100 flex flex-col items-center justify-center p-6 selection:bg-teal-500 selection:text-slate-950">
-      {/* Background glowing effects */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-40 -left-40 w-96 h-96 bg-teal-500/10 rounded-full blur-3xl" />
-        <div className="absolute -bottom-40 -right-40 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl" />
-      </div>
-
-      <div className="relative z-10 max-w-2xl w-full bg-slate-900/80 border border-slate-800 rounded-2xl p-8 backdrop-blur-xl shadow-2xl space-y-6">
-        {/* Header */}
-        <div className="space-y-2 text-center">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-800/80 border border-slate-700 text-xs font-medium text-slate-300">
-            <span className="w-2 h-2 rounded-full bg-teal-400 animate-pulse" />
-            HAI Surveillance & Outbreak Tracing Platform
-          </div>
-          <h1 className="text-3xl sm:text-4xl font-bold tracking-tight bg-gradient-to-r from-teal-300 via-cyan-200 to-indigo-300 bg-clip-text text-transparent">
-            RogRakshak
-          </h1>
-          <p className="text-sm text-slate-400 max-w-md mx-auto">
-            Temporal graph transmission tracking, multi-agent outbreak reasoning, and contact exposure analysis.
-          </p>
+    <div className="mx-auto max-w-[1400px] space-y-6 p-6 lg:p-8">
+      {loading && (
+        <div className="flex items-center gap-3 py-16 text-sm text-muted-foreground">
+          <div className="h-4 w-4 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+          Loading investigations…
         </div>
+      )}
 
-        {/* Backend Status Card */}
-        <div className="p-5 rounded-xl bg-slate-950/60 border border-slate-800/80 space-y-4">
-          <div className="flex items-center justify-between">
-            <span className="text-sm font-medium text-slate-300">Backend Connection</span>
-            {healthStatus === "loading" && (
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-amber-500/10 border border-amber-500/30 text-amber-300">
-                <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-ping" />
-                Checking...
-              </span>
-            )}
-            {healthStatus === "ok" && (
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 shadow-sm shadow-emerald-500/20">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-                Backend: OK
-              </span>
-            )}
-            {healthStatus === "error" && (
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-rose-500/10 border border-rose-500/30 text-rose-400">
-                <span className="w-1.5 h-1.5 rounded-full bg-rose-400" />
-                Backend: Offline
-              </span>
-            )}
-          </div>
-
-          <div className="text-xs font-mono text-slate-400 bg-slate-900/90 rounded-lg p-3 border border-slate-800 space-y-1">
-            <div className="flex justify-between">
-              <span className="text-slate-500">API Endpoint:</span>
-              <span className="text-slate-300">{apiUrl}/health</span>
+      {error && (
+        <Card className="border-risk-high-foreground/20">
+          <CardContent className="flex items-start gap-3 p-5">
+            <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-risk-high-foreground" />
+            <div>
+              <p className="text-sm font-semibold text-foreground">
+                Failed to load data
+              </p>
+              <p className="mt-0.5 text-sm text-muted-foreground">{error}</p>
             </div>
-            {healthData && (
-              <>
-                <div className="flex justify-between">
-                  <span className="text-slate-500">Service:</span>
-                  <span className="text-slate-300">{healthData.service}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-slate-500">Status Response:</span>
-                  <span className="text-emerald-400 font-bold">{healthData.status}</span>
-                </div>
-              </>
-            )}
-            {errorMessage && (
-              <div className="flex justify-between text-rose-400">
-                <span className="text-slate-500">Error:</span>
-                <span>{errorMessage}</span>
-              </div>
-            )}
-          </div>
-        </div>
+          </CardContent>
+        </Card>
+      )}
 
-        {/* System Architecture Grid */}
-        <div className="grid grid-cols-2 gap-3 pt-2">
-          <div className="p-3 rounded-lg bg-slate-850/50 border border-slate-800 text-left space-y-1">
-            <div className="text-xs font-semibold text-slate-200">Postgres + Neo4j</div>
-            <div className="text-[11px] text-slate-400">Structured clinical logs & temporal contact graphs</div>
+      {!loading && !error && (
+        <>
+          {/* Stat row */}
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+            <StatCard
+              label="Active Cases"
+              value={metrics.activeCases}
+              hint={
+                metrics.casesThisWeek > 0
+                  ? `+${metrics.casesThisWeek} this week`
+                  : "None this week"
+              }
+              hintTone={metrics.casesThisWeek > 0 ? "primary" : "muted"}
+            />
+            <StatCard
+              label="High-Risk Contacts"
+              value={metrics.highRiskContacts}
+              hint={`${metrics.highRiskLinks} with high-tier evidence`}
+            />
+            <StatCard
+              label="Potential Clusters"
+              value={metrics.potentialClusters}
+              hint={
+                metrics.highPriorityCount > 0
+                  ? `${metrics.highPriorityCount} high priority`
+                  : "None escalated"
+              }
+              hintTone={metrics.highPriorityCount > 0 ? "high" : "muted"}
+            />
+            <StatCard
+              label="Flagged Locations"
+              value={metrics.flaggedLocations}
+              hint={metrics.topLocation ?? "No locations in evidence"}
+            />
           </div>
-          <div className="p-3 rounded-lg bg-slate-850/50 border border-slate-800 text-left space-y-1">
-            <div className="text-xs font-semibold text-slate-200">LangGraph + Gemini</div>
-            <div className="text-[11px] text-slate-400">Multi-agent investigation & transmission synthesis</div>
+
+          {/* Cases table + flagged locations */}
+          <div className="grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,1fr)_320px]">
+            <Card className="overflow-hidden">
+              <CardHeader className="px-5 pb-4 pt-5">
+                <CardTitle>Active Infection Cases</CardTitle>
+              </CardHeader>
+              {sorted.length === 0 ? (
+                <CardContent className="pb-8 pt-2 text-center text-sm text-muted-foreground">
+                  No investigations yet.{" "}
+                  <Link
+                    href="/investigations/new"
+                    className="font-medium text-primary hover:underline"
+                  >
+                    Start one
+                  </Link>
+                  .
+                </CardContent>
+              ) : (
+                <Table>
+                  <TableHeader>
+                    <TableRow className="hover:bg-transparent">
+                      <TableHead>Case</TableHead>
+                      <TableHead>Index Patient</TableHead>
+                      <TableHead>Organism</TableHead>
+                      <TableHead>Status</TableHead>
+                      <TableHead className="whitespace-nowrap text-right">
+                        First Event
+                      </TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {sorted.map((c) => (
+                      <TableRow key={c.case_id}>
+                        <TableCell className="whitespace-nowrap font-medium">
+                          <Link
+                            href={`/investigations/${c.case_id}`}
+                            className="hover:text-primary hover:underline"
+                          >
+                            {c.case_id}
+                          </Link>
+                        </TableCell>
+                        <TableCell className="whitespace-nowrap text-muted-foreground">
+                          {c.index_patient.name}
+                        </TableCell>
+                        <TableCell>
+                          <span className="italic">{c.organism}</span>
+                          {c.resistance_profile && (
+                            <span className="ml-1.5 whitespace-nowrap text-muted-foreground">
+                              · {c.resistance_profile}
+                            </span>
+                          )}
+                        </TableCell>
+                        <TableCell>
+                          <StatusBadge status={c.status} />
+                        </TableCell>
+                        <TableCell className="whitespace-nowrap text-right text-muted-foreground tabular-nums">
+                          {(() => {
+                            const started = caseStartedAt(c);
+                            return (
+                              <span
+                                title={
+                                  started.isFallback
+                                    ? "No timeline events — showing when the investigation was generated"
+                                    : new Date(started.iso).toLocaleString("en-GB")
+                                }
+                                className={started.isFallback ? "italic" : undefined}
+                              >
+                                {formatDay(started.iso)}
+                              </span>
+                            );
+                          })()}
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              )}
+            </Card>
+
+            <Card className="overflow-hidden">
+              <CardHeader className="px-5 pb-4 pt-5">
+                <CardTitle>Flagged Locations</CardTitle>
+              </CardHeader>
+              {locations.length === 0 ? (
+                <CardContent className="pb-8 pt-2 text-sm text-muted-foreground">
+                  No locations recorded in contact evidence.
+                </CardContent>
+              ) : (
+                <div className="divide-hairline border-t border-border">
+                  {locations.map((loc) => (
+                    <div
+                      key={loc.name}
+                      className="flex items-start justify-between gap-3 px-5 py-4"
+                    >
+                      <div className="min-w-0">
+                        <p className="truncate font-medium text-foreground">
+                          {loc.name}
+                        </p>
+                        <p className="mt-0.5 text-[0.8125rem] text-muted-foreground">
+                          {loc.evidenceCount} evidence item
+                          {loc.evidenceCount !== 1 ? "s" : ""} ·{" "}
+                          {loc.caseIds.length} case
+                          {loc.caseIds.length !== 1 ? "s" : ""}
+                        </p>
+                      </div>
+                      <Badge
+                        variant={loc.tier === "HIGH" ? "riskHigh" : "riskMedium"}
+                        className="shrink-0"
+                      >
+                        {loc.tier === "HIGH" ? "High Risk" : "Medium Risk"}
+                      </Badge>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </Card>
           </div>
-          <div className="p-3 rounded-lg bg-slate-850/50 border border-slate-800 text-left space-y-1">
-            <div className="text-xs font-semibold text-slate-200">@xyflow/react</div>
-            <div className="text-[11px] text-slate-400">Interactive outbreak network graph view</div>
-          </div>
-          <div className="p-3 rounded-lg bg-slate-850/50 border border-slate-800 text-left space-y-1">
-            <div className="text-xs font-semibold text-slate-200">Plotly.js Timelines</div>
-            <div className="text-[11px] text-slate-400">Patient ward co-location journey tracks</div>
-          </div>
-        </div>
-      </div>
-    </main>
+
+          {/* Trend */}
+          <Card>
+            <CardHeader className="px-5 pb-2 pt-5">
+              <CardTitle>Confirmed Positives — Cumulative</CardTitle>
+              <p className="text-sm text-muted-foreground">
+                From recorded culture dates across all investigated patients.
+              </p>
+            </CardHeader>
+            <CardContent className="px-2 pb-4">
+              <TrendChart points={trend} />
+            </CardContent>
+          </Card>
+        </>
+      )}
+    </div>
   );
 }

@@ -1,0 +1,170 @@
+"use client";
+
+import type { InvestigationCase } from "@/types/api";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { StatusBadge } from "@/components/investigation/status-badge";
+import { evidenceTier } from "@/lib/risk";
+
+/**
+ * The backend's `summary` is a deterministic f-string (see
+ * langgraph_workflow.synthesize_summary) that ends with a fixed
+ * "Recommended actions: ..." clause. Split the two so the briefing prose and
+ * the standing protocol list can be presented for what each actually is.
+ */
+function splitSummary(summary: string): { briefing: string; actions: string[] } {
+  const marker = "Recommended actions:";
+  const at = summary.indexOf(marker);
+  if (at === -1) return { briefing: summary, actions: [] };
+
+  const briefing = summary.slice(0, at).trim();
+  const actions = summary
+    .slice(at + marker.length)
+    .replace(/\.$/, "")
+    .split(/,\s*(?:and\s+)?|\s+and\s+/)
+    .map((s) => s.trim())
+    .filter(Boolean)
+    .map((s) => s.charAt(0).toUpperCase() + s.slice(1));
+
+  return { briefing, actions };
+}
+
+function exposureWindow(inv: InvestigationCase): string | null {
+  const times: number[] = [];
+  for (const e of inv.evidence) {
+    if (e.start_time) times.push(new Date(e.start_time).getTime());
+    if (e.end_time) times.push(new Date(e.end_time).getTime());
+  }
+  if (times.length === 0) return null;
+
+  const fmt = (t: number) =>
+    new Date(t).toLocaleDateString("en-GB", {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+    });
+  return `${fmt(Math.min(...times))} – ${fmt(Math.max(...times))}`;
+}
+
+function topBy<T>(items: T[], key: (t: T) => string | null): string | null {
+  const counts = new Map<string, number>();
+  for (const item of items) {
+    const k = key(item);
+    if (k) counts.set(k, (counts.get(k) ?? 0) + 1);
+  }
+  return Array.from(counts.entries()).sort((a, b) => b[1] - a[1])[0]?.[0] ?? null;
+}
+
+function Row({
+  label,
+  children,
+}: {
+  label: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="flex flex-col gap-1 py-3 sm:flex-row sm:items-baseline sm:gap-4">
+      <p className="shrink-0 text-eyebrow font-semibold uppercase text-muted-foreground sm:w-[190px]">
+        {label}
+      </p>
+      <div className="min-w-0 flex-1 text-[0.9375rem] text-foreground">
+        {children}
+      </div>
+    </div>
+  );
+}
+
+export function ReportCard({ investigation: inv }: { investigation: InvestigationCase }) {
+  const { briefing, actions } = splitSummary(inv.summary);
+  const window = exposureWindow(inv);
+
+  const highPriority = inv.candidate_patients.filter((p) =>
+    inv.evidence.some(
+      (e) =>
+        evidenceTier(e) === "HIGH" &&
+        [e.subject_patient_id, e.object_patient_id].includes(p.id)
+    )
+  );
+
+  const commonLocation = topBy(inv.evidence, (e) => e.location ?? null);
+  const commonStaff = topBy(inv.evidence, (e) =>
+    e.mediator?.type === "staff" ? e.mediator.name : null
+  );
+
+  return (
+    <Card>
+      <CardHeader className="pb-2">
+        <CardTitle>Investigation Report</CardTitle>
+        <p className="text-sm text-muted-foreground">
+          Generated{" "}
+          {new Date(inv.generated_at).toLocaleString("en-GB", {
+            day: "2-digit",
+            month: "short",
+            year: "numeric",
+            hour: "2-digit",
+            minute: "2-digit",
+          })}
+        </p>
+      </CardHeader>
+
+      <CardContent>
+        <div className="divide-hairline border-t border-border">
+          <Row label="Case">
+            {inv.case_id} · <span className="italic">{inv.organism}</span>
+            {inv.resistance_profile && ` ${inv.resistance_profile}`}
+          </Row>
+
+          {window && <Row label="Exposure Window">{window}</Row>}
+
+          <Row label="High-Priority Contacts">
+            {highPriority.length === 0 ? (
+              <span className="text-muted-foreground">None at high tier</span>
+            ) : (
+              <span className="flex flex-wrap gap-1.5">
+                {highPriority.map((p) => (
+                  <Badge key={p.id} variant="riskHigh">
+                    {p.name}
+                  </Badge>
+                ))}
+              </span>
+            )}
+          </Row>
+
+          {commonLocation && <Row label="Common Location">{commonLocation}</Row>}
+          {commonStaff && <Row label="Common Staff">{commonStaff}</Row>}
+
+          <Row label="Assessment">
+            <span className="flex flex-wrap items-center gap-2">
+              <StatusBadge status={inv.status} />
+              <span className="text-muted-foreground">
+                {Math.round(inv.confidence * 100)}% confidence
+              </span>
+            </span>
+          </Row>
+
+          <Row label="Briefing">
+            <p className="leading-relaxed text-muted-foreground">{briefing}</p>
+          </Row>
+
+          {actions.length > 0 && (
+            <Row label="Standing Protocol">
+              <ul className="list-disc space-y-1 pl-4 text-muted-foreground">
+                {actions.map((a) => (
+                  <li key={a}>{a}</li>
+                ))}
+              </ul>
+              <p className="mt-2 text-[0.8125rem] italic text-muted-foreground/80">
+                Fixed infection-control protocol returned with every case — not
+                derived from this case&apos;s evidence.
+              </p>
+            </Row>
+          )}
+        </div>
+
+        <p className="mt-4 text-[0.8125rem] italic text-muted-foreground">
+          Decision support only — findings require clinical review.
+        </p>
+      </CardContent>
+    </Card>
+  );
+}
