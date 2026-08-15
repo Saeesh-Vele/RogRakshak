@@ -40,7 +40,7 @@ function createClient(): AxiosInstance {
 
   return axios.create({
     baseURL,
-    timeout: 30_000,
+    timeout: 60_000,
     headers: { Accept: "application/json", "Content-Type": "application/json" },
   });
 }
@@ -51,10 +51,24 @@ const client = createClient();
 function handleError(err: unknown): never {
   if (err instanceof AxiosError) {
     const status = err.response?.status ?? 0;
-    const detail =
-      err.response?.data?.detail ??
-      err.message ??
-      "An unexpected network error occurred";
+    let detail = err.response?.data?.detail;
+
+    if (!detail) {
+      if (err.code === "ECONNABORTED" || (err.message && err.message.toLowerCase().includes("timeout"))) {
+        detail = "The investigation service did not respond in time. Please try again or switch to Mock mode.";
+      } else if (status === 0 || err.message === "Network Error") {
+        detail = "Unable to connect to the surveillance server. Please ensure the backend service is reachable or switch to Mock mode.";
+      } else if (status === 404) {
+        detail = "The requested investigation case was not found.";
+      } else if (status >= 500) {
+        detail = "The investigation service encountered an internal error. Please try again.";
+      } else {
+        detail = err.message || "An unexpected network error occurred.";
+      }
+    }
+    
+    // Keep raw error logged in console for developers
+    console.error("[RogRakshak API Error]", { status, original: err });
     throw new ApiError(status, String(detail));
   }
   throw err;

@@ -3,37 +3,35 @@ import { cva, type VariantProps } from "class-variance-authority"
 import { cn } from "@/lib/utils"
 
 /**
- * Soft pastel pill: tinted background + darker text, never a solid fill.
- * `risk*` variants are the HIGH / MEDIUM / LOW tiers used across evidence,
- * contacts and locations; `status*` variants map investigation statuses.
+ * Clinical pill badge: tinted background + darker text.
+ * Status badges include a leading coloured dot for rapid visual scanning.
  */
 const badgeVariants = cva(
-  "inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold whitespace-nowrap transition-colors",
+  "inline-flex items-center gap-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-colors",
   {
     variants: {
       variant: {
-        default: "bg-muted text-muted-foreground",
-        outline: "border border-border text-muted-foreground",
-        primary: "bg-primary-soft text-primary-soft-foreground",
+        default:     "bg-muted text-muted-foreground px-2.5 py-0.5",
+        outline:     "border border-border text-muted-foreground px-2.5 py-0.5",
+        primary:     "bg-primary-soft text-primary-soft-foreground px-2.5 py-0.5",
 
         // Risk tiers
-        riskHigh: "bg-risk-high text-risk-high-foreground",
-        riskMedium: "bg-risk-medium text-risk-medium-foreground",
-        riskLow: "bg-risk-low text-risk-low-foreground",
+        riskHigh:   "bg-risk-high text-risk-high-foreground px-2.5 py-0.5",
+        riskMedium: "bg-risk-medium text-risk-medium-foreground px-2.5 py-0.5",
+        riskLow:    "bg-risk-low text-risk-low-foreground px-2.5 py-0.5",
 
-        // Investigation statuses
-        cluster: "bg-risk-high text-risk-high-foreground",
-        highPriority: "bg-risk-high text-risk-high-foreground",
-        potential: "bg-risk-medium text-risk-medium-foreground",
-        noSignal: "bg-risk-low text-risk-low-foreground",
+        // Investigation statuses — dot indicator variant
+        cluster:     "bg-risk-high text-risk-high-foreground px-2.5 py-0.5",
+        highPriority:"bg-risk-high text-risk-high-foreground px-2.5 py-0.5",
+        potential:   "bg-risk-medium text-risk-medium-foreground px-2.5 py-0.5",
+        noSignal:    "bg-risk-low text-risk-low-foreground px-2.5 py-0.5",
 
-        success: "bg-emerald-50 text-emerald-700",
+        success: "bg-emerald-50 text-emerald-700 px-2.5 py-0.5",
       },
       size: {
-        default: "px-2.5 py-0.5 text-xs",
-        sm: "px-2 py-0.5 text-[0.6875rem]",
-        // Uppercase micro-pill used for HIGH / MEDIUM / LOW
-        tier: "px-2 py-0.5 text-[0.6875rem] font-bold tracking-wide uppercase",
+        default: "",
+        sm:  "px-2 py-px text-[0.6875rem]",
+        tier:"px-2 py-px text-[0.6875rem] font-bold tracking-wide uppercase",
       },
     },
     defaultVariants: {

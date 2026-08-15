@@ -76,15 +76,15 @@ const config: Config = {
         xl: "calc(var(--radius) + 4px)",
       },
       boxShadow: {
-        // Deliberately soft — the mockups lean on hairline borders, not elevation
-        card: "0 1px 2px 0 rgb(16 24 40 / 0.04), 0 1px 3px 0 rgb(16 24 40 / 0.03)",
-        "card-hover":
-          "0 2px 6px -1px rgb(16 24 40 / 0.07), 0 1px 3px -1px rgb(16 24 40 / 0.04)",
-        pop: "0 8px 24px -6px rgb(16 24 40 / 0.12), 0 2px 6px -2px rgb(16 24 40 / 0.06)",
+        // Cards have clear but subtle elevation — not floating, not flat
+        card: "0 1px 3px 0 rgb(16 24 40 / 0.07), 0 1px 2px -1px rgb(16 24 40 / 0.04)",
+        "card-hover": "0 4px 12px -2px rgb(16 24 40 / 0.10), 0 2px 4px -2px rgb(16 24 40 / 0.05)",
+        pop: "0 12px 32px -8px rgb(16 24 40 / 0.14), 0 4px 8px -4px rgb(16 24 40 / 0.07)",
+        "sm": "0 1px 2px 0 rgb(16 24 40 / 0.05)",
       },
       fontSize: {
         // Small uppercase eyebrow used on stat cards and report rows
-        eyebrow: ["0.6875rem", { lineHeight: "1rem", letterSpacing: "0.06em" }],
+        eyebrow: ["0.6875rem", { lineHeight: "1rem", letterSpacing: "0.07em" }],
       },
       keyframes: {
         "accordion-down": {

@@ -370,7 +370,6 @@ export function TransmissionGraph({
       aria-label={`Transmission graph: ${fallbackText}`}
     >
       <ReactFlow
-        key={Object.values(enabled).join()}
         nodes={nodes}
         edges={edges}
         nodeTypes={nodeTypes}
@@ -421,12 +420,13 @@ export function TransmissionGraph({
       )}
 
       {/* Node-type filters */}
-      <div className="absolute right-4 top-4 z-10 w-[188px] rounded-xl border border-border bg-card p-3.5 shadow-pop">
-        <p className="mb-2.5 font-semibold text-foreground">Filters</p>
-        <div className="space-y-2">
+      <div className="absolute right-4 top-4 z-10 w-[210px] rounded-xl border border-border bg-card p-3.5 shadow-pop">
+        <p className="mb-2.5 text-sm font-semibold text-foreground">Filters</p>
+        <div className="space-y-2.5">
           {(Object.keys(ENTITY_STYLES) as EntityKind[]).map((kind) => {
             const count = built.counts[kind];
             const absent = count === 0;
+            const isChecked = enabled[kind] && !absent;
             return (
               <label
                 key={kind}
@@ -435,28 +435,27 @@ export function TransmissionGraph({
                   absent && "cursor-not-allowed opacity-45"
                 )}
               >
-                <span className="text-foreground">
+                <span className="font-medium text-foreground">
                   {ENTITY_STYLES[kind].label}
                   <span className="ml-1 text-muted-foreground">({count})</span>
                 </span>
                 <button
                   type="button"
                   role="switch"
-                  aria-checked={enabled[kind] && !absent}
+                  aria-checked={isChecked}
                   aria-label={`Toggle ${ENTITY_STYLES[kind].label}`}
                   disabled={absent}
                   onClick={() => setEnabled((s) => ({ ...s, [kind]: !s[kind] }))}
                   className={cn(
-                    "relative h-5 w-9 shrink-0 rounded-full transition-colors",
-                    enabled[kind] && !absent ? "bg-primary" : "bg-border"
+                    "relative inline-flex h-5 w-9 shrink-0 cursor-pointer items-center rounded-full p-0.5 transition-colors duration-200 ease-in-out focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/40",
+                    isChecked ? "bg-primary" : "bg-muted-foreground/25",
+                    absent && "cursor-not-allowed opacity-50"
                   )}
                 >
                   <span
                     className={cn(
-                      "absolute top-0.5 h-4 w-4 rounded-full bg-white shadow-card transition-transform",
-                      enabled[kind] && !absent
-                        ? "translate-x-[18px]"
-                        : "translate-x-0.5"
+                      "pointer-events-none block h-4 w-4 rounded-full bg-white shadow-sm ring-0 transition-transform duration-200 ease-in-out",
+                      isChecked ? "translate-x-4" : "translate-x-0"
                     )}
                   />
                 </button>

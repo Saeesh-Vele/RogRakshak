@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useState, useMemo } from "react";
-import { useSearchParams } from "next/navigation";
+import { Suspense, useEffect, useState, useMemo, useCallback } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { getProvider } from "@/lib/data-provider";
 import type { InvestigationCase, InvestigationStatus } from "@/types/api";
@@ -9,6 +9,7 @@ import { useAppStore } from "@/lib/store";
 import { caseStartedAt } from "@/lib/metrics";
 import { StatusBadge } from "@/components/investigation/status-badge";
 import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { SearchInput } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
 import {
@@ -19,7 +20,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { AlertTriangle, Search } from "lucide-react";
+import { AlertTriangle, RefreshCw, RotateCcw, Search } from "lucide-react";
 
 function formatDay(iso: string) {
   return new Date(iso).toLocaleDateString("en-GB", {
@@ -29,7 +30,8 @@ function formatDay(iso: string) {
   });
 }
 
-export default function InvestigationsListPage() {
+function InvestigationsListContent() {
+  const router = useRouter();
   const [cases, setCases] = useState<InvestigationCase[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -41,26 +43,22 @@ export default function InvestigationsListPage() {
   const [sortBy, setSortBy] = useState<"confidence" | "date">("confidence");
   const mode = useAppStore((s) => s.mode);
 
-  useEffect(() => {
-    let cancelled = false;
-    async function load() {
-      setLoading(true);
-      setError(null);
-      try {
-        const resp = await getProvider().list();
-        if (!cancelled) setCases(resp.cases);
-      } catch (err: unknown) {
-        if (!cancelled)
-          setError(err instanceof Error ? err.message : "Failed to load");
-      } finally {
-        if (!cancelled) setLoading(false);
-      }
+  const loadData = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const resp = await getProvider().list();
+      setCases(resp.cases);
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Failed to load investigations");
+    } finally {
+      setLoading(false);
     }
-    load();
-    return () => {
-      cancelled = true;
-    };
-  }, [mode]);
+  }, []);
+
+  useEffect(() => {
+    void loadData();
+  }, [loadData, mode]);
 
   // Reflect top-bar searches that navigate here with a ?q= param
   useEffect(() => {
@@ -95,14 +93,22 @@ export default function InvestigationsListPage() {
     return result;
   }, [cases, search, statusFilter, sortBy]);
 
+  const hasActiveFilters = Boolean(search.trim() || statusFilter !== "ALL");
+
+  const resetFilters = useCallback(() => {
+    setSearch("");
+    setStatusFilter("ALL");
+    setSortBy("confidence");
+  }, []);
+
   return (
     <div className="mx-auto max-w-[1400px] space-y-6 p-6 lg:p-8">
       <div>
-        <h1 className="text-[1.75rem] font-bold tracking-tight text-foreground">
+        <h1 className="text-[1.625rem] font-bold tracking-tight text-foreground">
           Investigations
         </h1>
-        <p className="mt-1 text-sm text-muted-foreground">
-          All outbreak investigation cases
+        <p className="mt-1 text-[0.9rem] text-muted-foreground">
+          All outbreak investigation cases — sorted by confidence
         </p>
       </div>
 
@@ -145,38 +151,65 @@ export default function InvestigationsListPage() {
       </div>
 
       {loading && (
-        <div className="flex items-center gap-3 py-16 text-sm text-muted-foreground">
-          <div className="h-4 w-4 animate-spin rounded-full border-2 border-primary border-t-transparent" />
-          Loading investigations…
-        </div>
+        <Card className="overflow-hidden p-5 space-y-4 animate-pulse">
+          <div className="h-4 w-32 rounded bg-muted" />
+          <div className="space-y-3 pt-2">
+            {[1, 2, 3, 4].map((i) => (
+              <div key={i} className="h-12 w-full rounded bg-muted/60" />
+            ))}
+          </div>
+        </Card>
       )}
 
-      {error && (
+      {error && !loading && (
         <Card className="border-risk-high-foreground/20">
-          <CardContent className="flex items-start gap-3 p-5">
-            <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-risk-high-foreground" />
-            <div>
-              <p className="text-sm font-semibold text-foreground">
-                Failed to load investigations
-              </p>
-              <p className="mt-0.5 text-sm text-muted-foreground">{error}</p>
+          <CardContent className="flex items-start justify-between gap-4 p-5">
+            <div className="flex items-start gap-3">
+              <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-risk-high-foreground" />
+              <div>
+                <p className="text-sm font-semibold text-foreground">
+                  Unable to load investigations
+                </p>
+                <p className="mt-0.5 text-sm text-muted-foreground">{error}</p>
+              </div>
             </div>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={loadData}
+              className="shrink-0 gap-1.5"
+            >
+              <RefreshCw className="h-3.5 w-3.5" />
+              Retry
+            </Button>
           </CardContent>
         </Card>
       )}
 
       {!loading && !error && (
         <>
-          <p className="text-sm text-muted-foreground">
-            {filtered.length} investigation{filtered.length !== 1 ? "s" : ""}
-            {filtered.length !== cases.length && ` of ${cases.length}`}
-          </p>
+          <div className="flex items-center justify-between">
+            <p className="text-sm text-muted-foreground">
+              {filtered.length} investigation{filtered.length !== 1 ? "s" : ""}
+              {filtered.length !== cases.length && ` of ${cases.length}`}
+            </p>
+            {hasActiveFilters && (
+              <button
+                type="button"
+                onClick={resetFilters}
+                className="inline-flex items-center gap-1 text-xs font-medium text-primary hover:underline cursor-pointer"
+              >
+                <RotateCcw className="h-3 w-3" />
+                Reset filters
+              </button>
+            )}
+          </div>
 
           {filtered.length === 0 ? (
             <Card>
-              <CardContent className="p-10 text-center text-sm text-muted-foreground">
+              <CardContent className="p-10 text-center text-sm text-muted-foreground space-y-3">
                 {cases.length === 0 ? (
-                  <>
+                  <p>
                     No investigations yet.{" "}
                     <Link
                       href="/investigations/new"
@@ -185,9 +218,20 @@ export default function InvestigationsListPage() {
                       Start one
                     </Link>
                     .
-                  </>
+                  </p>
                 ) : (
-                  "No investigations match your search criteria."
+                  <div>
+                    <p>No investigations match your filter criteria.</p>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={resetFilters}
+                      className="mt-3 inline-flex items-center gap-1.5"
+                    >
+                      <RotateCcw className="h-3.5 w-3.5" />
+                      Clear all filters
+                    </Button>
+                  </div>
                 )}
               </CardContent>
             </Card>
@@ -209,36 +253,45 @@ export default function InvestigationsListPage() {
                 <TableBody>
                   {filtered.map((c) => {
                     const started = caseStartedAt(c);
+                    const confPct = Math.round(c.confidence * 100);
                     return (
-                      <TableRow key={c.case_id}>
-                        <TableCell className="whitespace-nowrap font-medium">
-                          <Link
-                            href={`/investigations/${c.case_id}`}
-                            className="hover:text-primary hover:underline"
-                          >
+                      <TableRow
+                        key={c.case_id}
+                        onClick={() => router.push(`/investigations/${c.case_id}`)}
+                        className="cursor-pointer"
+                      >
+                        <TableCell className="whitespace-nowrap">
+                          <span className="inline-flex items-center rounded-md bg-primary-soft px-2 py-0.5 font-mono text-[0.8125rem] font-semibold text-primary">
                             {c.case_id}
-                          </Link>
-                        </TableCell>
-                        <TableCell className="whitespace-nowrap text-muted-foreground">
-                          {c.index_patient.name}
-                          <span className="ml-2 text-[0.8125rem] text-muted-foreground/70">
-                            {c.candidate_patients.length} contact
-                            {c.candidate_patients.length !== 1 ? "s" : ""}
                           </span>
                         </TableCell>
+                        <TableCell className="whitespace-nowrap">
+                          <p className="font-medium text-foreground">{c.index_patient.name}</p>
+                          <p className="text-[0.8125rem] text-muted-foreground">
+                            {c.candidate_patients.length} contact{c.candidate_patients.length !== 1 ? "s" : ""}
+                          </p>
+                        </TableCell>
                         <TableCell>
-                          <span className="italic">{c.organism}</span>
+                          <span className="italic text-foreground">{c.organism}</span>
                           {c.resistance_profile && (
-                            <span className="ml-1.5 whitespace-nowrap text-muted-foreground">
-                              · {c.resistance_profile}
+                            <span className="ml-1.5 whitespace-nowrap font-mono text-[0.8125rem] text-muted-foreground">
+                              {c.resistance_profile}
                             </span>
                           )}
                         </TableCell>
                         <TableCell>
                           <StatusBadge status={c.status} />
                         </TableCell>
-                        <TableCell className="text-right font-semibold tabular-nums">
-                          {Math.round(c.confidence * 100)}%
+                        <TableCell className="text-right">
+                          <div className="flex items-center justify-end gap-2">
+                            <div className="w-14 h-1.5 overflow-hidden rounded-full bg-muted">
+                              <div
+                                className="h-full rounded-full bg-primary transition-all duration-300"
+                                style={{ width: `${confPct}%` }}
+                              />
+                            </div>
+                            <span className="font-semibold tabular-nums text-foreground">{confPct}%</span>
+                          </div>
                         </TableCell>
                         <TableCell className="whitespace-nowrap text-right text-muted-foreground tabular-nums">
                           <span
@@ -262,5 +315,22 @@ export default function InvestigationsListPage() {
         </>
       )}
     </div>
+  );
+}
+
+export default function InvestigationsListPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="mx-auto max-w-[1400px] p-6 lg:p-8">
+          <div className="flex items-center gap-3 py-16 text-sm text-muted-foreground">
+            <div className="h-4 w-4 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+            Loading investigations…
+          </div>
+        </div>
+      }
+    >
+      <InvestigationsListContent />
+    </Suspense>
   );
 }

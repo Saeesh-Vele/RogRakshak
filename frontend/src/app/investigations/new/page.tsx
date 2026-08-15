@@ -26,17 +26,22 @@ function Field({
   id,
   label,
   hint,
+  required: isRequired,
   children,
 }: {
   id: string;
   label: string;
   hint?: string;
+  required?: boolean;
   children: React.ReactNode;
 }) {
   return (
-    <div className="space-y-1.5">
-      <label htmlFor={id} className="block text-sm font-medium text-foreground">
+    <div className="space-y-2">
+      <label htmlFor={id} className="block text-[0.875rem] font-medium text-foreground">
         {label}
+        {isRequired && (
+          <span className="ml-1 text-risk-high-foreground" aria-hidden>*</span>
+        )}
       </label>
       {children}
       {hint && <p className="text-[0.8125rem] text-muted-foreground">{hint}</p>}
@@ -126,11 +131,11 @@ export default function NewInvestigationPage() {
   return (
     <div className="mx-auto max-w-[1400px] space-y-6 p-6 lg:p-8">
       <div>
-        <h1 className="text-[1.75rem] font-bold tracking-tight text-foreground">
+        <h1 className="text-[1.625rem] font-bold tracking-tight text-foreground">
           New Investigation
         </h1>
-        <p className="mt-1 text-sm text-muted-foreground">
-          Trigger an epidemiological investigation workflow
+        <p className="mt-1 text-[0.9rem] text-muted-foreground">
+          Trigger a 7-step epidemiological investigation workflow using live hospital data
         </p>
       </div>
 
@@ -144,7 +149,8 @@ export default function NewInvestigationPage() {
               <Field
                 id="patientId"
                 label="Target Patient ID"
-                hint="The index patient to investigate."
+                hint="The index patient to investigate. Numeric ID from the hospital graph."
+                required
               >
                 <Input
                   id="patientId"
@@ -158,7 +164,7 @@ export default function NewInvestigationPage() {
                 />
               </Field>
 
-              <Field id="organism" label="Organism">
+              <Field id="organism" label="Organism" required>
                 <Input
                   id="organism"
                   value={organism}
@@ -172,7 +178,7 @@ export default function NewInvestigationPage() {
               <Field
                 id="resistance"
                 label="Resistance Profile"
-                hint="Optional — e.g. MDR, XDR."
+                hint="Optional — e.g. MDR, XDR, ESBL."
               >
                 <Input
                   id="resistance"
@@ -183,22 +189,21 @@ export default function NewInvestigationPage() {
                 />
               </Field>
 
-              <label className="flex cursor-pointer items-start gap-3 rounded-lg border border-border p-3.5">
+              <label className="flex cursor-pointer items-start gap-3 rounded-lg border border-border p-4 transition-colors hover:bg-muted/30">
                 <input
                   id="useMockGraph"
                   type="checkbox"
                   checked={useMockGraph}
                   onChange={(e) => setUseMockGraph(e.target.checked)}
                   disabled={running}
-                  className="mt-0.5 h-4 w-4 rounded border-border text-primary focus:ring-2 focus:ring-primary/25"
+                  className="mt-0.5 h-4 w-4 rounded border-border text-primary accent-primary focus:ring-2 focus:ring-primary/25"
                 />
                 <span>
-                  <span className="block text-sm font-medium text-foreground">
+                  <span className="block text-[0.875rem] font-medium text-foreground">
                     Use offline mock graph
                   </span>
-                  <span className="block text-[0.8125rem] text-muted-foreground">
-                    Runs against fixtures instead of the live graph. Development
-                    only.
+                  <span className="mt-0.5 block text-[0.8125rem] text-muted-foreground">
+                    Runs against fixtures instead of the live graph. Development only.
                   </span>
                 </span>
               </label>
@@ -223,10 +228,19 @@ export default function NewInvestigationPage() {
                 type="submit"
                 disabled={running}
                 size="lg"
-                className="w-full"
+                className="w-full gap-2 transition-all cursor-pointer"
               >
-                <PlusCircle />
-                {running ? "Running Investigation…" : "Start Investigation"}
+                {running ? (
+                  <>
+                    <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                    Running Investigation…
+                  </>
+                ) : (
+                  <>
+                    <PlusCircle className="h-4 w-4" />
+                    Start Investigation
+                  </>
+                )}
               </Button>
             </form>
           </CardContent>
@@ -235,21 +249,26 @@ export default function NewInvestigationPage() {
         <div className="space-y-4">
           {progress === "idle" ? (
             <Card>
-              <CardHeader className="pb-2">
-                <CardTitle>Agent Activity</CardTitle>
+              <CardHeader className="pb-3">
+                <CardTitle>Agent Workflow</CardTitle>
+                <p className="text-sm text-muted-foreground">
+                  7 LangGraph nodes run in sequence when you start an investigation
+                </p>
               </CardHeader>
               <CardContent>
-                <p className="text-sm text-muted-foreground">
-                  The LangGraph workflow runs seven nodes in sequence. Progress
-                  appears here once you start an investigation.
-                </p>
-                <ol className="mt-3 space-y-1.5">
-                  {WORKFLOW_STEPS.map((s) => (
+                <ol className="space-y-2">
+                  {WORKFLOW_STEPS.map((s, i) => (
                     <li
                       key={s.node}
-                      className="font-mono text-[0.75rem] text-muted-foreground/70"
+                      className="flex items-center gap-3"
                     >
-                      {s.node}
+                      <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full border-2 border-border bg-muted text-[0.6875rem] font-bold text-muted-foreground">
+                        {i + 1}
+                      </span>
+                      <div className="min-w-0">
+                        <p className="text-[0.875rem] font-medium text-foreground">{s.label}</p>
+                        <p className="font-mono text-[0.6875rem] text-muted-foreground/60">{s.node}</p>
+                      </div>
                     </li>
                   ))}
                 </ol>

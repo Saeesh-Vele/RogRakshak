@@ -10,8 +10,16 @@ import {
   tierBadgeVariant,
   type RiskTier,
 } from "@/lib/risk";
+import { cn } from "@/lib/utils";
+import { User } from "lucide-react";
 
 const TIER_ORDER: Record<RiskTier, number> = { HIGH: 0, MEDIUM: 1, LOW: 2 };
+
+const TIER_DOT: Record<RiskTier, string> = {
+  HIGH:   "bg-risk-high-foreground",
+  MEDIUM: "bg-[hsl(30_82%_50%)]",
+  LOW:    "bg-muted-foreground",
+};
 
 interface RankedContact {
   patient: PatientSummary;
@@ -20,13 +28,6 @@ interface RankedContact {
   detail: string;
 }
 
-/**
- * Ranks candidate patients by the strength of their link to the index case.
- *
- * Everything shown is read off the evidence array: the tier comes from
- * `risk.ts`, the overlap total from `overlap_minutes`, and the location from
- * whichever place contributed the most contact evidence. No scoring of our own.
- */
 function rankContacts(inv: InvestigationCase): RankedContact[] {
   const indexId = inv.index_patient.id;
 
@@ -37,21 +38,15 @@ function rankContacts(inv: InvestigationCase): RankedContact[] {
         return pair.includes(indexId) && pair.includes(patient.id);
       });
 
-      const totalOverlap = linking.reduce(
-        (sum, e) => sum + (e.overlap_minutes ?? 0),
-        0
-      );
+      const totalOverlap = linking.reduce((sum, e) => sum + (e.overlap_minutes ?? 0), 0);
 
-      // Shared locations behind the link. Several are common, and picking a
-      // single "top" one would break ties arbitrarily and misreport the link.
       const locations = Array.from(
         new Set(linking.map((e) => e.location).filter(Boolean) as string[])
       );
 
       const parts: string[] = [];
       if (locations.length === 1) parts.push(`Shared ${locations[0]}`);
-      else if (locations.length > 1)
-        parts.push(`${locations.length} shared locations`);
+      else if (locations.length > 1) parts.push(`${locations.length} shared locations`);
       if (totalOverlap > 0) parts.push(`${formatMinutes(totalOverlap)} overlap`);
       if (parts.length === 0) {
         const hasContact = linking.some((e) => evidenceTier(e) !== "LOW");
@@ -71,8 +66,7 @@ function rankContacts(inv: InvestigationCase): RankedContact[] {
     })
     .sort(
       (a, b) =>
-        TIER_ORDER[a.tier] - TIER_ORDER[b.tier] ||
-        b.totalOverlap - a.totalOverlap
+        TIER_ORDER[a.tier] - TIER_ORDER[b.tier] || b.totalOverlap - a.totalOverlap
     );
 }
 
@@ -85,7 +79,7 @@ export function DiscoveredContacts({
 
   return (
     <Card className="overflow-hidden">
-      <CardHeader className="pb-4">
+      <CardHeader className="pb-3">
         <CardTitle>Discovered Contacts</CardTitle>
         <p className="text-sm text-muted-foreground">
           Ranked by temporal overlap with the index case
@@ -97,22 +91,34 @@ export function DiscoveredContacts({
           No candidate contacts identified.
         </p>
       ) : (
-        <div className="divide-hairline border-t border-border">
+        <div className="border-t border-border">
           {contacts.map(({ patient, tier, detail }) => (
             <div
               key={patient.id}
-              className="flex items-start justify-between gap-3 px-5 py-4"
+              className="flex items-center justify-between gap-3 px-5 py-3.5 transition-colors duration-100 hover:bg-muted/30"
             >
-              <div className="min-w-0">
-                <p className="font-semibold text-foreground">{patient.name}</p>
-                <p className="mt-0.5 text-[0.8125rem] text-muted-foreground">
-                  {detail}
-                </p>
-                <p className="mt-0.5 font-mono text-[0.75rem] text-muted-foreground/70">
-                  {patient.mrn}
-                </p>
+              <div className="flex min-w-0 items-center gap-3">
+                {/* Avatar */}
+                <span
+                  className={cn(
+                    "grid h-8 w-8 shrink-0 place-items-center rounded-full text-xs font-semibold",
+                    tier === "HIGH"   && "bg-risk-high text-risk-high-foreground",
+                    tier === "MEDIUM" && "bg-risk-medium text-risk-medium-foreground",
+                    tier === "LOW"    && "bg-muted text-muted-foreground"
+                  )}
+                >
+                  <User className="h-3.5 w-3.5" />
+                </span>
+                <div className="min-w-0">
+                  <p className="font-semibold text-foreground">{patient.name}</p>
+                  <p className="mt-0.5 text-[0.8125rem] text-muted-foreground">{detail}</p>
+                  <p className="mt-0.5 font-mono text-[0.75rem] text-muted-foreground/60">
+                    {patient.mrn}
+                  </p>
+                </div>
               </div>
               <Badge variant={tierBadgeVariant[tier]} size="tier" className="shrink-0">
+                <span aria-hidden className={cn("h-1.5 w-1.5 rounded-full", TIER_DOT[tier])} />
                 {tier}
               </Badge>
             </div>

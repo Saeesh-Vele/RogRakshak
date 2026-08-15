@@ -4,7 +4,7 @@ import { cn } from "@/lib/utils"
 
 /**
  * Styled native <select>. Native keeps keyboard/screen-reader behaviour and
- * mobile pickers for free; the chevron is drawn over it since `appearance-none`
+ * mobile pickers for free. The chevron is drawn over it since `appearance-none`
  * removes the platform one.
  */
 const Select = React.forwardRef<
@@ -15,9 +15,11 @@ const Select = React.forwardRef<
     <select
       ref={ref}
       className={cn(
-        "h-11 w-full appearance-none rounded-xl border border-border bg-card py-2 pl-3.5 pr-9 text-sm font-medium text-foreground",
+        "h-9 w-full appearance-none rounded-lg border border-border bg-card py-2 pl-3.5 pr-9 text-sm font-medium text-foreground shadow-sm",
+        "transition-colors duration-150",
+        "hover:border-border/70 hover:bg-muted/30",
         "focus-visible:outline-none focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/15",
-        "disabled:cursor-not-allowed disabled:opacity-50",
+        "disabled:cursor-not-allowed disabled:opacity-45",
         className
       )}
       {...props}
@@ -26,7 +28,7 @@ const Select = React.forwardRef<
     </select>
     <ChevronDown
       aria-hidden
-      className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground"
+      className="pointer-events-none absolute right-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground"
     />
   </div>
 ))

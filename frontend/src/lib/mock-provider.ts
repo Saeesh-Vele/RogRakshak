@@ -42,21 +42,29 @@ export const mockProvider = {
 
   async get(caseId: string): Promise<InvestigationCase | null> {
     await delay();
-    if (caseId === fixture.investigation.case_id) {
+    const cleanId = caseId.trim().toUpperCase();
+    const fixtureId = fixture.investigation.case_id.toUpperCase();
+    if (cleanId === fixtureId || cleanId === "CASE-001" || cleanId === "CASE-2026-001") {
       return fixture.investigation;
     }
     return null;
   },
 
-  async create(): Promise<InvestigationCase> {
+  async create(req?: { target_patient_id?: number; organism?: string; resistance_profile?: string | null }): Promise<InvestigationCase> {
     await delay(800);
-    // Return the pre-computed investigation as though it was just created
-    return fixture.investigation;
+    if (!req) return fixture.investigation;
+    return {
+      ...fixture.investigation,
+      organism: req.organism || fixture.investigation.organism,
+      resistance_profile: req.resistance_profile !== undefined ? req.resistance_profile : fixture.investigation.resistance_profile,
+    };
   },
 
   async getEvidence(caseId: string): Promise<EvidenceItem[]> {
     await delay();
-    if (caseId === fixture.investigation.case_id) {
+    const cleanId = caseId.trim().toUpperCase();
+    const fixtureId = fixture.investigation.case_id.toUpperCase();
+    if (cleanId === fixtureId || cleanId === "CASE-001" || cleanId === "CASE-2026-001") {
       return fixture.investigation.evidence;
     }
     return [];
@@ -66,7 +74,9 @@ export const mockProvider = {
     caseId: string
   ): Promise<InvestigationTimelineEntry[]> {
     await delay();
-    if (caseId === fixture.investigation.case_id) {
+    const cleanId = caseId.trim().toUpperCase();
+    const fixtureId = fixture.investigation.case_id.toUpperCase();
+    if (cleanId === fixtureId || cleanId === "CASE-001" || cleanId === "CASE-2026-001") {
       return fixture.investigation.timeline;
     }
     return [];

@@ -109,10 +109,15 @@ export default function InvestigationDetailPage() {
 
   if (loading) {
     return (
-      <div className="mx-auto max-w-[1400px] p-6 lg:p-8">
-        <div className="flex items-center gap-3 py-16 text-sm text-muted-foreground">
-          <div className="h-4 w-4 animate-spin rounded-full border-2 border-primary border-t-transparent" />
-          Loading investigation…
+      <div className="mx-auto max-w-[1400px] space-y-6 p-6 lg:p-8 animate-pulse">
+        <div className="space-y-3">
+          <div className="h-4 w-36 rounded bg-muted" />
+          <div className="h-9 w-72 rounded bg-muted" />
+          <div className="h-4 w-48 rounded bg-muted" />
+        </div>
+        <div className="grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,1fr)_400px]">
+          <Card className="h-64 p-6 bg-muted/40" />
+          <Card className="h-64 p-6 bg-muted/40" />
         </div>
       </div>
     );
@@ -127,17 +132,26 @@ export default function InvestigationDetailPage() {
         >
           <ArrowLeft className="h-4 w-4" /> Back to Investigations
         </Link>
-        <Card>
-          <CardContent className="flex items-start gap-3 p-6">
-            <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-risk-high-foreground" />
-            <div>
-              <p className="font-semibold text-foreground">
-                {error || "Investigation not found"}
-              </p>
-              <p className="mt-1 text-sm text-muted-foreground">
-                The case may not exist, or the backend may be unavailable.
-              </p>
+        <Card className="border-risk-high-foreground/20">
+          <CardContent className="flex items-start justify-between gap-4 p-6">
+            <div className="flex items-start gap-3">
+              <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-risk-high-foreground" />
+              <div>
+                <p className="font-semibold text-foreground">
+                  {error || "Investigation not found"}
+                </p>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  The case may not exist, or the backend service may be temporarily unavailable.
+                </p>
+              </div>
             </div>
+            <button
+              type="button"
+              onClick={() => void load()}
+              className="inline-flex items-center gap-1.5 rounded-lg border border-border bg-card px-3 py-1.5 text-xs font-medium text-foreground hover:bg-muted cursor-pointer transition-colors"
+            >
+              Retry
+            </button>
           </CardContent>
         </Card>
       </div>

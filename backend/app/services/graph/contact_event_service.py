@@ -11,7 +11,7 @@ import hashlib
 from pathlib import Path
 from datetime import datetime
 from typing import List, Dict, Any, Optional, Tuple
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 
 # Ensure backend package is in python path
 backend_path = Path(__file__).resolve().parent.parent.parent
@@ -59,8 +59,10 @@ class ContactEventEngine:
     def __init__(self, db_session: Optional[Session] = None):
         self._owns_session = db_session is None
         self.db = db_session or SessionLocal()
+        self._cached_events: Optional[List[ContactEvent]] = None
 
     def close(self):
+        self._cached_events = None
         if self._owns_session:
             self.db.close()
 
@@ -77,6 +79,9 @@ class ContactEventEngine:
         2. Patient <-> Patient co-location contacts (via shared ward/bed stays)
         3. Patient <-> Procedure Staff contacts (via clinical procedures)
         """
+        if self._cached_events is not None:
+            return self._cached_events
+
         events: List[ContactEvent] = []
 
         # Cache reference entities
@@ -101,19 +106,22 @@ class ContactEventEngine:
             .all()
         )
 
+        staff_movements_by_ward: Dict[int, List[Movement]] = {}
+        for sm in staff_ward_movements:
+            staff_movements_by_ward.setdefault(sm.location_id, []).append(sm)
+
         for pm in patient_ward_movements:
-            p_obj = patients.get(pm.location_id if False else pm.patient_id)
+            p_obj = patients.get(pm.patient_id)
             if not p_obj:
                 continue
 
-            for sm in staff_ward_movements:
-                # Same ward check
-                if pm.location_id != sm.location_id:
-                    continue
+            w_obj = wards.get(pm.location_id)
+            if not w_obj:
+                continue
 
+            for sm in staff_movements_by_ward.get(pm.location_id, []):
                 s_obj = staff_members.get(sm.staff_id)
-                w_obj = wards.get(pm.location_id)
-                if not s_obj or not w_obj:
+                if not s_obj:
                     continue
 
                 overlap = compute_interval_overlap(pm.entry_time, pm.exit_time, sm.entry_time, sm.exit_time)
@@ -220,7 +228,7 @@ class ContactEventEngine:
         # -------------------------------------------------------------
         # 3. Patient <-> Procedure Staff Overlaps
         # -------------------------------------------------------------
-        procedures = self.db.query(Procedure).all()
+        procedures = self.db.query(Procedure).options(joinedload(Procedure.staff_members)).all()
         for proc in procedures:
             p_obj = patients.get(proc.patient_id)
             w_obj = wards.get(proc.location_id) or Ward(id=proc.location_id, name="Procedure Room", department="Clinical")
@@ -262,4 +270,5 @@ class ContactEventEngine:
 
         # Sort events deterministically by start_time, patient_id, connected_entity.id
         events.sort(key=lambda x: (x.start_time, x.patient_id, x.connected_entity.id, x.event_id))
+        self._cached_events = events
         return events

@@ -2,8 +2,9 @@ import * as React from "react"
 import { cn } from "@/lib/utils"
 
 /**
- * Low-chrome table: light gray header row, generous row padding, hairline
- * row separators only — no vertical rules, no outer border (the Card supplies it).
+ * Clinical data table: uppercase eyebrow headers, clear row hover,
+ * generous row padding, hairline separators only — no vertical rules.
+ * The Card component supplies the outer border and shadow.
  */
 
 const Table = React.forwardRef<
@@ -24,7 +25,11 @@ const TableHeader = React.forwardRef<
   HTMLTableSectionElement,
   React.HTMLAttributes<HTMLTableSectionElement>
 >(({ className, ...props }, ref) => (
-  <thead ref={ref} className={cn("bg-muted/60", className)} {...props} />
+  <thead
+    ref={ref}
+    className={cn("border-b border-border bg-muted/50", className)}
+    {...props}
+  />
 ))
 TableHeader.displayName = "TableHeader"
 
@@ -32,7 +37,7 @@ const TableBody = React.forwardRef<
   HTMLTableSectionElement,
   React.HTMLAttributes<HTMLTableSectionElement>
 >(({ className, ...props }, ref) => (
-  <tbody ref={ref} className={cn("", className)} {...props} />
+  <tbody ref={ref} className={cn("divide-y divide-border", className)} {...props} />
 ))
 TableBody.displayName = "TableBody"
 
@@ -43,7 +48,7 @@ const TableRow = React.forwardRef<
   <tr
     ref={ref}
     className={cn(
-      "border-b border-border last:border-0 transition-colors hover:bg-muted/40",
+      "transition-colors duration-100 hover:bg-primary-soft/40",
       className
     )}
     {...props}
@@ -58,7 +63,8 @@ const TableHead = React.forwardRef<
   <th
     ref={ref}
     className={cn(
-      "px-4 py-3 text-left text-sm font-medium text-muted-foreground",
+      // Eyebrow style — scannable column headers
+      "px-4 py-3 text-left text-[0.6875rem] font-semibold uppercase tracking-wider text-muted-foreground",
       className
     )}
     {...props}
@@ -72,7 +78,7 @@ const TableCell = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <td
     ref={ref}
-    className={cn("px-4 py-4 align-middle text-foreground", className)}
+    className={cn("px-4 py-3.5 align-middle text-foreground", className)}
     {...props}
   />
 ))

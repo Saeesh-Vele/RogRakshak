@@ -5,13 +5,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { StatusBadge } from "@/components/investigation/status-badge";
 import { evidenceTier } from "@/lib/risk";
+import { CheckCircle2 } from "lucide-react";
 
-/**
- * The backend's `summary` is a deterministic f-string (see
- * langgraph_workflow.synthesize_summary) that ends with a fixed
- * "Recommended actions: ..." clause. Split the two so the briefing prose and
- * the standing protocol list can be presented for what each actually is.
- */
 function splitSummary(summary: string): { briefing: string; actions: string[] } {
   const marker = "Recommended actions:";
   const at = summary.indexOf(marker);
@@ -33,15 +28,13 @@ function exposureWindow(inv: InvestigationCase): string | null {
   const times: number[] = [];
   for (const e of inv.evidence) {
     if (e.start_time) times.push(new Date(e.start_time).getTime());
-    if (e.end_time) times.push(new Date(e.end_time).getTime());
+    if (e.end_time)   times.push(new Date(e.end_time).getTime());
   }
   if (times.length === 0) return null;
 
   const fmt = (t: number) =>
     new Date(t).toLocaleDateString("en-GB", {
-      day: "2-digit",
-      month: "short",
-      year: "numeric",
+      day: "2-digit", month: "short", year: "numeric",
     });
   return `${fmt(Math.min(...times))} – ${fmt(Math.max(...times))}`;
 }
@@ -55,21 +48,13 @@ function topBy<T>(items: T[], key: (t: T) => string | null): string | null {
   return Array.from(counts.entries()).sort((a, b) => b[1] - a[1])[0]?.[0] ?? null;
 }
 
-function Row({
-  label,
-  children,
-}: {
-  label: string;
-  children: React.ReactNode;
-}) {
+function Row({ label, children }: { label: string; children: React.ReactNode }) {
   return (
-    <div className="flex flex-col gap-1 py-3 sm:flex-row sm:items-baseline sm:gap-4">
-      <p className="shrink-0 text-eyebrow font-semibold uppercase text-muted-foreground sm:w-[190px]">
+    <div className="flex flex-col gap-1 border-t border-border py-3.5 sm:flex-row sm:items-baseline sm:gap-4">
+      <p className="shrink-0 text-[0.6875rem] font-semibold uppercase tracking-wider text-muted-foreground sm:w-[200px]">
         {label}
       </p>
-      <div className="min-w-0 flex-1 text-[0.9375rem] text-foreground">
-        {children}
-      </div>
+      <div className="min-w-0 flex-1 text-[0.9rem] text-foreground">{children}</div>
     </div>
   );
 }
@@ -98,20 +83,23 @@ export function ReportCard({ investigation: inv }: { investigation: Investigatio
         <p className="text-sm text-muted-foreground">
           Generated{" "}
           {new Date(inv.generated_at).toLocaleString("en-GB", {
-            day: "2-digit",
-            month: "short",
-            year: "numeric",
-            hour: "2-digit",
-            minute: "2-digit",
+            day: "2-digit", month: "short", year: "numeric",
+            hour: "2-digit", minute: "2-digit",
           })}
         </p>
       </CardHeader>
 
       <CardContent>
-        <div className="divide-hairline border-t border-border">
+        <div>
           <Row label="Case">
-            {inv.case_id} · <span className="italic">{inv.organism}</span>
-            {inv.resistance_profile && ` ${inv.resistance_profile}`}
+            <span className="font-semibold">{inv.case_id}</span>
+            <span className="mx-1.5 text-muted-foreground/50">·</span>
+            <span className="italic text-muted-foreground">{inv.organism}</span>
+            {inv.resistance_profile && (
+              <span className="ml-1 font-mono text-muted-foreground">
+                {inv.resistance_profile}
+              </span>
+            )}
           </Row>
 
           {window && <Row label="Exposure Window">{window}</Row>}
@@ -122,23 +110,22 @@ export function ReportCard({ investigation: inv }: { investigation: Investigatio
             ) : (
               <span className="flex flex-wrap gap-1.5">
                 {highPriority.map((p) => (
-                  <Badge key={p.id} variant="riskHigh">
-                    {p.name}
-                  </Badge>
+                  <Badge key={p.id} variant="riskHigh">{p.name}</Badge>
                 ))}
               </span>
             )}
           </Row>
 
           {commonLocation && <Row label="Common Location">{commonLocation}</Row>}
-          {commonStaff && <Row label="Common Staff">{commonStaff}</Row>}
+          {commonStaff     && <Row label="Common Staff">{commonStaff}</Row>}
 
           <Row label="Assessment">
             <span className="flex flex-wrap items-center gap-2">
               <StatusBadge status={inv.status} />
-              <span className="text-muted-foreground">
-                {Math.round(inv.confidence * 100)}% confidence
+              <span className="font-semibold text-foreground tabular-nums">
+                {Math.round(inv.confidence * 100)}%
               </span>
+              <span className="text-muted-foreground">confidence</span>
             </span>
           </Row>
 
@@ -148,12 +135,15 @@ export function ReportCard({ investigation: inv }: { investigation: Investigatio
 
           {actions.length > 0 && (
             <Row label="Standing Protocol">
-              <ul className="list-disc space-y-1 pl-4 text-muted-foreground">
+              <ul className="space-y-2">
                 {actions.map((a) => (
-                  <li key={a}>{a}</li>
+                  <li key={a} className="flex items-start gap-2">
+                    <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-success" />
+                    <span className="text-muted-foreground">{a}</span>
+                  </li>
                 ))}
               </ul>
-              <p className="mt-2 text-[0.8125rem] italic text-muted-foreground/80">
+              <p className="mt-3 text-[0.8125rem] italic text-muted-foreground/70">
                 Fixed infection-control protocol returned with every case — not
                 derived from this case&apos;s evidence.
               </p>
@@ -161,8 +151,8 @@ export function ReportCard({ investigation: inv }: { investigation: Investigatio
           )}
         </div>
 
-        <p className="mt-4 text-[0.8125rem] italic text-muted-foreground">
-          Decision support only — findings require clinical review.
+        <p className="mt-4 rounded-lg bg-risk-medium/60 px-3.5 py-2.5 text-[0.8125rem] font-medium text-risk-medium-foreground">
+          ⚕ Decision support only — all findings require clinical review before action.
         </p>
       </CardContent>
     </Card>

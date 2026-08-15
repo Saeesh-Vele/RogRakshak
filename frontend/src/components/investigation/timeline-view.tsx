@@ -7,37 +7,36 @@ import { formatMinutes } from "@/lib/risk";
 import { cn } from "@/lib/utils";
 
 const EVENT_LABELS: Record<string, string> = {
-  admission: "Admission",
-  discharge: "Discharge",
-  movement: "Movement",
-  lab_report: "Lab Report",
-  procedure: "Procedure",
+  admission:   "Admission",
+  discharge:   "Discharge",
+  movement:    "Movement",
+  lab_report:  "Lab Report",
+  procedure:   "Procedure",
 };
 
 function eventLabel(entry: InvestigationTimelineEntry): string {
-  // Prefer the concrete place when the event has one — matches how the
-  // reference design reads ("02 Aug — ICU Bed 12").
   if (entry.location) return entry.location;
   return EVENT_LABELS[entry.event_type] ?? entry.event_type;
 }
 
 function formatDay(iso: string): string {
-  return new Date(iso).toLocaleDateString("en-GB", {
-    day: "2-digit",
-    month: "short",
-  });
+  return new Date(iso).toLocaleDateString("en-GB", { day: "2-digit", month: "short" });
 }
 
 function formatTime(iso: string): string {
-  return new Date(iso).toLocaleTimeString("en-GB", {
-    hour: "2-digit",
-    minute: "2-digit",
-  });
+  return new Date(iso).toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" });
 }
+
+const EVENT_DOT: Record<string, string> = {
+  lab_report:  "bg-risk-high-foreground ring-risk-high",
+  admission:   "bg-success ring-emerald-100",
+  discharge:   "bg-muted-foreground ring-muted",
+  movement:    "bg-primary ring-primary-soft",
+  procedure:   "bg-[hsl(265_60%_58%)] ring-[hsl(265_60%_90%)]",
+};
 
 interface TimelineViewProps {
   entries: InvestigationTimelineEntry[];
-  /** Shown when several patients appear in one timeline. */
   showPatient?: boolean;
 }
 
@@ -53,9 +52,7 @@ export function TimelineView({ entries, showPatient }: TimelineViewProps) {
           <CardTitle>Patient Movement Timeline</CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-sm text-muted-foreground">
-            No timeline events available.
-          </p>
+          <p className="text-sm text-muted-foreground">No timeline events available.</p>
         </CardContent>
       </Card>
     );
@@ -68,50 +65,45 @@ export function TimelineView({ entries, showPatient }: TimelineViewProps) {
     <Card>
       <CardHeader className="pb-4">
         <CardTitle>Patient Movement Timeline</CardTitle>
-        <p className="text-sm text-muted-foreground">
-          {sorted.length} recorded events
-        </p>
+        <p className="text-sm text-muted-foreground">{sorted.length} recorded events</p>
       </CardHeader>
       <CardContent>
         <ol className="relative">
           {sorted.map((entry, i) => {
             const next = sorted[i + 1];
             const gapMinutes = next
-              ? (new Date(next.timestamp).getTime() -
-                  new Date(entry.timestamp).getTime()) /
-                60000
+              ? (new Date(next.timestamp).getTime() - new Date(entry.timestamp).getTime()) / 60000
               : 0;
-            // Simultaneous events are common (a ward move and a bed move share
-            // a timestamp) — a "0m" label there would be noise.
-            const showGap = next != null && gapMinutes >= 1;
+            const showGap  = next != null && gapMinutes >= 1;
             const isCulture = entry.event_type === "lab_report";
-            const isLast = i === sorted.length - 1;
+            const isLast    = i === sorted.length - 1;
+            const dotClass  = EVENT_DOT[entry.event_type] ?? "bg-primary ring-primary-soft";
 
             return (
-              <li key={`${entry.timestamp}-${i}`} className="relative flex gap-4">
-                {/* Rail */}
-                <div className="relative flex w-3 flex-none justify-center">
+              <li key={`${entry.timestamp}-${i}`} className="flex gap-4">
+                {/* Solid rail */}
+                <div className="relative flex w-4 flex-none justify-center">
                   {!isLast && (
                     <span
                       aria-hidden
-                      className="absolute top-3 h-full w-px border-l-2 border-dotted border-border"
+                      className="absolute top-5 h-full w-px bg-border"
                     />
                   )}
                   <span
                     aria-hidden
                     className={cn(
-                      "relative z-10 mt-1.5 h-3 w-3 rounded-full ring-4 ring-card",
-                      isCulture ? "bg-risk-high-foreground" : "bg-primary"
+                      "relative z-10 mt-1.5 h-3.5 w-3.5 rounded-full ring-4 ring-offset-0 transition-colors",
+                      dotClass
                     )}
                   />
                 </div>
 
                 {/* Content */}
                 <div className={cn("min-w-0 flex-1", isLast ? "pb-0" : "pb-1")}>
-                  <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+                  <div className="flex flex-wrap items-baseline gap-x-2 gap-y-1">
                     <p
                       className={cn(
-                        "font-semibold",
+                        "text-[0.9rem] font-semibold",
                         isCulture ? "text-risk-high-foreground" : "text-foreground"
                       )}
                     >
@@ -127,20 +119,21 @@ export function TimelineView({ entries, showPatient }: TimelineViewProps) {
                     </span>
                   </div>
 
-                  <p className="mt-0.5 text-[0.9375rem] leading-snug text-muted-foreground">
+                  <p className="mt-0.5 text-[0.9rem] leading-snug text-muted-foreground">
                     {entry.description}
                   </p>
 
                   {multiplePatients && (
-                    <p className="mt-0.5 text-[0.8125rem] text-muted-foreground/80">
+                    <p className="mt-0.5 text-[0.8125rem] font-medium text-muted-foreground/80">
                       {entry.patient_name}
                     </p>
                   )}
 
-                  {/* Elapsed time until the next event */}
-                  <p className="py-2 text-[0.8125rem] text-muted-foreground">
-                    {showGap ? formatMinutes(gapMinutes) : " "}
-                  </p>
+                  {showGap && (
+                    <p className="py-1.5 text-[0.8125rem] text-muted-foreground/60 tabular-nums">
+                      ↓ {formatMinutes(gapMinutes)}
+                    </p>
+                  )}
                 </div>
               </li>
             );
