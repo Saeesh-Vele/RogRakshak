@@ -1,7 +1,7 @@
 "use client";
 
 import type { InvestigationTimelineEntry } from "@/types/api";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { formatMinutes } from "@/lib/risk";
 import { cn } from "@/lib/utils";
@@ -52,11 +52,9 @@ export function TimelineView({ entries, showPatient }: TimelineViewProps) {
         <CardHeader>
           <CardTitle>Patient Movement Timeline</CardTitle>
         </CardHeader>
-        <CardContent>
-          <p className="text-sm text-muted-foreground">
-            No timeline events available.
-          </p>
-        </CardContent>
+        <div className="px-5 pb-6 text-sm text-muted-foreground">
+          No timeline events available.
+        </div>
       </Card>
     );
   }
@@ -65,88 +63,120 @@ export function TimelineView({ entries, showPatient }: TimelineViewProps) {
     showPatient ?? new Set(sorted.map((e) => e.patient_id)).size > 1;
 
   return (
-    <Card>
-      <CardHeader className="pb-4">
-        <CardTitle>Patient Movement Timeline</CardTitle>
+    <Card className="flex flex-col overflow-hidden">
+      <CardHeader className="gap-1 border-b border-border bg-muted/40 pb-4">
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <CardTitle>Patient Movement Timeline</CardTitle>
+          <Badge variant="outline" size="sm" className="bg-card tabular-nums">
+            {sorted.length} recorded events
+          </Badge>
+        </div>
         <p className="text-sm text-muted-foreground">
-          {sorted.length} recorded events
+          Chronological record of admissions, moves and results
         </p>
       </CardHeader>
-      <CardContent>
-        <ol className="relative">
-          {sorted.map((entry, i) => {
-            const next = sorted[i + 1];
-            const gapMinutes = next
-              ? (new Date(next.timestamp).getTime() -
-                  new Date(entry.timestamp).getTime()) /
-                60000
-              : 0;
-            // Simultaneous events are common (a ward move and a bed move share
-            // a timestamp) — a "0m" label there would be noise.
-            const showGap = next != null && gapMinutes >= 1;
-            const isCulture = entry.event_type === "lab_report";
-            const isLast = i === sorted.length - 1;
 
-            return (
-              <li key={`${entry.timestamp}-${i}`} className="relative flex gap-4">
-                {/* Rail */}
-                <div className="relative flex w-3 flex-none justify-center">
-                  {!isLast && (
-                    <span
-                      aria-hidden
-                      className="absolute top-3 h-full w-px border-l-2 border-dotted border-border"
-                    />
+      <ol className="flex-1 px-5 py-1.5">
+        {sorted.map((entry, i) => {
+          const next = sorted[i + 1];
+          const gapMinutes = next
+            ? (new Date(next.timestamp).getTime() -
+                new Date(entry.timestamp).getTime()) /
+              60000
+            : 0;
+          // Simultaneous events are common (a ward move and a bed move share
+          // a timestamp) — a "0m" label there would be noise.
+          const showGap = next != null && gapMinutes >= 1;
+          const isCulture = entry.event_type === "lab_report";
+          const isLast = i === sorted.length - 1;
+
+          return (
+            <li key={`${entry.timestamp}-${i}`} className="flex gap-4">
+              {/* Timestamp gutter — pulled out of the body so every event
+                  lines up on one column and the prose gets the full width */}
+              <div className="w-[68px] flex-none pt-3.5 text-right">
+                <p
+                  className={cn(
+                    "text-[0.8125rem] font-semibold tabular-nums leading-none",
+                    isCulture ? "text-risk-high-foreground" : "text-foreground"
                   )}
+                >
+                  {formatDay(entry.timestamp)}
+                </p>
+                <p className="mt-1 text-[0.75rem] tabular-nums leading-none text-muted-foreground">
+                  {formatTime(entry.timestamp)}
+                </p>
+              </div>
+
+              {/* Rail */}
+              <div className="relative flex w-3 flex-none justify-center">
+                {!isLast && (
                   <span
                     aria-hidden
-                    className={cn(
-                      "relative z-10 mt-1.5 h-3 w-3 rounded-full ring-4 ring-card",
-                      isCulture ? "bg-risk-high-foreground" : "bg-primary"
-                    )}
+                    className="absolute top-4 h-full w-px border-l-2 border-dotted border-border"
                   />
-                </div>
+                )}
+                <span
+                  aria-hidden
+                  className={cn(
+                    "relative z-10 mt-3 h-3 w-3 rounded-full ring-4 ring-card",
+                    isCulture ? "bg-risk-high-foreground" : "bg-primary"
+                  )}
+                />
+              </div>
 
-                {/* Content */}
-                <div className={cn("min-w-0 flex-1", isLast ? "pb-0" : "pb-1")}>
+              {/* Content */}
+              <div className="min-w-0 flex-1 pb-1">
+                <div
+                  className={cn(
+                    "rounded-lg px-3 py-2.5 transition-colors",
+                    isCulture
+                      ? "bg-risk-high/60 ring-1 ring-inset ring-risk-high-foreground/15"
+                      : "hover:bg-muted/50"
+                  )}
+                >
                   <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
                     <p
                       className={cn(
-                        "font-semibold",
-                        isCulture ? "text-risk-high-foreground" : "text-foreground"
+                        "font-semibold leading-tight",
+                        isCulture
+                          ? "text-risk-high-foreground"
+                          : "text-foreground"
                       )}
                     >
-                      {formatDay(entry.timestamp)} — {eventLabel(entry)}
+                      {eventLabel(entry)}
                     </p>
                     {isCulture && (
                       <Badge variant="riskHigh" size="sm">
                         Culture result
                       </Badge>
                     )}
-                    <span className="text-[0.8125rem] text-muted-foreground tabular-nums">
-                      {formatTime(entry.timestamp)}
-                    </span>
                   </div>
 
-                  <p className="mt-0.5 text-[0.9375rem] leading-snug text-muted-foreground">
+                  <p className="mt-1 text-[0.875rem] leading-relaxed text-muted-foreground">
                     {entry.description}
                   </p>
 
                   {multiplePatients && (
-                    <p className="mt-0.5 text-[0.8125rem] text-muted-foreground/80">
+                    <p className="mt-1 text-[0.8125rem] text-muted-foreground/80">
                       {entry.patient_name}
                     </p>
                   )}
-
-                  {/* Elapsed time until the next event */}
-                  <p className="py-2 text-[0.8125rem] text-muted-foreground">
-                    {showGap ? formatMinutes(gapMinutes) : " "}
-                  </p>
                 </div>
-              </li>
-            );
-          })}
-        </ol>
-      </CardContent>
+
+                {/* Elapsed time until the next event */}
+                <div className="flex h-7 items-center">
+                  {showGap && (
+                    <span className="ml-3 text-[0.75rem] font-medium tabular-nums text-muted-foreground/70">
+                      {formatMinutes(gapMinutes)} later
+                    </span>
+                  )}
+                </div>
+              </div>
+            </li>
+          );
+        })}
+      </ol>
     </Card>
   );
 }

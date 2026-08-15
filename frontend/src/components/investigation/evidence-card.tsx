@@ -21,50 +21,41 @@ function formatDateTime(iso: string | null | undefined): string {
   });
 }
 
-export function EvidenceCard({ item }: { item: EvidenceItem }) {
-  const label = evidenceTypeLabel(item.type);
-  const tier = evidenceTier(item);
-
+/**
+ * The full body of an evidence item — explanation, the location / staff /
+ * timing facts, and provenance. Split out from `EvidenceCard` so the collapsed
+ * accordion rows in `EvidenceList` can reveal exactly this, unchanged, on
+ * expand.
+ */
+export function EvidenceDetail({ item }: { item: EvidenceItem }) {
   return (
-    <div className="rounded-xl border border-border bg-card p-4 transition-colors hover:border-primary/30">
-      <div className="flex items-start justify-between gap-3">
-        <div className="min-w-0">
-          <p className="font-semibold text-foreground">{label}</p>
-          <p className="mt-0.5 text-[0.8125rem] text-muted-foreground">
-            {tierReason(item)}
-          </p>
-        </div>
-        <Badge variant={tierBadgeVariant[tier]} size="tier" className="shrink-0">
-          {tier}
-        </Badge>
-      </div>
-
-      <p className="mt-2.5 text-[0.9375rem] leading-snug text-muted-foreground">
+    <>
+      <p className="text-[0.9375rem] leading-relaxed text-muted-foreground">
         {item.explanation}
       </p>
 
-      <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1.5 text-[0.8125rem] text-muted-foreground">
+      <div className="mt-3 flex flex-wrap items-center gap-x-2 gap-y-1.5 text-[0.8125rem] text-muted-foreground">
         {item.location && (
-          <span className="inline-flex items-center gap-1.5">
-            <MapPin className="h-3.5 w-3.5" />
+          <span className="inline-flex items-center gap-1.5 rounded-md bg-muted px-2 py-1">
+            <MapPin className="h-3.5 w-3.5 shrink-0" />
             {item.location}
           </span>
         )}
         {item.overlap_minutes != null && (
-          <span className="inline-flex items-center gap-1.5">
-            <Clock className="h-3.5 w-3.5" />
+          <span className="inline-flex items-center gap-1.5 rounded-md bg-muted px-2 py-1 tabular-nums">
+            <Clock className="h-3.5 w-3.5 shrink-0" />
             {formatMinutes(item.overlap_minutes)}
           </span>
         )}
         {item.mediator && (
-          <span className="inline-flex items-center gap-1.5">
-            <User className="h-3.5 w-3.5" />
+          <span className="inline-flex items-center gap-1.5 rounded-md bg-muted px-2 py-1">
+            <User className="h-3.5 w-3.5 shrink-0" />
             {item.mediator.name}
             {item.mediator.role ? ` (${item.mediator.role})` : ""}
           </span>
         )}
         {item.start_time && (
-          <span className="tabular-nums">
+          <span className="rounded-md bg-muted px-2 py-1 tabular-nums">
             {formatDateTime(item.start_time)}
             {item.end_time ? ` → ${formatDateTime(item.end_time)}` : ""}
           </span>
@@ -90,6 +81,31 @@ export function EvidenceCard({ item }: { item: EvidenceItem }) {
           ))}
         </div>
       )}
+    </>
+  );
+}
+
+export function EvidenceCard({ item }: { item: EvidenceItem }) {
+  const label = evidenceTypeLabel(item.type);
+  const tier = evidenceTier(item);
+
+  return (
+    <div className="rounded-xl border border-border bg-card p-4 transition-colors hover:border-primary/30">
+      <div className="flex items-start justify-between gap-3">
+        <div className="min-w-0">
+          <p className="font-semibold text-foreground">{label}</p>
+          <p className="mt-0.5 text-[0.8125rem] text-muted-foreground">
+            {tierReason(item)}
+          </p>
+        </div>
+        <Badge variant={tierBadgeVariant[tier]} size="tier" className="shrink-0">
+          {tier}
+        </Badge>
+      </div>
+
+      <div className="mt-2.5">
+        <EvidenceDetail item={item} />
+      </div>
     </div>
   );
 }

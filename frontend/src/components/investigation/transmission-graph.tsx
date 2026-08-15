@@ -22,6 +22,7 @@ import type {
 import { evidenceTypeLabel, formatMinutes } from "@/lib/risk";
 import { shortBedLabel } from "@/lib/patient-placement";
 import { cn } from "@/lib/utils";
+import { Switch } from "@/components/ui/switch";
 import {
   EntityNode,
   ENTITY_STYLES,
@@ -439,27 +440,14 @@ export function TransmissionGraph({
                   {ENTITY_STYLES[kind].label}
                   <span className="ml-1 text-muted-foreground">({count})</span>
                 </span>
-                <button
-                  type="button"
-                  role="switch"
-                  aria-checked={enabled[kind] && !absent}
+                <Switch
+                  checked={enabled[kind] && !absent}
                   aria-label={`Toggle ${ENTITY_STYLES[kind].label}`}
                   disabled={absent}
-                  onClick={() => setEnabled((s) => ({ ...s, [kind]: !s[kind] }))}
-                  className={cn(
-                    "relative h-5 w-9 shrink-0 rounded-full transition-colors",
-                    enabled[kind] && !absent ? "bg-primary" : "bg-border"
-                  )}
-                >
-                  <span
-                    className={cn(
-                      "absolute top-0.5 h-4 w-4 rounded-full bg-white shadow-card transition-transform",
-                      enabled[kind] && !absent
-                        ? "translate-x-[18px]"
-                        : "translate-x-0.5"
-                    )}
-                  />
-                </button>
+                  onCheckedChange={() =>
+                    setEnabled((s) => ({ ...s, [kind]: !s[kind] }))
+                  }
+                />
               </label>
             );
           })}

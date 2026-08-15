@@ -55,6 +55,7 @@ function topBy<T>(items: T[], key: (t: T) => string | null): string | null {
   return Array.from(counts.entries()).sort((a, b) => b[1] - a[1])[0]?.[0] ?? null;
 }
 
+/** A structured fact: eyebrow label in a fixed gutter, value beside it. */
 function Row({
   label,
   children,
@@ -63,14 +64,36 @@ function Row({
   children: React.ReactNode;
 }) {
   return (
-    <div className="flex flex-col gap-1 py-3 sm:flex-row sm:items-baseline sm:gap-4">
-      <p className="shrink-0 text-eyebrow font-semibold uppercase text-muted-foreground sm:w-[190px]">
+    <div className="flex flex-col gap-1 py-2.5 sm:flex-row sm:items-baseline sm:gap-4">
+      <p className="shrink-0 text-eyebrow font-semibold uppercase text-muted-foreground sm:w-[170px]">
         {label}
       </p>
       <div className="min-w-0 flex-1 text-[0.9375rem] text-foreground">
         {children}
       </div>
     </div>
+  );
+}
+
+/**
+ * A narrative block. The prose sections are set apart from the fact rows above
+ * them — own heading, own surface — so the generated briefing is never mistaken
+ * for a recorded field.
+ */
+function Prose({
+  label,
+  children,
+}: {
+  label: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <section className="rounded-lg border border-border bg-muted/40 p-4">
+      <p className="mb-2 text-eyebrow font-semibold uppercase text-muted-foreground">
+        {label}
+      </p>
+      <div className="text-[0.9375rem] text-foreground">{children}</div>
+    </section>
   );
 }
 
@@ -92,8 +115,8 @@ export function ReportCard({ investigation: inv }: { investigation: Investigatio
   );
 
   return (
-    <Card>
-      <CardHeader className="pb-2">
+    <Card className="overflow-hidden">
+      <CardHeader className="gap-1 border-b border-border bg-muted/40 pb-4">
         <CardTitle>Investigation Report</CardTitle>
         <p className="text-sm text-muted-foreground">
           Generated{" "}
@@ -107,8 +130,9 @@ export function ReportCard({ investigation: inv }: { investigation: Investigatio
         </p>
       </CardHeader>
 
-      <CardContent>
-        <div className="divide-hairline border-t border-border">
+      <CardContent className="space-y-4 pt-5">
+        {/* Structured facts */}
+        <div className="divide-hairline rounded-lg border border-border px-4 py-1">
           <Row label="Case">
             {inv.case_id} · <span className="italic">{inv.organism}</span>
             {inv.resistance_profile && ` ${inv.resistance_profile}`}
@@ -142,26 +166,28 @@ export function ReportCard({ investigation: inv }: { investigation: Investigatio
             </span>
           </Row>
 
-          <Row label="Briefing">
-            <p className="leading-relaxed text-muted-foreground">{briefing}</p>
-          </Row>
-
-          {actions.length > 0 && (
-            <Row label="Standing Protocol">
-              <ul className="list-disc space-y-1 pl-4 text-muted-foreground">
-                {actions.map((a) => (
-                  <li key={a}>{a}</li>
-                ))}
-              </ul>
-              <p className="mt-2 text-[0.8125rem] italic text-muted-foreground/80">
-                Fixed infection-control protocol returned with every case — not
-                derived from this case&apos;s evidence.
-              </p>
-            </Row>
-          )}
         </div>
 
-        <p className="mt-4 text-[0.8125rem] italic text-muted-foreground">
+        {/* Narrative */}
+        <Prose label="Briefing">
+          <p className="leading-relaxed text-muted-foreground">{briefing}</p>
+        </Prose>
+
+        {actions.length > 0 && (
+          <Prose label="Standing Protocol">
+            <ul className="list-disc space-y-1 pl-4 leading-relaxed text-muted-foreground">
+              {actions.map((a) => (
+                <li key={a}>{a}</li>
+              ))}
+            </ul>
+            <p className="mt-2.5 border-t border-border pt-2.5 text-[0.8125rem] italic text-muted-foreground/80">
+              Fixed infection-control protocol returned with every case — not
+              derived from this case&apos;s evidence.
+            </p>
+          </Prose>
+        )}
+
+        <p className="text-[0.8125rem] italic text-muted-foreground">
           Decision support only — findings require clinical review.
         </p>
       </CardContent>

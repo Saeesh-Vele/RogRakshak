@@ -10,7 +10,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 import { CaseHeader } from "@/components/investigation/case-header";
 import { ScoringBreakdownView } from "@/components/investigation/scoring-breakdown";
-import { EvidenceCard } from "@/components/investigation/evidence-card";
+import { EvidenceList } from "@/components/investigation/evidence-list";
 import { TransmissionGraph } from "@/components/investigation/transmission-graph";
 import { TimelineView } from "@/components/investigation/timeline-view";
 import { DiscoveredContacts } from "@/components/investigation/discovered-contacts";
@@ -33,6 +33,10 @@ export default function InvestigationDetailPage() {
   const [placements, setPlacements] = useState<Record<number, PatientPlacement>>(
     {}
   );
+  const [focusedEvidence, setFocusedEvidence] = useState<{
+    id: string;
+    nonce: number;
+  } | null>(null);
 
   const mode = useAppStore((s) => s.mode);
 
@@ -98,13 +102,14 @@ export default function InvestigationDetailPage() {
     }
   }, [investigation]);
 
+  // Evidence rows are collapsed by default, so a graph edge click hands the id
+  // to the list rather than driving the DOM itself. The nonce lets the same
+  // edge be clicked twice and still re-trigger the scroll + highlight.
   const onSelectEvidence = useCallback((evidenceId: string) => {
-    const el = document.getElementById(`evidence-${evidenceId}`);
-    if (el) {
-      el.scrollIntoView({ behavior: "smooth", block: "center" });
-      el.classList.add("ring-2", "ring-primary");
-      setTimeout(() => el.classList.remove("ring-2", "ring-primary"), 2000);
-    }
+    setFocusedEvidence((prev) => ({
+      id: evidenceId,
+      nonce: (prev?.nonce ?? 0) + 1,
+    }));
   }, []);
 
   if (loading) {
@@ -173,8 +178,9 @@ export default function InvestigationDetailPage() {
         </Card>
       )}
 
-      {/* Timeline + ranked contacts */}
-      <div className="grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,1fr)_400px]">
+      {/* Timeline + ranked contacts — proportional so neither column leaves a
+          dead band of whitespace on a wide screen */}
+      <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-[minmax(0,1.55fr)_minmax(0,1fr)]">
         <TimelineView entries={inv.timeline} />
         <DiscoveredContacts investigation={inv} />
       </div>
@@ -217,13 +223,7 @@ export default function InvestigationDetailPage() {
             Each item is an atomic, independently verifiable observation.
           </p>
         </CardHeader>
-        <CardContent className="grid grid-cols-1 gap-3 lg:grid-cols-2">
-          {sortedEvidence.map((e) => (
-            <div key={e.evidence_id} id={`evidence-${e.evidence_id}`} className="rounded-xl">
-              <EvidenceCard item={e} />
-            </div>
-          ))}
-        </CardContent>
+        <EvidenceList items={sortedEvidence} focused={focusedEvidence} />
       </Card>
 
       <div className="grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,1fr)_420px]">

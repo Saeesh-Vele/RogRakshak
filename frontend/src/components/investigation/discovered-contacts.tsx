@@ -3,6 +3,7 @@
 import type { EvidenceItem, InvestigationCase, PatientSummary } from "@/types/api";
 import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { cn } from "@/lib/utils";
 import {
   aggregateTier,
   evidenceTier,
@@ -12,6 +13,13 @@ import {
 } from "@/lib/risk";
 
 const TIER_ORDER: Record<RiskTier, number> = { HIGH: 0, MEDIUM: 1, LOW: 2 };
+
+/** Left rail colour per tier, so ranking is legible before reading the pill. */
+const TIER_RAIL: Record<RiskTier, string> = {
+  HIGH: "before:bg-risk-high-foreground/70",
+  MEDIUM: "before:bg-risk-medium-foreground/50",
+  LOW: "before:bg-transparent",
+};
 
 interface RankedContact {
   patient: PatientSummary;
@@ -84,35 +92,48 @@ export function DiscoveredContacts({
   const contacts = rankContacts(investigation);
 
   return (
-    <Card className="overflow-hidden">
-      <CardHeader className="pb-4">
-        <CardTitle>Discovered Contacts</CardTitle>
+    <Card className="flex flex-col overflow-hidden">
+      <CardHeader className="gap-1 border-b border-border bg-muted/40 pb-4">
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <CardTitle>Discovered Contacts</CardTitle>
+          <Badge variant="outline" size="sm" className="bg-card tabular-nums">
+            {contacts.length} identified
+          </Badge>
+        </div>
         <p className="text-sm text-muted-foreground">
           Ranked by temporal overlap with the index case
         </p>
       </CardHeader>
 
       {contacts.length === 0 ? (
-        <p className="px-5 pb-6 text-sm text-muted-foreground">
+        <p className="px-5 py-6 text-sm text-muted-foreground">
           No candidate contacts identified.
         </p>
       ) : (
-        <div className="divide-hairline border-t border-border">
+        <div className="divide-hairline flex-1">
           {contacts.map(({ patient, tier, detail }) => (
             <div
               key={patient.id}
-              className="flex items-start justify-between gap-3 px-5 py-4"
+              className={cn(
+                "relative flex items-start justify-between gap-3 px-5 py-4 transition-colors hover:bg-muted/40",
+                // The tier is the ranking signal, so it gets a rail as well as
+                // a pill — HIGH reads first without parsing the badge text.
+                "before:absolute before:inset-y-0 before:left-0 before:w-1",
+                TIER_RAIL[tier]
+              )}
             >
               <div className="min-w-0">
-                <p className="font-semibold text-foreground">{patient.name}</p>
-                <p className="mt-0.5 text-[0.8125rem] text-muted-foreground">
+                <p className="font-semibold leading-tight text-foreground">
+                  {patient.name}
+                </p>
+                <p className="mt-1 text-[0.8125rem] leading-snug text-muted-foreground">
                   {detail}
                 </p>
-                <p className="mt-0.5 font-mono text-[0.75rem] text-muted-foreground/70">
+                <p className="mt-1.5 inline-block rounded bg-muted px-1.5 py-0.5 font-mono text-[0.6875rem] text-muted-foreground/80">
                   {patient.mrn}
                 </p>
               </div>
-              <Badge variant={tierBadgeVariant[tier]} size="tier" className="shrink-0">
+              <Badge variant={tierBadgeVariant[tier]} size="tier" className="mt-0.5 shrink-0">
                 {tier}
               </Badge>
             </div>
