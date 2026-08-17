@@ -22,7 +22,7 @@ export default async function AppLayout({
   return (
     <>
       <Sidebar />
-      <div className="flex min-h-screen flex-col md:ml-[248px]">
+      <div className="flex min-h-screen flex-col font-body md:ml-[248px]">
         <Suspense
           fallback={<div className="h-[72px] border-b border-border bg-card" />}
         >

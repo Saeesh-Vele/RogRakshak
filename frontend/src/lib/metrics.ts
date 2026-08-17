@@ -155,11 +155,13 @@ export function caseStartedAt(c: InvestigationCase): {
 export interface TrendPoint {
   date: string;
   label: string;
+  /** New confirmed positives recorded on this day — the epi curve bars. */
+  count: number;
   cumulative: number;
 }
 
 /**
- * Cumulative confirmed positive cultures per day.
+ * Confirmed positive cultures per day, with a running total.
  *
  * Sourced from `PatientSummary.positive_culture_date`, the only real
  * time-series the API exposes — there is no trend/analytics endpoint. Patients
@@ -198,7 +200,8 @@ export function deriveTrend(cases: InvestigationCase[]): TrendPoint[] {
     d.setUTCDate(d.getUTCDate() + 1)
   ) {
     const key = d.toISOString().slice(0, 10);
-    running += perDay.get(key) ?? 0;
+    const count = perDay.get(key) ?? 0;
+    running += count;
     points.push({
       date: key,
       label: new Date(`${key}T00:00:00Z`).toLocaleDateString("en-GB", {
@@ -206,6 +209,7 @@ export function deriveTrend(cases: InvestigationCase[]): TrendPoint[] {
         month: "short",
         timeZone: "UTC",
       }),
+      count,
       cumulative: running,
     });
   }

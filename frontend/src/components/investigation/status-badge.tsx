@@ -11,6 +11,17 @@ const STATUS_META: Record<
   NO_SIGNAL: { label: "No Signal", variant: "noSignal" },
 };
 
+/**
+ * Left-rail colour per status, for list rows that carry a status stripe.
+ * Shares the STATUS_META ordering so a row and its badge never disagree.
+ */
+export const STATUS_RAIL: Record<InvestigationStatus, string> = {
+  HIGH_PRIORITY_INVESTIGATION: "bg-node-infected",
+  SUSPECTED_CLUSTER: "bg-node-infected",
+  POTENTIAL_CONTACT: "bg-node-downstream",
+  NO_SIGNAL: "bg-node-neutral",
+};
+
 export function StatusBadge({
   status,
   className,

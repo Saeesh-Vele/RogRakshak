@@ -14,6 +14,7 @@ import {
   type ProgressState,
 } from "@/components/investigation/agent-progress";
 import { AlertTriangle, PlusCircle } from "lucide-react";
+import { PageHeader } from "@/components/layout/page-header";
 
 /**
  * Pacing for the client-side checklist. The graph is invoked synchronously, so
@@ -125,14 +126,11 @@ export default function NewInvestigationPage() {
 
   return (
     <div className="mx-auto max-w-[1400px] space-y-6 p-6 lg:p-8">
-      <div>
-        <h1 className="text-[1.75rem] font-bold tracking-tight text-foreground">
-          New Investigation
-        </h1>
-        <p className="mt-1 text-sm text-muted-foreground">
-          Trigger an epidemiological investigation workflow
-        </p>
-      </div>
+      <PageHeader
+        eyebrow="Investigate"
+        title="New investigation"
+        description="Point the LangGraph workflow at an index patient and organism."
+      />
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_400px]">
         <Card>

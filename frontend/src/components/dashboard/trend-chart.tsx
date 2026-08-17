@@ -1,11 +1,10 @@
 "use client";
 
 import {
-  Area,
-  AreaChart,
+  Bar,
   CartesianGrid,
-  LabelList,
-  ReferenceDot,
+  ComposedChart,
+  Line,
   ResponsiveContainer,
   Tooltip,
   XAxis,
@@ -17,7 +16,21 @@ interface TrendChartProps {
   points: TrendPoint[];
 }
 
-function TrendTooltip({
+/**
+ * An epidemic curve: bars for new confirmed positives on each day, with the
+ * running total drawn over them.
+ *
+ * This is the standard chart of the field, and it is also the more honest one
+ * for this data — a cumulative area alone can only ever slope up and to the
+ * right, so on a handful of cases it reported growth where the underlying
+ * picture was three isolates on three separate days. The bars show when
+ * anything actually happened; the line keeps the total in view.
+ *
+ * Both series count patients, so they share one integer axis rather than
+ * carrying a second scale that would imply more precision than exists.
+ */
+
+function CurveTooltip({
   active,
   payload,
 }: {
@@ -28,160 +41,112 @@ function TrendTooltip({
   const point = payload[0].payload;
   return (
     <div className="rounded-lg border border-border bg-card px-3 py-2 shadow-pop">
-      <p className="text-xs font-medium text-muted-foreground">{point.label}</p>
-      <p className="text-sm font-bold text-foreground">
-        {point.cumulative} confirmed
+      <p className="font-mono text-[0.6875rem] uppercase tracking-[0.1em] text-muted-foreground">
+        {point.label}
+      </p>
+      <p className="mt-1 text-[0.8125rem] text-foreground">
+        <span className="font-semibold tabular-nums">{point.count}</span> new
+        {point.count === 1 ? " positive" : " positives"}
+      </p>
+      <p className="text-[0.8125rem] text-muted-foreground">
+        <span className="font-semibold tabular-nums">{point.cumulative}</span>{" "}
+        cumulative
       </p>
     </div>
   );
 }
 
-/**
- * Blue rounded badge with a pointer, anchored above the final data point.
- * Rendered as SVG because recharts labels have no background of their own.
- */
-function CalloutBadge(props: {
-  text: string;
-  /** Only render the badge on this data index (the final point). */
-  targetIndex?: number;
-  // Injected by recharts <LabelList content={...}>
-  x?: number;
-  y?: number;
-  index?: number;
-}) {
-  const { text, targetIndex, x: cx, y: cy, index } = props;
-  if (cx == null || cy == null) return null;
-  if (targetIndex != null && index !== targetIndex) return null;
-
-  const paddingX = 9;
-  const charWidth = 6.6;
-  const width = text.length * charWidth + paddingX * 2;
-  const height = 24;
-  const gap = 12;
-  const boxX = cx - width / 2;
-  const boxY = cy - gap - height;
-
+function LegendKey() {
   return (
-    <g pointerEvents="none">
-      <rect
-        x={boxX}
-        y={boxY}
-        width={width}
-        height={height}
-        rx={6}
-        fill="hsl(var(--primary))"
-      />
-      <path
-        d={`M ${cx - 4} ${boxY + height} L ${cx} ${boxY + height + 4} L ${cx + 4} ${boxY + height} Z`}
-        fill="hsl(var(--primary))"
-      />
-      <text
-        x={cx}
-        y={boxY + height / 2 + 4}
-        textAnchor="middle"
-        fontSize={12}
-        fontWeight={600}
-        fill="hsl(var(--primary-foreground))"
-      >
-        {text}
-      </text>
-    </g>
+    <div className="flex flex-wrap items-center gap-x-5 gap-y-1.5 px-5 pb-1">
+      <span className="flex items-center gap-2 font-mono text-[0.625rem] uppercase tracking-[0.12em] text-muted-foreground">
+        <span className="h-2.5 w-2.5 rounded-[2px] bg-node-infected" />
+        New positives
+      </span>
+      <span className="flex items-center gap-2 font-mono text-[0.625rem] uppercase tracking-[0.12em] text-muted-foreground">
+        <span className="h-[2px] w-4 rounded-full bg-primary" />
+        Cumulative
+      </span>
+    </div>
   );
 }
 
 export function TrendChart({ points }: TrendChartProps) {
   if (points.length < 2) {
     return (
-      <div className="flex h-[280px] items-center justify-center rounded-lg bg-muted/40 text-sm text-muted-foreground">
-        Not enough dated culture results to plot a trend.
+      <div className="flex h-[260px] flex-col items-center justify-center gap-1.5 px-6 text-center">
+        <p className="text-sm text-foreground">No curve to plot yet.</p>
+        <p className="max-w-sm text-[0.8125rem] leading-relaxed text-muted-foreground">
+          The curve is drawn from recorded culture dates. It appears once at
+          least two dated positive results exist.
+        </p>
       </div>
     );
   }
 
-  const last = points[points.length - 1];
   const max = Math.max(...points.map((p) => p.cumulative));
-  // Give the callout badge vertical room above the final point
-  const yMax = Math.max(4, Math.ceil((max + 1) * 1.25));
+  const yMax = Math.max(4, Math.ceil(max * 1.2));
 
   return (
-    <div className="h-[280px] w-full">
-      <ResponsiveContainer width="100%" height="100%">
-        <AreaChart
-          data={points}
-          margin={{ top: 30, right: 64, bottom: 4, left: 0 }}
-        >
-          <defs>
-            <linearGradient id="trendFill" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="hsl(var(--primary))" stopOpacity={0.22} />
-              <stop offset="100%" stopColor="hsl(var(--primary))" stopOpacity={0.01} />
-            </linearGradient>
-          </defs>
-
-          <CartesianGrid
-            stroke="hsl(var(--border))"
-            strokeOpacity={0.7}
-            vertical={false}
-          />
-          <XAxis
-            dataKey="label"
-            tickLine={false}
-            axisLine={false}
-            tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 12 }}
-            tickMargin={12}
-            minTickGap={24}
-          />
-          <YAxis
-            domain={[0, yMax]}
-            allowDecimals={false}
-            tickLine={false}
-            axisLine={false}
-            width={40}
-            tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 12 }}
-          />
-          <Tooltip
-            content={<TrendTooltip />}
-            cursor={{ stroke: "hsl(var(--border))", strokeWidth: 1 }}
-          />
-
-          <Area
-            type="monotone"
-            dataKey="cumulative"
-            stroke="hsl(var(--primary))"
-            strokeWidth={2.5}
-            fill="url(#trendFill)"
-            dot={false}
-            isAnimationActive={false}
-            activeDot={{
-              r: 4,
-              fill: "hsl(var(--primary))",
-              stroke: "hsl(var(--card))",
-              strokeWidth: 2,
-            }}
+    <div>
+      <LegendKey />
+      <div className="h-[260px] w-full">
+        <ResponsiveContainer width="100%" height="100%">
+          <ComposedChart
+            data={points}
+            margin={{ top: 12, right: 16, bottom: 4, left: 0 }}
+            barCategoryGap="35%"
           >
-            {/* Floating value callout pinned to the final point */}
-            <LabelList
-              dataKey="cumulative"
-              content={
-                <CalloutBadge
-                  text={`${last.cumulative} confirmed`}
-                  targetIndex={points.length - 1}
-                />
-              }
+            <CartesianGrid
+              stroke="hsl(var(--border))"
+              strokeOpacity={0.8}
+              vertical={false}
             />
-          </Area>
+            <XAxis
+              dataKey="label"
+              tickLine={false}
+              axisLine={{ stroke: "hsl(var(--border))" }}
+              tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 11 }}
+              tickMargin={10}
+              minTickGap={20}
+            />
+            <YAxis
+              domain={[0, yMax]}
+              allowDecimals={false}
+              tickLine={false}
+              axisLine={false}
+              width={36}
+              tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 11 }}
+            />
+            <Tooltip
+              content={<CurveTooltip />}
+              cursor={{ fill: "hsl(var(--muted))", fillOpacity: 0.5 }}
+            />
 
-          {/* End-point marker */}
-          <ReferenceDot
-            x={last.label}
-            y={last.cumulative}
-            r={4.5}
-            fill="hsl(var(--primary))"
-            stroke="hsl(var(--card))"
-            strokeWidth={2}
-            isFront
-          />
-        </AreaChart>
-      </ResponsiveContainer>
+            <Bar
+              dataKey="count"
+              fill="hsl(var(--node-infected))"
+              radius={[3, 3, 0, 0]}
+              maxBarSize={34}
+              isAnimationActive={false}
+            />
+            <Line
+              type="monotone"
+              dataKey="cumulative"
+              stroke="hsl(var(--primary))"
+              strokeWidth={2}
+              dot={{
+                r: 3,
+                fill: "hsl(var(--card))",
+                stroke: "hsl(var(--primary))",
+                strokeWidth: 2,
+              }}
+              activeDot={{ r: 4.5 }}
+              isAnimationActive={false}
+            />
+          </ComposedChart>
+        </ResponsiveContainer>
+      </div>
     </div>
   );
 }

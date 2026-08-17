@@ -33,14 +33,14 @@ export function Topbar({ doctor }: { doctor: DoctorIdentity | null }) {
 
   return (
     <header className="sticky top-0 z-20 flex h-[72px] shrink-0 items-center gap-4 border-b border-border bg-card px-6 pl-16 md:pl-6">
-      <form onSubmit={submit} className="relative w-full max-w-[560px]">
-        <Search className="pointer-events-none absolute left-3.5 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-muted-foreground" />
+      <form onSubmit={submit} className="relative w-full max-w-[420px]">
+        <Search className="pointer-events-none absolute left-3.5 top-1/2 h-[17px] w-[17px] -translate-y-1/2 text-muted-foreground" />
         <SearchInput
           value={value}
           onChange={(e) => setValue(e.target.value)}
           placeholder="Search cases, organisms, patients…"
           aria-label="Search investigations"
-          className="pl-10"
+          className="h-10 rounded-lg border-border bg-background pl-10"
         />
       </form>
 

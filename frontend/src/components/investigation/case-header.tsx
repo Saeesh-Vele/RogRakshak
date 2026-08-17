@@ -52,20 +52,26 @@ export function CaseHeader({
         className="inline-flex items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground"
       >
         <ArrowLeft className="h-4 w-4" />
-        Back to Investigations
+        Back to investigations
       </Link>
 
-      <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+      <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
         <div className="min-w-0">
+          {/* The case ID identifies the record; the organism is what the case
+              is about, so the organism carries the title. */}
           <div className="flex flex-wrap items-center gap-3">
-            <h1 className="text-[2rem] font-bold leading-tight tracking-tight text-foreground">
-              {inv.case_id} —{" "}
-              <span className="italic">{inv.organism}</span>
-              {inv.resistance_profile && ` ${inv.resistance_profile}`}
-            </h1>
+            <span className="font-mono text-[0.75rem] uppercase tracking-[0.14em] text-muted-foreground">
+              {inv.case_id}
+            </span>
             <StatusBadge status={inv.status} />
           </div>
-          <p className="mt-1.5 text-[0.9375rem] text-muted-foreground">
+          <h1 className="mt-2 font-display text-[2rem] font-normal leading-[1.12] tracking-[-0.015em] text-foreground sm:text-[2.375rem]">
+            <span className="italic">{inv.organism}</span>
+            {inv.resistance_profile && (
+              <span className="text-muted-foreground"> {inv.resistance_profile}</span>
+            )}
+          </h1>
+          <p className="mt-2 font-mono text-[0.75rem] uppercase tracking-[0.1em] text-muted-foreground">
             {subtitle}
           </p>
         </div>
@@ -76,7 +82,7 @@ export function CaseHeader({
           className="shrink-0 self-start"
         >
           <RefreshCw className={rerunning ? "animate-spin" : undefined} />
-          {rerunning ? "Re-running…" : "Re-run Investigation"}
+          {rerunning ? "Re-running…" : "Re-run investigation"}
         </Button>
       </div>
 

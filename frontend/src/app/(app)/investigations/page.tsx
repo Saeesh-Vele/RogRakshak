@@ -19,7 +19,9 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { AlertTriangle, Search } from "lucide-react";
+import { AlertTriangle, Plus, Search } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { PageHeader } from "@/components/layout/page-header";
 
 function formatDay(iso: string) {
   return new Date(iso).toLocaleDateString("en-GB", {
@@ -97,14 +99,19 @@ export default function InvestigationsListPage() {
 
   return (
     <div className="mx-auto max-w-[1400px] space-y-6 p-6 lg:p-8">
-      <div>
-        <h1 className="text-[1.75rem] font-bold tracking-tight text-foreground">
-          Investigations
-        </h1>
-        <p className="mt-1 text-sm text-muted-foreground">
-          All outbreak investigation cases
-        </p>
-      </div>
+      <PageHeader
+        eyebrow="Case log"
+        title="Investigations"
+        description="Every outbreak investigation the workflow has produced."
+        actions={
+          <Link href="/investigations/new">
+            <Button>
+              <Plus />
+              New investigation
+            </Button>
+          </Link>
+        }
+      />
 
       {/* Filters */}
       <div className="flex flex-col gap-3 sm:flex-row">

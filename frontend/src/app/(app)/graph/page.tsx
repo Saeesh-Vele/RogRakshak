@@ -16,7 +16,8 @@ import {
   GraphLegend,
   TransmissionGraph,
 } from "@/components/investigation/transmission-graph";
-import { AlertTriangle, Network } from "lucide-react";
+import { AlertTriangle } from "lucide-react";
+import { PageHeader } from "@/components/layout/page-header";
 
 function GraphExplorer() {
   const router = useRouter();
@@ -101,21 +102,15 @@ function GraphExplorer() {
     <div className="mx-auto max-w-[1600px] space-y-5 p-6 lg:p-8">
       {/* Toolbar */}
       <div className="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
-        <div className="flex items-start gap-3">
-          <span className="mt-1 grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-primary-soft">
-            <Network className="h-[18px] w-[18px] text-primary" />
-          </span>
-          <div>
-            <h1 className="text-[1.5rem] font-bold leading-tight tracking-tight text-foreground">
-              Temporal Contact Network &amp; Transmission Pathway
-            </h1>
-            <p className="mt-0.5 text-sm text-muted-foreground">
-              {selected
-                ? `Staff-mediated contact pathways for ${selected.case_id} · ${selected.index_patient.name}`
-                : "Select a case to view its contact network"}
-            </p>
-          </div>
-        </div>
+        <PageHeader
+          eyebrow="Graph explorer"
+          title="Temporal contact network"
+          description={
+            selected
+              ? `Staff-mediated contact pathways for ${selected.case_id} · ${selected.index_patient.name}`
+              : "Select a case to view its contact network."
+          }
+        />
 
         <div className="w-full shrink-0 sm:w-[320px]">
           <label
