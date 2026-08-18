@@ -9,7 +9,6 @@ import {
   BackgroundVariant,
   Controls,
   MarkerType,
-  MiniMap,
   useNodesState,
   useEdgesState,
 } from "@xyflow/react";
@@ -31,8 +30,8 @@ import {
 
 const nodeTypes = { entity: EntityNode };
 
-const COL_X = { location: -60, index: 240, vector: 240, downstream: 200 };
-const ROW_Y = { location: 40, index: 0, vector: 190, downstream: 380 };
+const COL_X = { location: -70, index: 250, vector: 250, downstream: 210 };
+const ROW_Y = { location: 40, index: 0, vector: 215, downstream: 450 };
 
 /**
  * Seed names carry their role inline ("Rajesh Verma (Index)",
@@ -113,8 +112,7 @@ function buildGraph(
   const indexKey = `patient-${inv.index_patient.id}`;
   addNode(indexKey, "index", COL_X.index, ROW_Y.index, {
     name: displayName(inv.index_patient.name),
-    roleLabel: "Index Patient",
-    rolePill: true,
+    roleLabel: "Index patient",
     organism,
     placement: placementLine(placements[inv.index_patient.id]),
   });
@@ -136,8 +134,7 @@ function buildGraph(
     if (via && viaKey && !seen.has(viaKey)) {
       addNode(viaKey, "vector", COL_X.vector + vectorCol * 300, ROW_Y.vector, {
         name: displayName(via.name),
-        roleLabel: "Intermediary Vector",
-        rolePill: true,
+        roleLabel: "Intermediary vector",
         placement: via.role ?? undefined,
       });
       vectorCol += 1;
@@ -150,12 +147,11 @@ function buildGraph(
       addNode(
         toKey,
         "downstream",
-        COL_X.downstream + downstreamCol * 250 - 250,
-        ROW_Y.downstream + (downstreamCol % 2) * 70,
+        COL_X.downstream + downstreamCol * 268 - 268,
+        ROW_Y.downstream + (downstreamCol % 2) * 96,
         {
           name: displayName(to.name),
-          roleLabel: `Downstream Case ${candidateIndex + 1}`,
-          rolePill: false,
+          roleLabel: `Downstream case ${candidateIndex + 1}`,
           organism,
           placement: placementLine(placements[to.id]),
         }
@@ -172,13 +168,22 @@ function buildGraph(
     const relation = hopEvidence
       ? evidenceTypeLabel(hopEvidence.type, true)
       : "Contact";
-    const label = overlap
-      ? `${relation} (${formatMinutes(overlap)} overlap)`
-      : hop?.location
-        ? `${relation} · ${hop.location}`
-        : relation;
+    const duration = overlap ? formatMinutes(overlap) : null;
+    /**
+     * Two label registers. A staff-mediated hop runs through a vector card that
+     * already says "Intermediary vector", so repeating "Staff contact" on both
+     * of its edges is noise — the duration is the only new information. A direct
+     * hop has no such card, so it still names the relationship.
+     */
+    const viaLabel = duration ?? relation;
+    const directLabel = duration ? `${relation} · ${duration}` : relation;
 
-    const contactEdge = (source: string, target: string, suffix: string) => {
+    const contactEdge = (
+      source: string,
+      target: string,
+      suffix: string,
+      label: string
+    ) => {
       if (!nodeMap.has(source) || !nodeMap.has(target)) return;
       edges.push({
         id: `${chain.chain_id}-${suffix}`,
@@ -196,10 +201,18 @@ function buildGraph(
           fill: "hsl(var(--risk-high-foreground))",
           fontSize: 10,
           fontWeight: 600,
+          letterSpacing: "0.02em",
         },
-        labelBgStyle: { fill: "hsl(var(--risk-high))", fillOpacity: 1 },
-        labelBgPadding: [7, 4] as [number, number],
-        labelBgBorderRadius: 9,
+        // White, so the chip reads as cutting the line rather than sitting on
+        // a second coloured field next to it.
+        labelBgStyle: {
+          fill: "hsl(var(--card))",
+          fillOpacity: 1,
+          stroke: "hsl(var(--node-infected))",
+          strokeOpacity: 0.35,
+        },
+        labelBgPadding: [8, 4] as [number, number],
+        labelBgBorderRadius: 999,
         markerEnd: {
           type: MarkerType.ArrowClosed,
           color: "hsl(var(--node-infected))",
@@ -212,10 +225,10 @@ function buildGraph(
     };
 
     if (viaKey) {
-      contactEdge(fromKey, viaKey, "a");
-      contactEdge(viaKey, toKey, "b");
+      contactEdge(fromKey, viaKey, "a", viaLabel);
+      contactEdge(viaKey, toKey, "b", viaLabel);
     } else {
-      contactEdge(fromKey, toKey, "direct");
+      contactEdge(fromKey, toKey, "direct", directLabel);
     }
   }
 
@@ -231,7 +244,6 @@ function buildGraph(
     addNode(key, "location", COL_X.location, ROW_Y.location + i * 150, {
       name: ward,
       roleLabel: `${evidenceCount} evidence item${evidenceCount !== 1 ? "s" : ""}`,
-      rolePill: false,
     });
   });
 
@@ -245,13 +257,12 @@ function buildGraph(
       id: `placement-${patientId}`,
       source: wardKey,
       target: nodeKey,
-      label: "Admitted ward",
       type: "smoothstep",
-      style: { stroke: "hsl(220 13% 78%)", strokeWidth: 1.25 },
-      labelStyle: { fill: "hsl(var(--muted-foreground))", fontSize: 10 },
-      labelBgStyle: { fill: "hsl(0 0% 100%)", fillOpacity: 0.95 },
-      labelBgPadding: [6, 3] as [number, number],
-      labelBgBorderRadius: 6,
+      style: {
+        stroke: "hsl(220 13% 84%)",
+        strokeWidth: 1,
+        strokeDasharray: "2 4",
+      },
       zIndex: 0,
     });
   };
@@ -282,26 +293,30 @@ function buildGraph(
 
 export function GraphLegend({ className }: { className?: string }) {
   return (
-    <div className={cn("flex flex-wrap items-center gap-x-4 gap-y-2", className)}>
-      <span className="text-[0.8125rem] font-semibold text-foreground">
-        Legend:
-      </span>
+    <div
+      className={cn(
+        "flex flex-wrap items-center gap-x-5 gap-y-2 font-mono text-[0.625rem] uppercase tracking-[0.12em] text-muted-foreground",
+        className
+      )}
+    >
       {(Object.keys(ENTITY_STYLES) as EntityKind[]).map((kind) => (
-        <span key={kind} className="flex items-center gap-1.5">
-          <span className={cn("h-3 w-3 rounded", ENTITY_STYLES[kind].dot)} />
-          <span className="text-[0.8125rem] text-muted-foreground">
-            {ENTITY_STYLES[kind].label}
-          </span>
+        <span key={kind} className="flex items-center gap-2">
+          <span
+            className={cn("h-2 w-2 rounded-full", ENTITY_STYLES[kind].dot)}
+          />
+          {ENTITY_STYLES[kind].label}
         </span>
       ))}
-      <span className="flex items-center gap-1.5">
+      <span className="flex items-center gap-2">
         <span
-          className="h-0 w-5 border-t-2 border-dashed"
+          className="h-0 w-5 border-t border-dashed"
           style={{ borderColor: "hsl(var(--node-infected))" }}
         />
-        <span className="text-[0.8125rem] text-muted-foreground">
-          High Overlap Contact
-        </span>
+        Contact pathway
+      </span>
+      <span className="flex items-center gap-2">
+        <span className="h-0 w-5 border-t border-dashed border-border" />
+        Admitted ward
       </span>
     </div>
   );
@@ -366,7 +381,7 @@ export function TransmissionGraph({
 
   return (
     <div
-      className={cn("relative w-full bg-background", height)}
+      className={cn("relative w-full bg-card", height)}
       role="img"
       aria-label={`Transmission graph: ${fallbackText}`}
     >
@@ -394,37 +409,33 @@ export function TransmissionGraph({
         <Controls
           showInteractive
           position="bottom-left"
-          className="!rounded-lg !border !border-border !bg-card !shadow-card [&_button]:!h-7 [&_button]:!w-7 [&_button]:!border-border [&_button]:!bg-card [&_button]:!text-muted-foreground [&_button:hover]:!bg-muted"
-        />
-        <MiniMap
-          position="bottom-right"
-          pannable
-          zoomable
-          nodeStrokeWidth={0}
-          nodeBorderRadius={3}
-          maskColor="hsl(220 23% 97% / 0.7)"
-          className="!rounded-lg !border !border-border !bg-card !shadow-card"
-          nodeColor={(n) => {
-            const kind = (n.data as { kind?: EntityKind })?.kind;
-            return kind ? ENTITY_STYLES[kind].minimap : "transparent";
-          }}
+          className={cn(
+            "!m-4 !overflow-hidden !rounded-xl !border !border-border !bg-card !shadow-pop",
+            "[&_button]:!h-8 [&_button]:!w-8 [&_button]:!border-0 [&_button]:!border-b [&_button]:!border-border",
+            "[&_button]:!bg-card [&_button]:!text-muted-foreground",
+            "[&_button:last-child]:!border-b-0",
+            "[&_button:hover]:!bg-muted [&_button:hover]:!text-foreground",
+            "[&_svg]:!fill-current"
+          )}
         />
       </ReactFlow>
 
       {/* Cluster caption — the membership signal itself is the ring on each node */}
       {built.clusterLabel && (
-        <div className="pointer-events-none absolute left-4 top-4 z-10 flex items-center gap-2 rounded-full bg-risk-high px-3 py-1.5">
-          <span className="h-2.5 w-2.5 rounded-full border-2 border-dashed border-node-infected" />
-          <span className="text-[0.75rem] font-semibold text-risk-high-foreground">
+        <div className="pointer-events-none absolute left-4 top-4 z-10 flex items-center gap-2.5 rounded-lg border border-node-infected/25 bg-card px-3 py-2 shadow-card">
+          <span className="h-3 w-3 shrink-0 rounded-full border border-dashed border-node-infected" />
+          <span className="font-mono text-[0.625rem] uppercase tracking-[0.12em] text-risk-high-foreground">
             {built.clusterLabel}
           </span>
         </div>
       )}
 
       {/* Node-type filters */}
-      <div className="absolute right-4 top-4 z-10 w-[188px] rounded-xl border border-border bg-card p-3.5 shadow-pop">
-        <p className="mb-2.5 font-semibold text-foreground">Filters</p>
-        <div className="space-y-2">
+      <div className="absolute right-4 top-4 z-10 w-[196px] overflow-hidden rounded-xl border border-border bg-card shadow-pop">
+        <p className="border-b border-border px-3.5 py-2.5 font-mono text-[0.625rem] uppercase tracking-[0.14em] text-muted-foreground">
+          Show
+        </p>
+        <div className="divide-hairline">
           {(Object.keys(ENTITY_STYLES) as EntityKind[]).map((kind) => {
             const count = built.counts[kind];
             const absent = count === 0;
@@ -432,13 +443,25 @@ export function TransmissionGraph({
               <label
                 key={kind}
                 className={cn(
-                  "flex cursor-pointer items-center justify-between gap-2 text-[0.8125rem]",
-                  absent && "cursor-not-allowed opacity-45"
+                  "flex items-center justify-between gap-2 px-3.5 py-2.5 transition-colors",
+                  absent
+                    ? "cursor-not-allowed opacity-40"
+                    : "cursor-pointer hover:bg-muted/50"
                 )}
               >
-                <span className="text-foreground">
-                  {ENTITY_STYLES[kind].label}
-                  <span className="ml-1 text-muted-foreground">({count})</span>
+                <span className="flex min-w-0 items-center gap-2">
+                  <span
+                    className={cn(
+                      "h-2 w-2 shrink-0 rounded-full",
+                      ENTITY_STYLES[kind].dot
+                    )}
+                  />
+                  <span className="truncate text-[0.75rem] text-foreground">
+                    {ENTITY_STYLES[kind].label}
+                  </span>
+                  <span className="shrink-0 font-mono text-[0.6875rem] tabular-nums text-muted-foreground">
+                    {count}
+                  </span>
                 </span>
                 <Switch
                   checked={enabled[kind] && !absent}

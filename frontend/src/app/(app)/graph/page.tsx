@@ -11,6 +11,7 @@ import type {
 } from "@/types/api";
 import { useAppStore } from "@/lib/store";
 import { Card, CardContent } from "@/components/ui/card";
+import { Panel } from "@/components/ui/panel";
 import { Select } from "@/components/ui/select";
 import {
   GraphLegend,
@@ -172,17 +173,18 @@ function GraphExplorer() {
       )}
 
       {!loading && !error && selected && (
-        <Card className="overflow-hidden">
-          <div className="flex flex-wrap items-center justify-between gap-3 px-5 py-3.5">
+        <Panel>
+          {/* Toolbar strip: the key on the left, the way out on the right */}
+          <div className="flex flex-wrap items-center justify-between gap-x-6 gap-y-3 border-b border-border bg-muted/40 px-5 py-3">
             <GraphLegend />
             <Link
               href={`/investigations/${selected.case_id}`}
-              className="text-sm font-medium text-primary hover:underline"
+              className="shrink-0 rounded-md px-2 py-1 text-[0.8125rem] font-medium text-primary transition-colors hover:bg-primary-soft focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
             >
               Open full investigation →
             </Link>
           </div>
-          <div className="border-t border-border">
+          <div>
             <TransmissionGraph
               investigation={selected}
               chains={selected.transmission_chains}
@@ -190,7 +192,7 @@ function GraphExplorer() {
               height="h-[calc(100vh-320px)] min-h-[520px]"
             />
           </div>
-        </Card>
+        </Panel>
       )}
     </div>
   );
