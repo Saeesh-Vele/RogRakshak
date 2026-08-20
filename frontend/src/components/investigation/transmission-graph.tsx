@@ -258,10 +258,13 @@ function buildGraph(
       source: wardKey,
       target: nodeKey,
       type: "smoothstep",
+      // Same grey the ward nodes and their legend swatch use, so the line is
+      // visibly tied to the thing it comes from. Subordinate to the coral
+      // contact edges, but it still has to be legible on its own.
       style: {
-        stroke: "hsl(220 13% 84%)",
-        strokeWidth: 1,
-        strokeDasharray: "2 4",
+        stroke: "hsl(var(--node-neutral))",
+        strokeWidth: 1.5,
+        strokeDasharray: "5 4",
       },
       zIndex: 0,
     });
@@ -309,13 +312,13 @@ export function GraphLegend({ className }: { className?: string }) {
       ))}
       <span className="flex items-center gap-2">
         <span
-          className="h-0 w-5 border-t border-dashed"
+          className="h-0 w-5 border-t-2 border-dashed"
           style={{ borderColor: "hsl(var(--node-infected))" }}
         />
         Contact pathway
       </span>
       <span className="flex items-center gap-2">
-        <span className="h-0 w-5 border-t border-dashed border-border" />
+        <span className="h-0 w-5 border-t-[1.5px] border-dashed border-node-neutral" />
         Admitted ward
       </span>
     </div>
