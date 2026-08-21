@@ -4,6 +4,7 @@ import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Bell, Search } from "lucide-react";
 import { SearchInput } from "@/components/ui/input";
+import { ThemeToggle } from "@/components/layout/theme-toggle";
 import { UserMenu } from "@/components/layout/user-menu";
 import type { DoctorIdentity } from "@/lib/auth";
 
@@ -44,7 +45,8 @@ export function Topbar({ doctor }: { doctor: DoctorIdentity | null }) {
         />
       </form>
 
-      <div className="ml-auto flex items-center gap-2">
+      <div className="ml-auto flex items-center gap-1">
+        <ThemeToggle />
         <button
           type="button"
           aria-label="Notifications"
@@ -54,6 +56,7 @@ export function Topbar({ doctor }: { doctor: DoctorIdentity | null }) {
         >
           <Bell className="h-[19px] w-[19px]" />
         </button>
+        <span aria-hidden className="mx-1 h-6 w-px bg-border" />
         <UserMenu doctor={doctor} />
       </div>
     </header>

@@ -22,6 +22,7 @@ import { evidenceTypeLabel, formatMinutes } from "@/lib/risk";
 import { shortBedLabel } from "@/lib/patient-placement";
 import { cn } from "@/lib/utils";
 import { Switch } from "@/components/ui/switch";
+import { useAppStore } from "@/lib/store";
 import {
   EntityNode,
   ENTITY_STYLES,
@@ -340,6 +341,7 @@ export function TransmissionGraph({
   onSelectEvidence,
   height = "h-[560px]",
 }: TransmissionGraphProps) {
+  const theme = useAppStore((s) => s.theme);
   const [enabled, setEnabled] = useState<Record<EntityKind, boolean>>({
     index: true,
     downstream: true,
@@ -384,7 +386,7 @@ export function TransmissionGraph({
 
   return (
     <div
-      className={cn("relative w-full bg-card", height)}
+      className={cn("relative w-full bg-background", height)}
       role="img"
       aria-label={`Transmission graph: ${fallbackText}`}
     >
@@ -405,7 +407,9 @@ export function TransmissionGraph({
       >
         <Background
           variant={BackgroundVariant.Dots}
-          color="hsl(220 13% 88%)"
+          /* ReactFlow writes this straight onto an SVG fill attribute, which
+             does not resolve var(), so the token is picked per theme here. */
+          color={theme === "dark" ? "#3A4058" : "#DDE0E7"}
           gap={18}
           size={1}
         />

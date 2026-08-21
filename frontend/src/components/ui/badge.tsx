@@ -27,7 +27,7 @@ const badgeVariants = cva(
         potential: "bg-risk-medium text-risk-medium-foreground",
         noSignal: "bg-risk-low text-risk-low-foreground",
 
-        success: "bg-emerald-50 text-emerald-700",
+        success: "bg-success/15 text-success",
       },
       size: {
         default: "px-2.5 py-0.5 text-xs",

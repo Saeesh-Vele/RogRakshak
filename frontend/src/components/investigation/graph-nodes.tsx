@@ -45,9 +45,10 @@ export const ENTITY_STYLES: Record<
     dot: "bg-node-location",
     iconBg: "bg-node-location",
     stripBg: "bg-node-location/[0.09]",
-    // A darkened teal — hsl(var(--node-location)) itself is too light for
-    // 9px uppercase type against a near-white strip.
-    stripText: "text-[#1B6E64]",
+    // --node-location itself is too light for 9px uppercase type on a
+    // near-white strip; the -strong token is darkened in light mode and
+    // brightened in dark, so the strip holds contrast either way.
+    stripText: "text-node-location-strong",
   },
   location: {
     label: "Ward / unit",

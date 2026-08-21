@@ -10,7 +10,11 @@ export default function AuthLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <div className="flex min-h-screen flex-col bg-background">
+    <div
+      // Matches the landing page it is entered from, not the app it leads to.
+      data-theme="light"
+      className="flex min-h-screen flex-col bg-background"
+    >
       <header className="flex items-center justify-between px-6 py-5">
         <Wordmark href="/" />
         <Link

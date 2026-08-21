@@ -11,7 +11,8 @@
  */
 
 @layer base {
-  :root {
+  :root,
+  [data-theme="light"] {
     /* Surfaces */
     --background: 220 23% 97%;
     --foreground: 222 47% 11%;
@@ -60,8 +61,93 @@
     --input: 220 13% 91%;
     --ring: 221 83% 53%;
 
+    /*
+     * Application chrome. The sidebar is the deepest layer in both themes —
+     * see the dark block below. The landing page pins itself to these light
+     * values so it never follows the in-app theme.
+     */
+    --ink: 228 42% 7%;
+    --ink-panel: 230 32% 14%;
+
+    /* Dot grid on the graph canvas and the marketing pipeline band */
+    --dot: 220 13% 88%;
+
+    /* A teal dark enough to carry 9px uppercase type on a near-white strip */
+    --node-location-strong: 173 58% 29%;
+
     --radius: 0.75rem;
   }
+
+  /**
+   * Dark theme — signed-in application only.
+   *
+   * Same blue-slate family as the ink chrome, so switching themes changes the
+   * light in the room rather than the room. Three surfaces stay stacked in the
+   * same order as in light: sidebar (5% L) below the page (10%) below the
+   * panels (13.5%), which is what keeps the sidebar readable as chrome instead
+   * of merging into the content.
+   *
+   * Accents brighten rather than shift hue: the same blue, coral, amber and
+   * teal, lifted to hold contrast against a dark field.
+   */
+  [data-theme="dark"] {
+    /* Surfaces — L* steps of 9.0 (page over chrome) and 4.7 (panel over page).
+       The panel step is wider than light mode's 2.9 on purpose: dark mode has
+       no usable drop shadow, so the surface itself has to do that work. */
+    --background: 226 28% 14%;
+    --foreground: 220 20% 93%;
+    --card: 226 24% 18%;
+    --card-foreground: 220 20% 93%;
+    --popover: 226 24% 21%;
+    --popover-foreground: 220 20% 93%;
+
+    /* Blue accent */
+    --primary: 217 91% 64%;
+    --primary-foreground: 0 0% 100%;
+    --primary-soft: 221 50% 25%;
+    --primary-soft-foreground: 214 95% 80%;
+
+    /* Neutrals */
+    --secondary: 225 18% 24%;
+    --secondary-foreground: 220 20% 93%;
+    --muted: 225 20% 22%;
+    --muted-foreground: 220 12% 66%;
+    --accent: 221 50% 25%;
+    --accent-foreground: 214 95% 80%;
+
+    /* Risk / status pills — deep tint, bright text */
+    --risk-high: 0 40% 22%;
+    --risk-high-foreground: 0 88% 78%;
+    --risk-medium: 34 44% 20%;
+    --risk-medium-foreground: 40 92% 70%;
+    --risk-low: 225 18% 24%;
+    --risk-low-foreground: 220 12% 72%;
+
+    /* Graph node palette, lifted for a dark canvas */
+    --node-infected: 0 74% 66%;
+    --node-downstream: 38 88% 62%;
+    --node-location: 172 58% 52%;
+    --node-neutral: 220 12% 55%;
+    --node-patient: 217 91% 72%;
+    --node-staff: 265 72% 70%;
+
+    --destructive: 0 74% 64%;
+    --destructive-foreground: 0 0% 100%;
+    --success: 142 60% 55%;
+
+    /* Lines */
+    --border: 225 16% 27%;
+    --input: 225 16% 27%;
+    --ring: 217 91% 64%;
+
+    /* Chrome sits below the page, as it does in light */
+    --ink: 228 45% 5%;
+    --ink-panel: 226 24% 20%;
+
+    --dot: 225 15% 27%;
+    --node-location-strong: 172 58% 62%;
+  }
+
 }
 
 @layer base {
@@ -86,7 +172,7 @@
    * transmission-graph.tsx, so the marketing page reads as the product.
    */
   .bg-graph-dots {
-    background-image: radial-gradient(hsl(220 13% 88%) 1px, transparent 1px);
+    background-image: radial-gradient(hsl(var(--dot)) 1px, transparent 1px);
     background-size: 18px 18px;
   }
 

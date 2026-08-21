@@ -126,7 +126,12 @@ function Eyebrow({
 
 export default function LandingPage() {
   return (
-    <div className="flex min-h-screen flex-col bg-background font-body">
+    <div
+      // The marketing page is a fixed composition — it never follows the
+      // signed-in theme, so it re-declares the light tokens for its subtree.
+      data-theme="light"
+      className="flex min-h-screen flex-col bg-background font-body"
+    >
       {/* ---------------------------------------------------------------- */}
       {/* Hero — the ink instrument panel                                  */}
       {/* ---------------------------------------------------------------- */}

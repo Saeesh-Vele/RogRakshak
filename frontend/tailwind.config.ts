@@ -65,6 +65,7 @@ const config: Config = {
           downstream: "hsl(var(--node-downstream))",
           location: "hsl(var(--node-location))",
           neutral: "hsl(var(--node-neutral))",
+          "location-strong": "hsl(var(--node-location-strong))",
           patient: "hsl(var(--node-patient))",
           staff: "hsl(var(--node-staff))",
         },
@@ -75,10 +76,11 @@ const config: Config = {
          * same page. Not used anywhere inside the app shell.
          */
         ink: {
-          DEFAULT: "#0B0E1A",
-          raised: "#111526",
-          panel: "#141931",
-          rail: "#1B2140",
+          // Token-driven so the sidebar can sit a shade deeper in dark mode.
+          // The landing pins itself to the light values via [data-theme].
+          DEFAULT: "hsl(var(--ink))",
+          panel: "hsl(var(--ink-panel))",
+          // The chrome is dark in both themes, so its hairline is always white.
           line: "rgba(255, 255, 255, 0.09)",
         },
         /** The coral already in the wordmark, promoted to a real accent. */

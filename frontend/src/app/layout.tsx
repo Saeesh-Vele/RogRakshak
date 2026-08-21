@@ -59,7 +59,24 @@ export default function RootLayout({
         plexSans.variable,
         plexMono.variable
       )}
+      // Replaced before paint by the script below; keeps SSR and the first
+      // client render agreeing so React does not warn about a mismatch.
+      data-theme="light"
+      suppressHydrationWarning
     >
+      <head>
+        {/*
+          Applies the stored theme before the first paint, so a signed-in user
+          who chose dark never sees a white flash. Inline and synchronous by
+          necessity — anything deferred paints the wrong theme first.
+          The key must match THEME_STORAGE_KEY in src/lib/store.ts.
+        */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `try{if(localStorage.getItem("rograkshak-theme")==="dark"){document.documentElement.dataset.theme="dark"}}catch(e){}`,
+          }}
+        />
+      </head>
       <body className="antialiased">{children}</body>
     </html>
   );
