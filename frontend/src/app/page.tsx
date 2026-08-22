@@ -67,60 +67,77 @@ const STEPS = [
 ];
 
 /**
- * Accent per feature card. Drawn from the graph node palette in globals.css
- * (teal / red / amber / blue) so the marketing cards use the same colours the
- * product does, rather than a second decorative palette.
+ * Accent per feature card, from the graph node palette in globals.css, so the
+ * marketing cards use the colours the product actually assigns to index cases,
+ * wards, downstream contacts and the product blue — not a second decorative
+ * palette. Tints are raised to /15 because they sit on ink, not on white.
  */
 const FEATURES = [
   {
     icon: GitBranch,
-    rail: "border-l-node-location",
-    iconClass: "bg-node-location/10 text-node-location",
+    rail: "bg-node-location",
+    chip: "bg-node-location/15 text-node-location",
     title: "Evidence you can audit to the record",
     body: "Every finding carries atomic evidence items with source record IDs, overlap durations, locations and timestamps. Nothing in a report exists without a row behind it that you can go and check.",
   },
   {
     icon: Network,
-    rail: "border-l-node-infected",
-    iconClass: "bg-node-infected/10 text-node-infected",
+    rail: "bg-coral",
+    chip: "bg-coral/15 text-coral",
     title: "Interactive transmission graph",
     body: "Chains render as an explorable graph of index patients, staff intermediaries and downstream contacts, with a per-case timeline of movements and positive cultures alongside it.",
   },
   {
     icon: ListOrdered,
-    rail: "border-l-node-downstream",
-    iconClass: "bg-node-downstream/10 text-node-downstream",
+    rail: "bg-node-downstream",
+    chip: "bg-node-downstream/15 text-node-downstream",
     title: "A ranked cohort, not a contact list",
     body: "The workflow assembles the candidate cohort around an index patient and orders it by weighted score, so a review opens on the strongest pathway instead of an undifferentiated list of everyone who was nearby.",
   },
   {
     icon: FileSearch,
-    rail: "border-l-primary",
-    iconClass: "bg-primary-soft text-primary-soft-foreground",
+    // A lifted blue — the product's --primary is too dark to read on ink.
+    rail: "bg-[#4C8DF6]",
+    chip: "bg-[#4C8DF6]/15 text-[#83ACF7]",
     title: "Investigation dossiers on demand",
     body: "Point the workflow at an index patient and organism; it returns a full case dossier — cohort, evidence, scored dimensions, chain hypotheses and an executive briefing — through one REST call.",
   },
 ];
 
 /** Small uppercase mono label that opens each section. */
-function Eyebrow({
-  children,
-  tone = "default",
-}: {
-  children: React.ReactNode;
-  tone?: "default" | "light";
-}) {
+function Eyebrow({ children }: { children: React.ReactNode }) {
   return (
-    <p
-      className={`flex items-center gap-2.5 font-mono text-[0.6875rem] uppercase tracking-[0.16em] ${
-        tone === "light" ? "text-white/45" : "text-muted-foreground"
-      }`}
-    >
-      <span
-        className={`h-px w-6 ${tone === "light" ? "bg-white/25" : "bg-border"}`}
-      />
+    <p className="flex items-center gap-3 font-mono text-[0.6875rem] uppercase tracking-[0.18em] text-white/45">
+      <span className="h-px w-7 bg-white/25" />
       {children}
     </p>
+  );
+}
+
+/** Eyebrow + display heading + optional lead, shared by every section. */
+function SectionIntro({
+  eyebrow,
+  title,
+  lead,
+  className,
+}: {
+  eyebrow: string;
+  title: React.ReactNode;
+  lead?: React.ReactNode;
+  className?: string;
+}) {
+  return (
+    <div className={className}>
+      <Eyebrow>{eyebrow}</Eyebrow>
+      <h2 className="mt-5 text-balance font-display text-[2rem] font-normal leading-[1.14] tracking-[-0.015em] text-white sm:text-[2.625rem]">
+        {title}
+      </h2>
+      {lead && (
+        <p className="mt-5 max-w-2xl text-pretty text-[1.0625rem] leading-[1.7] text-white/55">
+          {lead}
+        </p>
+      )}
+    </div>
   );
 }
 
@@ -130,7 +147,7 @@ export default function LandingPage() {
       // The marketing page is a fixed composition — it never follows the
       // signed-in theme, so it re-declares the light tokens for its subtree.
       data-theme="light"
-      className="flex min-h-screen flex-col bg-background font-body"
+      className="flex min-h-screen flex-col bg-ink font-body"
     >
       {/* ---------------------------------------------------------------- */}
       {/* Hero — the ink instrument panel                                  */}
@@ -223,7 +240,7 @@ export default function LandingPage() {
           </div>
 
           <p
-            className="animate-rise-in mt-5 font-mono text-[0.6875rem] leading-relaxed text-white/35"
+            className="animate-rise-in mt-5 font-mono text-[0.6875rem] leading-relaxed text-white/50"
             style={{ animationDelay: "1.0s" }}
           >
             Accounts are provisioned by your infection control team. The demo
@@ -232,22 +249,34 @@ export default function LandingPage() {
         </div>
       </section>
 
-      <main className="flex-1">
+      {/*
+        Everything below the hero lives on the same ink field. The page used to
+        drop to white here and climb back to ink for the closing call, which
+        read as three unrelated pages stapled together. One continuous dark
+        canvas, varied by depth — recessed bands, lifted bands, glows and the
+        dot grid — carries the whole scroll instead.
+      */}
+      <main className="flex-1 bg-ink">
         {/* -------------------------------------------------------------- */}
-        {/* The problem — quiet editorial counterweight to the hero        */}
+        {/* The problem — pure type. The breath after the hero.            */}
         {/* -------------------------------------------------------------- */}
-        <section id="problem" className="border-b border-border bg-card">
-          <div className="mx-auto max-w-[1160px] px-6 py-20 lg:py-28">
-            <div className="grid gap-10 lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1fr)] lg:gap-20">
-              <div>
-                <Eyebrow>The problem</Eyebrow>
-                <h2 className="mt-5 text-balance font-display text-[2rem] font-normal leading-[1.14] tracking-[-0.015em] text-foreground sm:text-[2.5rem]">
-                  Drawn by hand, the chain takes longer to finish than the
-                  outbreak takes to spread.
-                </h2>
-              </div>
+        <section
+          id="problem"
+          className="relative isolate border-t border-ink-line"
+        >
+          <div className="mx-auto max-w-[1160px] px-6 py-24 lg:py-32">
+            <div className="grid gap-12 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1fr)] lg:gap-20">
+              <SectionIntro
+                eyebrow="The problem"
+                title={
+                  <>
+                    Drawn by hand, the chain takes longer to finish than the
+                    outbreak takes to spread.
+                  </>
+                }
+              />
 
-              <div className="space-y-6 text-pretty text-[1.0625rem] leading-[1.7] text-muted-foreground lg:pt-2">
+              <div className="space-y-6 text-pretty text-[1.0625rem] leading-[1.75] text-white/55 lg:pt-3">
                 <p>
                   When a resistant organism turns up on a ward, working out who
                   else was exposed means hand-reconciling admission, transfer
@@ -260,67 +289,72 @@ export default function LandingPage() {
                   the links that matter are temporal: an overlap of a few hours,
                   three transfers ago.
                 </p>
-                <p className="border-l-2 border-coral pl-5 text-foreground">
-                  By the time the chain is drawn by hand, the next cases have
-                  already been admitted.
-                </p>
               </div>
             </div>
+
+            {/* The consequence, given its own beat */}
+            <p className="mt-16 border-t border-ink-line pt-10 text-balance font-display text-[1.5rem] font-normal leading-[1.4] text-white/85 sm:text-[1.875rem] lg:mt-20">
+              By the time the chain is drawn by hand,{" "}
+              <span className="italic text-coral">
+                the next cases have already been admitted.
+              </span>
+            </p>
           </div>
         </section>
 
         {/* -------------------------------------------------------------- */}
-        {/* Pipeline — a real sequence, so it is numbered                   */}
+        {/* Pipeline — a real sequence, so it is numbered                  */}
         {/* -------------------------------------------------------------- */}
         <section
           id="pipeline"
-          className="relative isolate overflow-hidden border-b border-border"
+          className="relative isolate overflow-hidden border-t border-ink-line"
         >
+          {/* Lifted band, so the sequence reads as raised off the field */}
           <div
             aria-hidden
-            className="bg-graph-dots pointer-events-none absolute inset-0 -z-10 opacity-70 [mask-image:radial-gradient(ellipse_at_center,black_20%,transparent_75%)]"
+            className="pointer-events-none absolute inset-0 -z-10 bg-gradient-to-b from-white/[0.035] via-white/[0.012] to-transparent"
+          />
+          <div
+            aria-hidden
+            className="bg-graph-dots-ink pointer-events-none absolute inset-0 -z-10 opacity-50 [mask-image:radial-gradient(ellipse_70%_55%_at_50%_20%,black,transparent)]"
           />
 
-          <div className="mx-auto max-w-[1160px] px-6 py-20 lg:py-28">
-            <div className="max-w-2xl">
-              <Eyebrow>How it works</Eyebrow>
-              <h2 className="mt-5 text-balance font-display text-[2rem] font-normal leading-[1.14] tracking-[-0.015em] text-foreground sm:text-[2.5rem]">
-                Three phases, one pipeline.
-              </h2>
-              <p className="mt-4 text-[1.0625rem] leading-[1.7] text-muted-foreground">
-                The same pipeline that runs in the product — from a raw lab PDF
-                to a scored, classified case.
-              </p>
-            </div>
+          <div className="mx-auto max-w-[1160px] px-6 py-24 lg:py-32">
+            <SectionIntro
+              eyebrow="How it works"
+              title="Three phases, one pipeline."
+              lead="The same pipeline that runs in the product — from a raw lab PDF to a scored, classified case."
+              className="max-w-2xl"
+            />
 
-            <ol className="relative mt-14 grid gap-6 lg:grid-cols-3 lg:gap-8">
-              {/* The rule that makes the sequence read as one run */}
+            <ol className="relative mt-20 grid gap-6 lg:grid-cols-3 lg:gap-7">
+              {/* The run: a lit rule with a station above each phase */}
               <span
                 aria-hidden
-                className="absolute -top-7 left-0 right-0 hidden h-px bg-border lg:block"
+                className="absolute -top-10 left-0 right-0 hidden h-px bg-gradient-to-r from-transparent via-primary/50 to-transparent lg:block"
               />
               {STEPS.map((step, i) => (
                 <li key={step.title} className="relative">
                   <span
                     aria-hidden
-                    className="absolute -top-9 left-0 hidden h-4 w-4 rounded-full border-2 border-primary bg-background lg:block"
+                    className="absolute -top-[46px] left-1 hidden h-3 w-3 rounded-full bg-primary shadow-[0_0_0_4px_rgba(37,99,235,0.18),0_0_14px_2px_rgba(59,130,246,0.55)] lg:block"
                   />
-                  <div className="h-full rounded-2xl border border-border bg-card p-6 shadow-card transition-shadow duration-300 hover:shadow-card-hover">
+                  <div className="group h-full rounded-2xl border border-ink-line bg-ink-panel p-7 transition-colors duration-300 hover:border-white/20">
                     <div className="flex items-center justify-between">
-                      <span className="grid h-10 w-10 place-items-center rounded-xl bg-primary-soft text-primary-soft-foreground">
-                        <step.icon className="h-[1.125rem] w-[1.125rem]" />
+                      <span className="grid h-11 w-11 place-items-center rounded-xl bg-primary/15 text-[#83ACF7] transition-colors duration-300 group-hover:bg-primary/25">
+                        <step.icon className="h-5 w-5" />
                       </span>
-                      <span className="font-mono text-[0.6875rem] uppercase tracking-[0.14em] text-muted-foreground">
+                      <span className="font-mono text-[0.625rem] uppercase tracking-[0.16em] text-white/50">
                         {step.phase}
                       </span>
                     </div>
-                    <h3 className="mt-6 font-display text-[1.375rem] font-normal leading-tight tracking-[-0.01em] text-foreground">
-                      <span className="mr-2 font-mono text-[0.75rem] align-[0.2em] text-primary">
+                    <h3 className="mt-7 font-display text-[1.4375rem] font-normal leading-tight tracking-[-0.01em] text-white">
+                      <span className="mr-2.5 align-[0.22em] font-mono text-[0.75rem] text-[#83ACF7]">
                         0{i + 1}
                       </span>
                       {step.title}
                     </h3>
-                    <p className="mt-3 text-[0.9375rem] leading-[1.65] text-muted-foreground">
+                    <p className="mt-3.5 text-[0.9375rem] leading-[1.7] text-white/50">
                       {step.body}
                     </p>
                   </div>
@@ -329,12 +363,12 @@ export default function LandingPage() {
             </ol>
 
             {/* The compiled graph, written the way it is written in code */}
-            <div className="mt-8 overflow-hidden rounded-2xl border border-border bg-card shadow-card">
-              <p className="border-b border-border px-5 py-3 font-mono text-[0.625rem] uppercase tracking-[0.14em] text-muted-foreground">
+            <div className="mt-7 overflow-hidden rounded-2xl border border-ink-line bg-ink-panel">
+              <p className="border-b border-ink-line px-5 py-3 font-mono text-[0.625rem] uppercase tracking-[0.16em] text-white/45">
                 Compiled LangGraph state machine
               </p>
-              <div className="overflow-x-auto px-5 py-4">
-                <p className="whitespace-nowrap font-mono text-[0.8125rem] text-foreground">
+              <div className="overflow-x-auto px-5 py-5">
+                <p className="flex w-max items-center font-mono text-[0.8125rem]">
                   {[
                     "load_context",
                     "get_cohort",
@@ -344,18 +378,18 @@ export default function LandingPage() {
                     "synthesize_summary",
                     "validate_output",
                   ].map((node, i, all) => (
-                    <span key={node}>
-                      <span className="rounded-md bg-muted px-1.5 py-1">
+                    <span key={node} className="flex items-center">
+                      <span className="rounded-md border border-ink-line bg-white/[0.05] px-2 py-1.5 text-white/85">
                         {node}
                       </span>
                       {i < all.length - 1 && (
-                        <span className="px-1.5 text-primary">→</span>
+                        <span className="px-2 text-[#83ACF7]">→</span>
                       )}
                     </span>
                   ))}
                 </p>
               </div>
-              <p className="border-t border-border px-5 py-3 text-[0.875rem] leading-relaxed text-muted-foreground">
+              <p className="border-t border-ink-line px-5 py-3.5 text-[0.875rem] leading-relaxed text-white/45">
                 The final node rejects any output whose claims are not backed by
                 referenced evidence.
               </p>
@@ -364,22 +398,25 @@ export default function LandingPage() {
         </section>
 
         {/* -------------------------------------------------------------- */}
-        {/* Scoring — the second ink moment                                */}
+        {/* Scoring — the arithmetic, beside the arithmetic                */}
         {/* -------------------------------------------------------------- */}
-        <section id="scoring" className="relative isolate overflow-hidden bg-ink">
+        <section
+          id="scoring"
+          className="relative isolate overflow-hidden border-t border-ink-line"
+        >
           <div
             aria-hidden
-            className="bg-graph-dots-ink pointer-events-none absolute inset-0 -z-10 opacity-60 [mask-image:radial-gradient(ellipse_70%_60%_at_30%_40%,black,transparent)]"
+            className="pointer-events-none absolute -left-[12%] top-1/4 -z-10 h-[460px] w-[460px] rounded-full bg-[radial-gradient(circle,rgba(59,130,246,0.16),transparent_65%)] blur-2xl"
           />
 
-          <div className="mx-auto max-w-[1160px] px-6 py-20 lg:py-28">
-            <div className="grid gap-12 lg:grid-cols-[minmax(0,1fr)_minmax(0,26rem)] lg:gap-20">
+          <div className="mx-auto max-w-[1160px] px-6 py-24 lg:py-32">
+            <div className="grid gap-14 lg:grid-cols-[minmax(0,1fr)_minmax(0,26rem)] lg:gap-20">
               <div>
-                <Eyebrow tone="light">The score</Eyebrow>
-                <h2 className="mt-5 text-balance font-display text-[2rem] font-normal leading-[1.14] tracking-[-0.015em] text-white sm:text-[2.5rem]">
-                  The confidence number is arithmetic, not opinion.
-                </h2>
-                <div className="mt-6 max-w-xl space-y-5 text-pretty text-[1.0625rem] leading-[1.7] text-white/60">
+                <SectionIntro
+                  eyebrow="The score"
+                  title="The confidence number is arithmetic, not opinion."
+                />
+                <div className="mt-6 max-w-xl space-y-5 text-pretty text-[1.0625rem] leading-[1.75] text-white/55">
                   <p>
                     Confidence is a weighted sum over five fixed dimensions. The
                     weights are set in the detection architecture and do not
@@ -392,7 +429,7 @@ export default function LandingPage() {
                     documents, and writing the briefing prose. They never touch
                     the risk arithmetic.
                   </p>
-                  <p className="font-mono text-[0.8125rem] leading-relaxed text-white/40">
+                  <p className="font-mono text-[0.75rem] uppercase tracking-[0.1em] text-white/50">
                     Shown: CASE-2026-001 · synthetic demonstration data
                   </p>
                 </div>
@@ -406,35 +443,43 @@ export default function LandingPage() {
         {/* -------------------------------------------------------------- */}
         {/* What you get                                                    */}
         {/* -------------------------------------------------------------- */}
-        <section id="evidence" className="border-b border-border bg-card">
-          <div className="mx-auto max-w-[1160px] px-6 py-20 lg:py-28">
-            <div className="max-w-2xl">
-              <Eyebrow>What you get</Eyebrow>
-              <h2 className="mt-5 text-balance font-display text-[2rem] font-normal leading-[1.14] tracking-[-0.015em] text-foreground sm:text-[2.5rem]">
-                Hypotheses you can defend in a review meeting.
-              </h2>
-              <p className="mt-4 text-[1.0625rem] leading-[1.7] text-muted-foreground">
-                RogRakshak does not claim confirmed transmission. It surfaces
-                suspected contact pathways and evidence-supported cluster
-                hypotheses, and shows its working.
-              </p>
-            </div>
+        <section
+          id="evidence"
+          className="relative isolate overflow-hidden border-t border-ink-line"
+        >
+          <div
+            aria-hidden
+            className="pointer-events-none absolute inset-0 -z-10 bg-gradient-to-b from-white/[0.035] via-white/[0.012] to-transparent"
+          />
 
-            <div className="mt-14 grid gap-6 sm:grid-cols-2">
+          <div className="mx-auto max-w-[1160px] px-6 py-24 lg:py-32">
+            <SectionIntro
+              eyebrow="What you get"
+              title="Hypotheses you can defend in a review meeting."
+              lead="RogRakshak does not claim confirmed transmission. It surfaces suspected contact pathways and evidence-supported cluster hypotheses, and shows its working."
+              className="max-w-2xl"
+            />
+
+            <div className="mt-16 grid gap-6 sm:grid-cols-2">
               {FEATURES.map((feature) => (
                 <div
                   key={feature.title}
-                  className={`rounded-2xl border border-l-[3px] border-border bg-background p-6 shadow-card transition-shadow duration-300 hover:shadow-card-hover ${feature.rail}`}
+                  className="group relative overflow-hidden rounded-2xl border border-ink-line bg-ink-panel p-7 transition-colors duration-300 hover:border-white/20"
                 >
+                  {/* Rail carries the colour, so the card keeps a hairline */}
                   <span
-                    className={`grid h-10 w-10 place-items-center rounded-xl ${feature.iconClass}`}
+                    aria-hidden
+                    className={`absolute inset-y-0 left-0 w-[3px] ${feature.rail}`}
+                  />
+                  <span
+                    className={`grid h-11 w-11 place-items-center rounded-xl transition-transform duration-300 group-hover:scale-105 ${feature.chip}`}
                   >
-                    <feature.icon className="h-[1.125rem] w-[1.125rem]" />
+                    <feature.icon className="h-5 w-5" />
                   </span>
-                  <h3 className="mt-5 font-display text-[1.375rem] font-normal leading-tight tracking-[-0.01em] text-foreground">
+                  <h3 className="mt-6 font-display text-[1.4375rem] font-normal leading-tight tracking-[-0.01em] text-white">
                     {feature.title}
                   </h3>
-                  <p className="mt-3 text-[0.9375rem] leading-[1.65] text-muted-foreground">
+                  <p className="mt-3.5 text-[0.9375rem] leading-[1.7] text-white/50">
                     {feature.body}
                   </p>
                 </div>
@@ -445,23 +490,39 @@ export default function LandingPage() {
       </main>
 
       {/* ---------------------------------------------------------------- */}
-      {/* Closing CTA + footer, back on ink                                */}
+      {/* Closing call + footer                                            */}
       {/* ---------------------------------------------------------------- */}
-      <footer className="relative isolate overflow-hidden bg-ink">
+      <footer className="relative isolate overflow-hidden border-t border-ink-line bg-ink">
         <div
           aria-hidden
-          className="bg-graph-dots-ink pointer-events-none absolute inset-0 -z-10 opacity-50 [mask-image:radial-gradient(ellipse_60%_70%_at_50%_0%,black,transparent)]"
+          className="bg-graph-dots-ink pointer-events-none absolute inset-0 -z-10 opacity-60 [mask-image:radial-gradient(ellipse_55%_70%_at_50%_35%,black,transparent)]"
+        />
+        <div
+          aria-hidden
+          className="pointer-events-none absolute left-1/2 top-1/4 -z-10 h-[460px] w-[720px] -translate-x-1/2 rounded-full bg-[radial-gradient(ellipse,rgba(59,130,246,0.18),transparent_65%)] blur-2xl"
         />
 
-        <div className="mx-auto max-w-[1160px] px-6 py-20 text-center lg:py-28">
-          <h2 className="mx-auto max-w-3xl text-balance font-display text-[2rem] font-normal leading-[1.14] tracking-[-0.015em] text-white sm:text-[2.75rem]">
+        <div className="mx-auto max-w-[1160px] px-6 py-28 text-center lg:py-36">
+          {/* The chain, in miniature — index, attendant, downstream */}
+          <span
+            aria-hidden
+            className="mx-auto flex w-fit items-center gap-2"
+          >
+            <span className="h-2 w-2 rounded-full bg-coral" />
+            <span className="h-px w-10 bg-gradient-to-r from-coral to-node-location" />
+            <span className="h-2 w-2 rounded-full bg-node-location" />
+            <span className="h-px w-10 bg-gradient-to-r from-node-location to-node-downstream" />
+            <span className="h-2 w-2 rounded-full bg-node-downstream" />
+          </span>
+
+          <h2 className="mx-auto mt-8 max-w-3xl text-balance font-display text-[2.125rem] font-normal leading-[1.12] tracking-[-0.015em] text-white sm:text-[3rem]">
             Open a case and follow the chain.
           </h2>
-          <p className="mx-auto mt-5 max-w-xl text-pretty text-[1.0625rem] leading-[1.7] text-white/55">
+          <p className="mx-auto mt-5 max-w-xl text-pretty text-[1.0625rem] leading-[1.7] text-white/50">
             Sign in with the credentials your infection control team issued to
             reach the surveillance dashboard.
           </p>
-          <div className="mt-8 flex justify-center">
+          <div className="mt-9 flex justify-center">
             <Link href="/login">
               <Button size="lg" className="ring-offset-ink">
                 Sign in
@@ -472,9 +533,9 @@ export default function LandingPage() {
         </div>
 
         <div className="border-t border-ink-line">
-          <div className="mx-auto flex max-w-[1160px] flex-col items-center justify-between gap-4 px-6 py-7 sm:flex-row">
+          <div className="mx-auto flex max-w-[1160px] flex-col items-center justify-between gap-4 px-6 py-8 sm:flex-row">
             <Wordmark href="/" tone="light" />
-            <p className="text-center font-mono text-[0.6875rem] uppercase tracking-[0.12em] text-white/35 sm:text-right">
+            <p className="text-center font-mono text-[0.6875rem] uppercase tracking-[0.12em] text-white/50 sm:text-right">
               HAI surveillance · Built for NexBuildOn Hack 2026
             </p>
           </div>

@@ -164,14 +164,14 @@ export function ContactTimeline() {
       <div className="px-4 pb-5 pt-4 sm:px-6">
         {/* Axis header */}
         <div className="grid grid-cols-[92px_1fr] items-end gap-x-3 sm:grid-cols-[168px_1fr] sm:gap-x-4">
-          <span className="font-mono text-[0.625rem] uppercase tracking-[0.12em] text-white/35">
+          <span className="font-mono text-[0.625rem] uppercase tracking-[0.12em] text-white/45">
             Aug 2026
           </span>
           <div className="relative h-4 border-b border-ink-line">
             {DAYS.map((d) => (
               <span
                 key={d.label}
-                className="absolute bottom-1 pl-1 font-mono text-[0.625rem] tabular-nums text-white/35"
+                className="absolute bottom-1 pl-1 font-mono text-[0.625rem] tabular-nums text-white/45"
                 style={{ left: `${d.left}%` }}
               >
                 {d.label}
@@ -199,7 +199,7 @@ export function ContactTimeline() {
                   />
                   <span className="truncate">{lane.name}</span>
                 </span>
-                <span className="truncate pl-3 font-mono text-[0.625rem] text-white/35">
+                <span className="truncate pl-3 font-mono text-[0.625rem] text-white/45">
                   {lane.meta}
                 </span>
               </div>
@@ -301,13 +301,13 @@ export function ContactTimeline() {
               CHAIN-001
             </span>
             <span className="text-coral">Rajesh Verma</span>
-            <span className="text-white/25">—</span>
+            <span className="text-white/45">—</span>
             <span>ICU · 720m</span>
-            <span className="text-white/25">→</span>
+            <span className="text-white/45">→</span>
             <span className="text-node-location">Anita Sharma</span>
-            <span className="text-white/25">—</span>
+            <span className="text-white/45">—</span>
             <span>Gen Med A · 720m</span>
-            <span className="text-white/25">→</span>
+            <span className="text-white/45">→</span>
             <span className="text-node-downstream">Suresh Joshi</span>
           </p>
         </div>
@@ -351,7 +351,7 @@ export function ContactTimeline() {
             className="animate-rise-in text-right"
             style={{ animationDelay: "1.8s" }}
           >
-            <p className="font-mono text-[0.625rem] uppercase tracking-[0.12em] text-white/40">
+            <p className="font-mono text-[0.625rem] uppercase tracking-[0.12em] text-white/45">
               Weighted confidence
             </p>
             <p className="font-display text-[2rem] leading-none tabular-nums text-white">

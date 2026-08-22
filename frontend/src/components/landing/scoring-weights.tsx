@@ -53,7 +53,7 @@ const DIMENSIONS = [
 export function ScoringWeights() {
   return (
     <div className="rounded-2xl border border-ink-line bg-ink-panel p-5 sm:p-6">
-      <div className="flex items-baseline justify-between gap-4 pb-4 font-mono text-[0.625rem] uppercase tracking-[0.12em] text-white/40">
+      <div className="flex items-baseline justify-between gap-4 pb-4 font-mono text-[0.625rem] uppercase tracking-[0.12em] text-white/45">
         <span>Dimension</span>
         <span>Weight · scored</span>
       </div>
@@ -63,7 +63,7 @@ export function ScoringWeights() {
           <li key={d.label}>
             <div className="flex items-baseline justify-between gap-3">
               <span className="text-[0.8125rem] text-white/80">{d.label}</span>
-              <span className="shrink-0 font-mono text-[0.6875rem] tabular-nums text-white/40">
+              <span className="shrink-0 font-mono text-[0.6875rem] tabular-nums text-white/45">
                 {d.weight.toFixed(2)} ·{" "}
                 <span className="text-white">{d.scored.toFixed(3)}</span>
               </span>
@@ -79,7 +79,7 @@ export function ScoringWeights() {
                   style={{ width: `${(d.scored / d.weight) * 100}%` }}
                 />
               </div>
-              <span className="font-mono text-[0.625rem] text-white/25">
+              <span className="font-mono text-[0.625rem] text-white/45">
                 {d.evidence} items
               </span>
             </div>
@@ -88,7 +88,7 @@ export function ScoringWeights() {
       </ul>
 
       <div className="mt-5 flex items-baseline justify-between border-t border-ink-line pt-4">
-        <span className="font-mono text-[0.625rem] uppercase tracking-[0.12em] text-white/40">
+        <span className="font-mono text-[0.625rem] uppercase tracking-[0.12em] text-white/45">
           Total
         </span>
         <span className="font-display text-[1.5rem] leading-none tabular-nums text-white">
