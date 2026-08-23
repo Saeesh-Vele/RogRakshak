@@ -1,0 +1,11 @@
+# Local development and test dependencies. Never installed on Render.
+#
+# reportlab is here rather than in requirements.txt because it is only imported
+# by data/generate_lab_report_documents.py (synthetic lab-report fixtures), not
+# by anything under app/. It is a slow, heavy build and the API does not need it.
+
+-r requirements.txt
+
+pytest==9.1.1
+httpx==0.28.1
+reportlab==5.0.0

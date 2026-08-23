@@ -24,7 +24,8 @@ import {
 import { StatCard } from "@/components/dashboard/stat-card";
 import { TrendChart } from "@/components/dashboard/trend-chart";
 import { StatusBadge } from "@/components/investigation/status-badge";
-import { AlertTriangle } from "lucide-react";
+import { AlertTriangle, FolderOpen, MapPin, Users } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 function formatDay(iso: string) {
   return new Date(iso).toLocaleDateString("en-GB", {
@@ -104,6 +105,8 @@ export default function DashboardPage() {
             <StatCard
               label="Active Cases"
               value={metrics.activeCases}
+              icon={FolderOpen}
+              accent="primary"
               hint={
                 metrics.casesThisWeek > 0
                   ? `+${metrics.casesThisWeek} this week`
@@ -114,11 +117,15 @@ export default function DashboardPage() {
             <StatCard
               label="High-Risk Contacts"
               value={metrics.highRiskContacts}
+              icon={Users}
+              accent="high"
               hint={`${metrics.highRiskLinks} with high-tier evidence`}
             />
             <StatCard
               label="Potential Clusters"
               value={metrics.potentialClusters}
+              icon={AlertTriangle}
+              accent="medium"
               hint={
                 metrics.highPriorityCount > 0
                   ? `${metrics.highPriorityCount} high priority`
@@ -129,6 +136,8 @@ export default function DashboardPage() {
             <StatCard
               label="Flagged Locations"
               value={metrics.flaggedLocations}
+              icon={MapPin}
+              accent="location"
               hint={metrics.topLocation ?? "No locations in evidence"}
             />
           </div>
@@ -136,8 +145,17 @@ export default function DashboardPage() {
           {/* Cases table + flagged locations */}
           <div className="grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,1fr)_320px]">
             <Card className="overflow-hidden">
-              <CardHeader className="px-5 pb-4 pt-5">
-                <CardTitle>Active Infection Cases</CardTitle>
+              <CardHeader className="gap-1 border-b border-border bg-muted/40 px-5 pb-4 pt-5">
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <CardTitle>Active Infection Cases</CardTitle>
+                  <Badge
+                    variant="outline"
+                    size="sm"
+                    className="bg-card tabular-nums"
+                  >
+                    {sorted.length} case{sorted.length !== 1 ? "s" : ""}
+                  </Badge>
+                </div>
               </CardHeader>
               {sorted.length === 0 ? (
                 <CardContent className="pb-8 pt-2 text-center text-sm text-muted-foreground">
@@ -213,25 +231,41 @@ export default function DashboardPage() {
             </Card>
 
             <Card className="overflow-hidden">
-              <CardHeader className="px-5 pb-4 pt-5">
-                <CardTitle>Flagged Locations</CardTitle>
+              <CardHeader className="gap-1 border-b border-border bg-muted/40 px-5 pb-4 pt-5">
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <CardTitle>Flagged Locations</CardTitle>
+                  <Badge
+                    variant="outline"
+                    size="sm"
+                    className="bg-card tabular-nums"
+                  >
+                    {locations.length} flagged
+                  </Badge>
+                </div>
               </CardHeader>
               {locations.length === 0 ? (
-                <CardContent className="pb-8 pt-2 text-sm text-muted-foreground">
+                <CardContent className="pb-8 pt-4 text-sm text-muted-foreground">
                   No locations recorded in contact evidence.
                 </CardContent>
               ) : (
-                <div className="divide-hairline border-t border-border">
+                <div className="divide-hairline">
                   {locations.map((loc) => (
                     <div
                       key={loc.name}
-                      className="flex items-start justify-between gap-3 px-5 py-4"
+                      className={cn(
+                        // Rail matches the risk pill, as on Discovered Contacts
+                        "relative flex items-start justify-between gap-3 px-5 py-3.5 transition-colors hover:bg-muted/40",
+                        "before:absolute before:inset-y-0 before:left-0 before:w-1",
+                        loc.tier === "HIGH"
+                          ? "before:bg-risk-high-foreground/70"
+                          : "before:bg-risk-medium-foreground/50"
+                      )}
                     >
                       <div className="min-w-0">
-                        <p className="truncate font-medium text-foreground">
+                        <p className="truncate font-semibold leading-tight text-foreground">
                           {loc.name}
                         </p>
-                        <p className="mt-0.5 text-[0.8125rem] text-muted-foreground">
+                        <p className="mt-1 text-[0.8125rem] leading-snug text-muted-foreground">
                           {loc.evidenceCount} evidence item
                           {loc.evidenceCount !== 1 ? "s" : ""} ·{" "}
                           {loc.caseIds.length} case
@@ -240,7 +274,8 @@ export default function DashboardPage() {
                       </div>
                       <Badge
                         variant={loc.tier === "HIGH" ? "riskHigh" : "riskMedium"}
-                        className="shrink-0"
+                        size="tier"
+                        className="mt-0.5 shrink-0"
                       >
                         {loc.tier === "HIGH" ? "High Risk" : "Medium Risk"}
                       </Badge>
@@ -252,14 +287,14 @@ export default function DashboardPage() {
           </div>
 
           {/* Trend */}
-          <Card>
-            <CardHeader className="px-5 pb-2 pt-5">
+          <Card className="overflow-hidden">
+            <CardHeader className="gap-1 border-b border-border bg-muted/40 px-5 pb-4 pt-5">
               <CardTitle>Confirmed Positives — Cumulative</CardTitle>
               <p className="text-sm text-muted-foreground">
                 From recorded culture dates across all investigated patients.
               </p>
             </CardHeader>
-            <CardContent className="px-2 pb-4">
+            <CardContent className="px-2 pb-4 pt-4">
               <TrendChart points={trend} />
             </CardContent>
           </Card>

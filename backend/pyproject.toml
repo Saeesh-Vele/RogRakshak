@@ -8,27 +8,31 @@ version = "0.1.0"
 description = "Backend service for RogRakshak - HAI surveillance and outbreak investigation platform"
 readme = "README.md"
 requires-python = ">=3.10"
+# Bounded to the major versions the app is written against. Deploys install
+# from requirements.txt (exact pins) — these looser bounds exist so a local
+# `pip install -e .` cannot silently pull a breaking major.
 dependencies = [
-    "fastapi",
-    "uvicorn[standard]",
-    "sqlalchemy",
-    "psycopg2-binary",
-    "pydantic>=2.0",
-    "python-dotenv",
-    "alembic",
-    "neo4j",
-    "langgraph",
-    "langchain-google-genai",
-    "google-genai",
-    "reportlab",
-    "pytest",
-    "httpx",
+    "fastapi>=0.141,<0.142",
+    "uvicorn[standard]>=0.52,<0.53",
+    "sqlalchemy>=2.0,<3.0",
+    "psycopg2-binary>=2.9,<3.0",
+    "pydantic>=2.0,<3.0",
+    "python-dotenv>=1.2,<2.0",
+    "alembic>=1.19,<2.0",
+    "neo4j>=6.2,<7.0",
+    "langgraph>=1.2,<2.0",
+    "langchain-google-genai>=4.3,<5.0",
+    "google-genai>=2.18,<3.0",
 ]
 
+# reportlab is only used by data/generate_lab_report_documents.py, and
+# pytest/httpx only by tests/ — none of them are imported under app/, so they
+# stay out of the runtime dependency set and off the production image.
 [project.optional-dependencies]
 dev = [
-    "pytest",
-    "httpx",
+    "pytest>=9.1,<10.0",
+    "httpx>=0.28,<0.29",
+    "reportlab>=5.0,<6.0",
 ]
 
 [tool.pytest.ini_options]

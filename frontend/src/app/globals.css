@@ -79,4 +79,49 @@
   .divide-hairline > * + * {
     border-top: 1px solid hsl(var(--border));
   }
+
+  /*
+   * The Graph Explorer canvas, as a background. Same dot colour, 18px gap and
+   * 1px size as the ReactFlow <Background variant={Dots}> in
+   * transmission-graph.tsx, so the marketing page reads as the product.
+   */
+  .bg-graph-dots {
+    background-image: radial-gradient(hsl(220 13% 88%) 1px, transparent 1px);
+    background-size: 18px 18px;
+  }
+
+  /* Same canvas, inverted, for the landing page's ink sections. */
+  .bg-graph-dots-ink {
+    background-image: radial-gradient(rgba(255, 255, 255, 0.11) 1px, transparent 1px);
+    background-size: 18px 18px;
+  }
+
+  /*
+   * Ruled time axis for the hero contact chart: one hairline per calendar day
+   * across a six-and-a-half day window (7 gridlines / 6.5 days).
+   */
+  .bg-day-rules {
+    background-image: linear-gradient(
+      to right,
+      rgba(255, 255, 255, 0.07) 1px,
+      transparent 1px
+    );
+    background-size: 15.3846% 100%;
+  }
+}
+
+/*
+ * The landing hero animates once on load. Anyone who has asked their system to
+ * reduce motion gets the finished state immediately — every animation uses
+ * fill-mode "both", so collapsing the duration lands on the final frame.
+ */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

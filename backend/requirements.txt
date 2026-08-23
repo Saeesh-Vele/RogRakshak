@@ -1,0 +1,26 @@
+# Production dependencies for the RogRakshak backend.
+#
+# Pinned to the exact versions the app was developed and tested against. The
+# langchain/langgraph/google-genai line moves fast and ships breaking changes on
+# minor releases, so floating these would let a redeploy break a service that
+# was working the day before. Bump deliberately, then re-run `pytest`.
+#
+# Dev/tooling-only packages live in requirements-dev.txt and are intentionally
+# absent here.
+
+fastapi==0.141.1
+uvicorn[standard]==0.52.3
+sqlalchemy==2.0.52
+psycopg2-binary==2.9.12
+pydantic==2.13.4
+python-dotenv==1.2.2
+alembic==1.19.1
+neo4j==6.2.0
+langgraph==1.2.11
+langchain-google-genai==4.3.3
+google-genai==2.18.1
+
+# Transitive via langchain-google-genai, but pinned deliberately: it is the
+# fastest-moving package in this tree, and leaving it to float is the most
+# likely way for two deploys of the same commit to behave differently.
+langchain-core==1.5.4

@@ -1,0 +1,37 @@
+# Render blueprint for the RogRakshak backend.
+#
+# The frontend is NOT defined here — it deploys to Vercel. Only the FastAPI
+# service runs on Render.
+#
+# Every secret below is declared `sync: false`, which means Render prompts for
+# the value in the dashboard and never reads it from this file. No real
+# credential belongs in this repo.
+
+services:
+  - type: web
+    name: rograkshak-backend
+    runtime: python
+    plan: free
+    rootDir: backend
+    buildCommand: pip install -r requirements.txt
+    # Render injects PORT; binding 0.0.0.0 is required for the container to be
+    # reachable. No --reload: that is a dev-only file watcher.
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /health
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.13.9
+      - key: DATABASE_URL
+        sync: false
+      - key: NEO4J_URI
+        sync: false
+      - key: NEO4J_USER
+        sync: false
+      - key: NEO4J_PASSWORD
+        sync: false
+      - key: GOOGLE_API_KEY
+        sync: false
+      - key: GEMINI_MODEL
+        value: gemini-2.5-flash
+      - key: ALLOWED_ORIGINS
+        sync: false

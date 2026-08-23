@@ -33,10 +33,11 @@ export class ApiError extends Error {
 // --- Client factory ---
 
 function createClient(): AxiosInstance {
-  const baseURL =
-    typeof window !== "undefined"
-      ? process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
-      : "http://localhost:8000";
+  // NEXT_PUBLIC_* is inlined at build time and is readable on both the server
+  // and the browser, so the same value applies to either. The localhost
+  // fallback is a dev convenience only — every deployed environment must set
+  // NEXT_PUBLIC_API_URL or requests will point at a host that isn't there.
+  const baseURL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
   return axios.create({
     baseURL,

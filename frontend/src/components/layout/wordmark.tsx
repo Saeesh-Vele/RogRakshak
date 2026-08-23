@@ -8,10 +8,13 @@ import { cn } from "@/lib/utils";
 export function Wordmark({
   href = "/dashboard",
   size = "default",
+  tone = "default",
   className,
 }: {
   href?: string;
   size?: "default" | "lg";
+  /** "light" inverts the wordmark for the landing page's ink sections. */
+  tone?: "default" | "light";
   className?: string;
 }) {
   const lg = size === "lg";
@@ -40,7 +43,8 @@ export function Wordmark({
       </span>
       <span
         className={cn(
-          "font-bold tracking-tight text-foreground",
+          "font-bold tracking-tight",
+          tone === "light" ? "text-white" : "text-foreground",
           lg ? "text-xl" : "text-lg"
         )}
       >
