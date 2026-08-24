@@ -293,10 +293,11 @@ export function ContactTimeline() {
 
         {/* The chain itself, written out — always legible, whatever the width */}
         <div
-          className="animate-rise-in mt-5 overflow-x-auto border-t border-ink-line pt-4"
+          className="animate-rise-in mt-5 border-t border-ink-line pt-4"
           style={{ animationDelay: "1.6s" }}
         >
-          <p className="flex w-max items-center gap-2 font-mono text-[0.6875rem] uppercase tracking-[0.08em] text-white/45">
+          {/* Wraps rather than scrolls, so no scrollbar crosses the panel. */}
+          <p className="flex flex-wrap items-center gap-x-2 gap-y-1.5 font-mono text-[0.6875rem] uppercase tracking-[0.08em] text-white/45">
             <span className="rounded bg-white/[0.06] px-1.5 py-1 text-white/70">
               CHAIN-001
             </span>

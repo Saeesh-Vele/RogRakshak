@@ -367,8 +367,16 @@ export default function LandingPage() {
               <p className="border-b border-ink-line px-5 py-3 font-mono text-[0.625rem] uppercase tracking-[0.16em] text-white/45">
                 Compiled LangGraph state machine
               </p>
-              <div className="overflow-x-auto px-5 py-5">
-                <p className="flex w-max items-center font-mono text-[0.8125rem]">
+              {/*
+                One unbroken line, always. Seven node names plus their arrows
+                do not fit at a fixed 13px on a laptop viewport, so the type
+                scales with the viewport instead of wrapping or clipping —
+                clamped so it never grows past 13px or shrinks below 8px.
+                Below roughly 640px it still overflows; there it scrolls with
+                the bar hidden rather than breaking the line.
+              */}
+              <div className="no-scrollbar overflow-x-auto px-5 py-5">
+                <p className="flex w-max items-center whitespace-nowrap font-mono text-[clamp(0.5rem,0.95vw,0.8125rem)]">
                   {[
                     "load_context",
                     "get_cohort",
@@ -379,11 +387,11 @@ export default function LandingPage() {
                     "validate_output",
                   ].map((node, i, all) => (
                     <span key={node} className="flex items-center">
-                      <span className="rounded-md border border-ink-line bg-white/[0.05] px-2 py-1.5 text-white/85">
+                      <span className="rounded-md border border-ink-line bg-white/[0.05] px-1.5 py-1 text-white/85">
                         {node}
                       </span>
                       {i < all.length - 1 && (
-                        <span className="px-2 text-[#83ACF7]">→</span>
+                        <span className="px-1.5 text-[#83ACF7]">→</span>
                       )}
                     </span>
                   ))}

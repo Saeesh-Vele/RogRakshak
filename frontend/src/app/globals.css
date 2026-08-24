@@ -176,6 +176,15 @@
     background-size: 18px 18px;
   }
 
+  /* Scrolls if it must, but never shows a bar across the design. */
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
   /* Same canvas, inverted, for the landing page's ink sections. */
   .bg-graph-dots-ink {
     background-image: radial-gradient(rgba(255, 255, 255, 0.11) 1px, transparent 1px);
