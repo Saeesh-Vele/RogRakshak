@@ -3,7 +3,8 @@ import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 
 import { NetworkFigure } from "@/components/landing/network-figure";
-import { ROLE_COLOR, OTHER_PATIENT_COUNT } from "@/components/landing/network-data";
+import { LandingNav } from "@/components/landing/landing-nav";
+import { deriveCaseFacts } from "@/components/landing/case-facts";
 import { PipelineDiagram } from "@/components/landing/pipeline-diagram";
 import { ChainStory } from "@/components/landing/chain-story";
 import { CountUp } from "@/components/landing/count-up";
@@ -27,27 +28,6 @@ export const metadata: Metadata = {
  * the page is CASE-2026-001 from the synthetic dataset, checked against the
  * live API. No logos, testimonials or usage numbers, because there are none.
  */
-
-const NAV = [
-  { href: "#pipeline", label: "Pipeline" },
-  { href: "#case", label: "The case" },
-  { href: "#product", label: "Product" },
-];
-
-const LEGEND = [
-  { role: "index" as const, label: "Index patient", who: "Rajesh Verma" },
-  { role: "staff" as const, label: "Shared attendant", who: "Nurse Anita Sharma" },
-  {
-    role: "downstream" as const,
-    label: "Downstream cases",
-    who: "Suresh Joshi, Meenakshi Rao, Tarun Agarwal",
-  },
-  {
-    role: "other" as const,
-    label: "Not linked",
-    who: `The other ${OTHER_PATIENT_COUNT} patients on record`,
-  },
-];
 
 const FIGURES = [
   { value: 0.964, decimals: 3, label: "Weighted confidence", sub: "Suspected cluster", risk: true },
@@ -92,34 +72,17 @@ function SectionHead({
 }
 
 export default function LandingPage() {
+  // Server-side: only the derived facts reach the browser, not the fixture
+  const facts = deriveCaseFacts();
   return (
     <div className="flex min-h-screen flex-col bg-background">
       <a href="#main-content" className="skip-link">
         Skip to content
       </a>
 
-      <header className="border-b border-border">
-        <div className="mx-auto flex h-16 max-w-[1200px] items-center justify-between gap-4 px-5 md:px-8">
-          <Wordmark href="/" />
-          <nav aria-label="Sections" className="flex items-center gap-1">
-            <ul className="mr-3 hidden items-center gap-1 md:flex">
-              {NAV.map((item) => (
-                <li key={item.href}>
-                  <a
-                    href={item.href}
-                    className="rounded-md px-2.5 py-2 text-ui text-muted-foreground transition-colors hover:text-foreground"
-                  >
-                    {item.label}
-                  </a>
-                </li>
-              ))}
-            </ul>
-            <Link href="/login" className={buttonVariants({ variant: "outline" })}>
-              Sign in
-            </Link>
-          </nav>
-        </div>
-      </header>
+      <LandingNav />
+      {/* The bar is fixed; this reserves its height so the hero never shifts under it */}
+      <div aria-hidden className="h-[76px]" />
 
       <main id="main-content" tabIndex={-1} className="flex-1 outline-none">
         {/* ------------------------------------------------------------ */}
@@ -171,38 +134,11 @@ export default function LandingPage() {
             </p>
           </div>
 
-          <figure className="lg:col-span-7" aria-labelledby="network-caption">
-            <div className="relative">
-              {/* The dot grid stands for the graph canvas — it is only used here */}
-              <div
-                aria-hidden
-                className="bg-graph-dots pointer-events-none absolute inset-0 [mask-image:radial-gradient(ellipse_60%_55%_at_50%_50%,black,transparent)]"
-              />
-              <NetworkFigure />
-            </div>
-            <figcaption id="network-caption" className="border-t border-border pt-3">
-              <p className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
-                <span className="font-mono text-meta text-foreground">CASE-2026-001</span>
-                <span className="text-meta text-muted-foreground">
-                  Three chains, each hop a 12-hour shift overlap · synthetic data
-                </span>
-              </p>
-              <ul className="mt-2.5 grid gap-x-6 gap-y-1.5 sm:grid-cols-2">
-                {LEGEND.map((l) => (
-                  <li key={l.role} className="flex items-baseline gap-2 text-meta">
-                    <span
-                      aria-hidden
-                      className="relative top-[1px] h-2 w-2 shrink-0 rounded-full"
-                      style={{ background: ROLE_COLOR[l.role] }}
-                    />
-                    <span>
-                      <span className="text-foreground">{l.label}</span>
-                      <span className="text-muted-foreground"> · {l.who}</span>
-                    </span>
-                  </li>
-                ))}
-              </ul>
-            </figcaption>
+          <figure
+            className="lg:col-span-7"
+            aria-label={`${facts.caseId}: index patient ${facts.nodes.index.name}, ${facts.nodes.staff.name} and three downstream patients. Interactive network with a case replay.`}
+          >
+            <NetworkFigure facts={facts} />
           </figure>
         </section>
 
@@ -212,7 +148,7 @@ export default function LandingPage() {
         <section
           id="pipeline"
           aria-labelledby="pipeline-title"
-          className="scroll-mt-4 border-y border-border bg-card"
+          className="scroll-mt-2 border-y border-border bg-card"
         >
           <div className="mx-auto max-w-[1200px] px-5 py-20 md:px-8 lg:py-28">
             <SectionHead
@@ -233,7 +169,7 @@ export default function LandingPage() {
         <section
           id="case"
           aria-labelledby="case-title"
-          className="scroll-mt-4 bg-foreground text-white"
+          className="scroll-mt-2 bg-foreground text-white"
         >
           <div className="mx-auto max-w-[1200px] px-5 pt-20 md:px-8 lg:pt-28">
             <SectionHead
@@ -277,7 +213,7 @@ export default function LandingPage() {
         <section
           id="product"
           aria-labelledby="product-title"
-          className="scroll-mt-4 overflow-hidden border-b border-border bg-sunken"
+          className="scroll-mt-2 overflow-hidden border-b border-border bg-sunken"
         >
           <div className="mx-auto max-w-[1200px] px-5 py-20 md:px-8 lg:py-28">
             <SectionHead
