@@ -1,35 +1,52 @@
 "use client";
 
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
-import type { InvestigationStatus } from "@/types/api";
+import { Plus, Search } from "lucide-react";
+
+import type { InvestigationCase, InvestigationStatus } from "@/types/api";
 import { useAppStore } from "@/lib/store";
 import { useCasesStore } from "@/lib/cases-store";
-import { ErrorState, LoadingState, Skeleton } from "@/components/ui/states";
 import { caseStartedAt } from "@/lib/metrics";
 import { StatusBadge } from "@/components/investigation/status-badge";
-import { Card, CardContent } from "@/components/ui/card";
+import { TierStrip } from "@/components/investigation/tier-strip";
+import { PageHeader } from "@/components/layout/page-header";
 import { SearchInput } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { Plus, Search } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { PageHeader } from "@/components/layout/page-header";
+import { Button, buttonVariants } from "@/components/ui/button";
+import { EmptyState, ErrorState, LoadingState, Skeleton } from "@/components/ui/states";
+import { cn } from "@/lib/utils";
 
-function formatDay(iso: string) {
-  return new Date(iso).toLocaleDateString("en-GB", {
-    day: "2-digit",
-    month: "short",
-    year: "numeric",
-  });
+type SortKey = "confidence" | "date" | "contacts";
+
+function fmtDay(iso: string) {
+  return new Date(iso).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" });
+}
+
+function Confidence({ value }: { value: number }) {
+  const pct = Math.round(value * 100);
+  return (
+    <span className="flex items-center justify-end gap-2.5">
+      <span aria-hidden className="h-1.5 w-16 bg-sunken">
+        <span className="block h-full bg-foreground" style={{ width: `${pct}%` }} />
+      </span>
+      <span className="w-9 text-right font-mono text-ui text-foreground">{pct}%</span>
+    </span>
+  );
+}
+
+function FirstEvent({ c }: { c: InvestigationCase }) {
+  const s = caseStartedAt(c);
+  return (
+    <span
+      className={cn("font-mono text-meta", s.isFallback ? "text-muted-foreground" : "text-foreground")}
+      title={s.isFallback ? "No timeline events: showing when the investigation was generated" : undefined}
+    >
+      {fmtDay(s.iso)}
+      {s.isFallback && <span className="sr-only"> (generated date, no timeline events)</span>}
+    </span>
+  );
 }
 
 export default function InvestigationsListPage() {
@@ -37,100 +54,87 @@ export default function InvestigationsListPage() {
   const loading = status === "idle" || status === "loading";
   const searchParams = useSearchParams();
   const [search, setSearch] = useState(searchParams.get("q") ?? "");
-  const [statusFilter, setStatusFilter] = useState<InvestigationStatus | "ALL">(
-    "ALL"
-  );
-  const [sortBy, setSortBy] = useState<"confidence" | "date">("confidence");
+  const [statusFilter, setStatusFilter] = useState<InvestigationStatus | "ALL">("ALL");
+  const [sortBy, setSortBy] = useState<SortKey>("confidence");
   const mode = useAppStore((s) => s.mode);
 
   useEffect(() => {
     void load();
   }, [load, mode]);
 
-  // Reflect top-bar searches that navigate here with a ?q= param
+  // Reflect searches that navigate here with ?q=
   useEffect(() => {
     setSearch(searchParams.get("q") ?? "");
   }, [searchParams]);
 
   const filtered = useMemo(() => {
-    let result = [...cases];
-
-    if (search.trim()) {
-      const q = search.toLowerCase();
-      result = result.filter(
-        (c) =>
-          c.case_id.toLowerCase().includes(q) ||
-          c.organism.toLowerCase().includes(q) ||
-          c.index_patient.name.toLowerCase().includes(q) ||
-          c.candidate_patients.some((p) => p.name.toLowerCase().includes(q))
-      );
-    }
-
-    if (statusFilter !== "ALL") {
-      result = result.filter((c) => c.status === statusFilter);
-    }
-
-    result.sort((a, b) =>
+    const q = search.trim().toLowerCase();
+    const result = cases.filter(
+      (c) =>
+        (statusFilter === "ALL" || c.status === statusFilter) &&
+        (!q ||
+          [c.case_id, c.organism, c.resistance_profile, c.index_patient.name, c.index_patient.mrn]
+            .some((f) => (f ?? "").toLowerCase().includes(q)) ||
+          c.candidate_patients.some((p) => p.name.toLowerCase().includes(q) || p.mrn.toLowerCase().includes(q)))
+    );
+    return result.sort((a, b) =>
       sortBy === "confidence"
         ? b.confidence - a.confidence
-        : new Date(caseStartedAt(b).iso).getTime() -
-          new Date(caseStartedAt(a).iso).getTime()
+        : sortBy === "contacts"
+          ? b.candidate_patients.length - a.candidate_patients.length
+          : new Date(caseStartedAt(b).iso).getTime() - new Date(caseStartedAt(a).iso).getTime()
     );
-
-    return result;
   }, [cases, search, statusFilter, sortBy]);
 
+  const filtering = search.trim() !== "" || statusFilter !== "ALL";
+
   return (
-    <div className="mx-auto max-w-[1400px] space-y-6 p-6 lg:p-8">
+    <div className="mx-auto max-w-[1400px] space-y-6 p-5 md:p-8">
       <PageHeader
         eyebrow="Case log"
         title="Investigations"
-        description="Every outbreak investigation the workflow has produced."
+        description="Every investigation the workflow has produced, strongest first."
         actions={
-          <Link href="/investigations/new">
-            <Button>
-              <Plus />
-              New investigation
-            </Button>
+          <Link href="/investigations/new" className={buttonVariants()}>
+            <Plus />
+            New investigation
           </Link>
         }
       />
 
-      {/* Filters */}
-      <div className="flex flex-col gap-3 sm:flex-row">
+      {/* Toolbar */}
+      <div role="search" className="flex flex-col gap-2 sm:flex-row sm:items-center">
         <div className="relative flex-1">
-          <Search className="pointer-events-none absolute left-3.5 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-muted-foreground" />
+          <Search aria-hidden className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <SearchInput
-            placeholder="Search by case ID, organism, patient…"
+            aria-label="Search investigations"
+            placeholder="Case ID, patient, MRN or organism"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="pl-10"
+            className="pl-9"
           />
         </div>
-        <div className="sm:w-[190px]">
-          <Select
-            value={statusFilter}
-            onChange={(e) =>
-              setStatusFilter(e.target.value as InvestigationStatus | "ALL")
-            }
-            aria-label="Filter by status"
-          >
-            <option value="ALL">All Statuses</option>
-            <option value="SUSPECTED_CLUSTER">Suspected Cluster</option>
-            <option value="HIGH_PRIORITY_INVESTIGATION">High Priority</option>
-            <option value="POTENTIAL_CONTACT">Potential Contact</option>
-            <option value="NO_SIGNAL">No Signal</option>
-          </Select>
-        </div>
-        <div className="sm:w-[190px]">
-          <Select
-            value={sortBy}
-            onChange={(e) => setSortBy(e.target.value as "confidence" | "date")}
-            aria-label="Sort by"
-          >
-            <option value="confidence">Sort by Confidence</option>
-            <option value="date">Sort by First Event</option>
-          </Select>
+        <div className="grid grid-cols-2 gap-2 sm:flex">
+          <div className="sm:w-[180px]">
+            <Select
+              aria-label="Filter by status"
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value as InvestigationStatus | "ALL")}
+            >
+              <option value="ALL">All statuses</option>
+              <option value="SUSPECTED_CLUSTER">Suspected cluster</option>
+              <option value="HIGH_PRIORITY_INVESTIGATION">High priority</option>
+              <option value="POTENTIAL_CONTACT">Potential contact</option>
+              <option value="NO_SIGNAL">No signal</option>
+            </Select>
+          </div>
+          <div className="sm:w-[180px]">
+            <Select aria-label="Sort by" value={sortBy} onChange={(e) => setSortBy(e.target.value as SortKey)}>
+              <option value="confidence">Sort: confidence</option>
+              <option value="date">Sort: first event</option>
+              <option value="contacts">Sort: contacts</option>
+            </Select>
+          </div>
         </div>
       </div>
 
@@ -138,13 +142,13 @@ export default function InvestigationsListPage() {
         <LoadingState
           startedAt={startedAt}
           skeleton={
-            <div className="divide-hairline rounded-lg border border-border bg-card">
-              {[0, 1, 2, 3].map((i) => (
-                <div key={i} className="flex items-center gap-6 px-3 py-3">
+            <div className="divide-hairline border-y border-border">
+              {[0, 1, 2].map((i) => (
+                <div key={i} className="flex items-center gap-6 py-4">
                   <Skeleton className="h-3 w-28" />
-                  <Skeleton className="h-3 w-40" />
-                  <Skeleton className="h-3 w-36" />
-                  <Skeleton className="ml-auto h-3 w-10" />
+                  <Skeleton className="h-3 w-44" />
+                  <Skeleton className="h-3 w-32" />
+                  <Skeleton className="ml-auto h-3 w-24" />
                 </div>
               ))}
             </div>
@@ -162,97 +166,133 @@ export default function InvestigationsListPage() {
 
       {status === "ready" && (
         <>
-          <p className="text-sm text-muted-foreground">
-            {filtered.length} investigation{filtered.length !== 1 ? "s" : ""}
-            {filtered.length !== cases.length && ` of ${cases.length}`}
+          <p role="status" className="font-mono text-meta text-muted-foreground">
+            {filtered.length} of {cases.length} investigation{cases.length === 1 ? "" : "s"}
           </p>
 
           {filtered.length === 0 ? (
-            <Card>
-              <CardContent className="p-10 text-center text-sm text-muted-foreground">
-                {cases.length === 0 ? (
-                  <>
-                    No investigations yet.{" "}
-                    <Link
-                      href="/investigations/new"
-                      className="font-medium text-primary hover:underline"
-                    >
-                      Start one
-                    </Link>
-                    .
-                  </>
+            <EmptyState
+              className="rounded-lg border border-border bg-card"
+              title={cases.length === 0 ? "No investigations yet" : "Nothing matches"}
+              body={
+                cases.length === 0
+                  ? "Run the workflow against an index patient to create the first case."
+                  : "No investigation matches the search and status filter."
+              }
+              action={
+                cases.length === 0 ? (
+                  <Link href="/investigations/new" className={buttonVariants()}>
+                    <Plus />
+                    Start an investigation
+                  </Link>
                 ) : (
-                  "No investigations match your search criteria."
-                )}
-              </CardContent>
-            </Card>
+                  filtering && (
+                    <Button
+                      variant="outline"
+                      onClick={() => {
+                        setSearch("");
+                        setStatusFilter("ALL");
+                      }}
+                    >
+                      Clear filters
+                    </Button>
+                  )
+                )
+              }
+            />
           ) : (
-            <Card className="overflow-hidden">
-              <Table>
-                <TableHeader>
-                  <TableRow className="hover:bg-transparent">
-                    <TableHead>Case</TableHead>
-                    <TableHead>Index Patient</TableHead>
-                    <TableHead>Organism</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead className="text-right">Confidence</TableHead>
-                    <TableHead className="whitespace-nowrap text-right">
-                      First Event
-                    </TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {filtered.map((c) => {
-                    const started = caseStartedAt(c);
-                    return (
-                      <TableRow key={c.case_id}>
-                        <TableCell className="whitespace-nowrap font-medium">
+            <>
+              {/* Wide screens: one dense table */}
+              <div className="hidden overflow-hidden rounded-lg border border-border bg-card md:block">
+                <table className="w-full border-collapse text-ui">
+                  <caption className="sr-only">Investigations</caption>
+                  <thead>
+                    <tr className="border-b border-border">
+                      {["Case", "Index patient", "Organism", "Contacts", "Evidence (H · M · L)", "First event", "Confidence"].map(
+                        (h, i) => (
+                          <th
+                            key={h}
+                            scope="col"
+                            className={cn(
+                              "h-9 px-4 text-left align-middle text-[0.6875rem] font-medium uppercase tracking-[0.08em] text-muted-foreground",
+                              (i === 3 || i === 6) && "text-right"
+                            )}
+                          >
+                            {h}
+                          </th>
+                        )
+                      )}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {filtered.map((c) => (
+                      <tr
+                        key={c.case_id}
+                        className="relative border-b border-border transition-colors last:border-0 hover:bg-sunken/60"
+                      >
+                        <td className="px-4 py-3 align-middle">
+                          {/* The case link covers the whole row */}
                           <Link
                             href={`/investigations/${c.case_id}`}
-                            className="hover:text-primary hover:underline"
+                            className="font-mono font-medium text-foreground after:absolute after:inset-0 hover:underline"
                           >
                             {c.case_id}
                           </Link>
-                        </TableCell>
-                        <TableCell className="whitespace-nowrap text-muted-foreground">
-                          {c.index_patient.name}
-                          <span className="ml-2 text-[0.8125rem] text-muted-foreground/70">
-                            {c.candidate_patients.length} contact
-                            {c.candidate_patients.length !== 1 ? "s" : ""}
+                          <span className="mt-1 block">
+                            <StatusBadge status={c.status} />
                           </span>
-                        </TableCell>
-                        <TableCell>
-                          <span className="italic">{c.organism}</span>
-                          {c.resistance_profile && (
-                            <span className="ml-1.5 whitespace-nowrap text-muted-foreground">
-                              · {c.resistance_profile}
-                            </span>
-                          )}
-                        </TableCell>
-                        <TableCell>
-                          <StatusBadge status={c.status} />
-                        </TableCell>
-                        <TableCell className="text-right font-semibold tabular-nums">
-                          {Math.round(c.confidence * 100)}%
-                        </TableCell>
-                        <TableCell className="whitespace-nowrap text-right text-muted-foreground tabular-nums">
-                          <span
-                            title={
-                              started.isFallback
-                                ? "No timeline events — showing when the investigation was generated"
-                                : new Date(started.iso).toLocaleString("en-GB")
-                            }
-                            className={started.isFallback ? "italic" : undefined}
-                          >
-                            {formatDay(started.iso)}
-                          </span>
-                        </TableCell>
-                      </TableRow>
-                    );
-                  })}
-                </TableBody>
-              </Table>
-            </Card>
+                        </td>
+                        <td className="px-4 py-3 align-middle">
+                          <span className="block text-foreground">{c.index_patient.name}</span>
+                          <span className="font-mono text-meta text-muted-foreground">{c.index_patient.mrn}</span>
+                        </td>
+                        <td className="px-4 py-3 align-middle">
+                          <span className="italic text-foreground">{c.organism}</span>
+                          {c.resistance_profile && <span className="text-muted-foreground"> {c.resistance_profile}</span>}
+                        </td>
+                        <td className="px-4 py-3 text-right align-middle font-mono text-foreground">
+                          {c.candidate_patients.length}
+                        </td>
+                        <td className="px-4 py-3 align-middle">
+                          <TierStrip items={c.evidence} />
+                        </td>
+                        <td className="px-4 py-3 align-middle">
+                          <FirstEvent c={c} />
+                        </td>
+                        <td className="px-4 py-3 align-middle">
+                          <Confidence value={c.confidence} />
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
+              {/* Narrow screens: the same facts, stacked */}
+              <ul className="divide-hairline rounded-lg border border-border bg-card md:hidden">
+                {filtered.map((c) => (
+                  <li key={c.case_id}>
+                    <Link href={`/investigations/${c.case_id}`} className="block space-y-2 px-4 py-3.5">
+                      <span className="flex flex-wrap items-center gap-x-2.5 gap-y-1">
+                        <span className="font-mono font-medium text-foreground">{c.case_id}</span>
+                        <StatusBadge status={c.status} />
+                      </span>
+                      <span className="block text-ui text-muted-foreground">
+                        <span className="text-foreground">{c.index_patient.name}</span> ·{" "}
+                        <span className="italic">{c.organism}</span> {c.resistance_profile}
+                      </span>
+                      <span className="flex flex-wrap items-center justify-between gap-2">
+                        <TierStrip items={c.evidence} />
+                        <Confidence value={c.confidence} />
+                      </span>
+                      <span className="block font-mono text-meta text-muted-foreground">
+                        {c.candidate_patients.length} contacts · first event <FirstEvent c={c} />
+                      </span>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </>
           )}
         </>
       )}

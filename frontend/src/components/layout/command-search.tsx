@@ -4,7 +4,8 @@ import { useCallback, useEffect, useId, useMemo, useRef, useState } from "react"
 import { useRouter } from "next/navigation";
 import { ArrowRight, Search } from "lucide-react";
 
-import { graphApi, describeError } from "@/lib/api-client";
+import { describeError } from "@/lib/api-client";
+import { loadPatients, patientsFromCases } from "@/lib/patients";
 import { useCasesStore } from "@/lib/cases-store";
 import { useAppStore } from "@/lib/store";
 import type { InvestigationCase, PatientListItem } from "@/types/api";
@@ -33,40 +34,6 @@ type Result =
       context: string;
     }
   | { kind: "filter"; key: string; href: string; query: string };
-
-let patientsPromise: Promise<PatientListItem[]> | null = null;
-function loadPatients(): Promise<PatientListItem[]> {
-  patientsPromise ??= graphApi
-    .listPatients()
-    .then((r) => r.patients)
-    .catch((err) => {
-      patientsPromise = null;
-      throw err;
-    });
-  return patientsPromise;
-}
-
-function patientsFromCases(cases: InvestigationCase[]): PatientListItem[] {
-  const map = new Map<number, PatientListItem>();
-  for (const c of cases) {
-    for (const p of [c.index_patient, ...c.candidate_patients]) {
-      if (!map.has(p.id)) {
-        map.set(p.id, {
-          id: p.id,
-          name: p.name,
-          mrn: p.mrn,
-          latest_culture: {
-            lab_report_id: 0,
-            organism: c.organism,
-            resistance_profile: c.resistance_profile,
-            collected_at: p.positive_culture_date ?? "",
-          },
-        });
-      }
-    }
-  }
-  return Array.from(map.values());
-}
 
 function caseForPatient(cases: InvestigationCase[], id: number) {
   const asIndex = cases.find((c) => c.index_patient.id === id);

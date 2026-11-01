@@ -2,7 +2,6 @@
 
 import type { EvidenceItem } from "@/types/api";
 import { formatMinutes } from "@/lib/risk";
-import { Clock, MapPin, User } from "lucide-react";
 
 function formatDateTime(iso: string | null | undefined): string {
   if (!iso) return "—";
@@ -15,65 +14,54 @@ function formatDateTime(iso: string | null | undefined): string {
 }
 
 /**
- * The full body of an evidence item — explanation, the location / staff /
- * timing facts, and provenance. Split out from `EvidenceCard` so the collapsed
- * accordion rows in `EvidenceList` can reveal exactly this, unchanged, on
- * expand.
+ * The body of an evidence item: the explanation, then its facts as a record
+ * (location, overlap, intermediary, window) and its provenance — the source and
+ * the record IDs it was computed from. Revealed by the rows in EvidenceList.
  */
 export function EvidenceDetail({ item }: { item: EvidenceItem }) {
+  const facts: [string, React.ReactNode][] = [];
+  if (item.location) facts.push(["Location", item.location]);
+  if (item.overlap_minutes != null) facts.push(["Overlap", formatMinutes(item.overlap_minutes)]);
+  if (item.mediator)
+    facts.push([
+      "Via",
+      `${item.mediator.name}${item.mediator.role ? ` (${item.mediator.role})` : ""}`,
+    ]);
+  if (item.start_time)
+    facts.push([
+      "Window",
+      `${formatDateTime(item.start_time)}${item.end_time ? ` → ${formatDateTime(item.end_time)}` : ""}`,
+    ]);
+  facts.push(["Source", item.source]);
+  const ids = Object.entries(item.source_record_ids);
+
   return (
     <>
-      <p className="text-[0.9375rem] leading-relaxed text-muted-foreground">
-        {item.explanation}
-      </p>
-
-      <div className="mt-3 flex flex-wrap items-center gap-x-2 gap-y-1.5 text-[0.8125rem] text-muted-foreground">
-        {item.location && (
-          <span className="inline-flex items-center gap-1.5 rounded-md bg-muted px-2 py-1">
-            <MapPin className="h-3.5 w-3.5 shrink-0" />
-            {item.location}
-          </span>
-        )}
-        {item.overlap_minutes != null && (
-          <span className="inline-flex items-center gap-1.5 rounded-md bg-muted px-2 py-1 tabular-nums">
-            <Clock className="h-3.5 w-3.5 shrink-0" />
-            {formatMinutes(item.overlap_minutes)}
-          </span>
-        )}
-        {item.mediator && (
-          <span className="inline-flex items-center gap-1.5 rounded-md bg-muted px-2 py-1">
-            <User className="h-3.5 w-3.5 shrink-0" />
-            {item.mediator.name}
-            {item.mediator.role ? ` (${item.mediator.role})` : ""}
-          </span>
-        )}
-        {item.start_time && (
-          <span className="rounded-md bg-muted px-2 py-1 tabular-nums">
-            {formatDateTime(item.start_time)}
-            {item.end_time ? ` → ${formatDateTime(item.end_time)}` : ""}
-          </span>
-        )}
-      </div>
-
-      {/* Provenance — kept, since atomic traceability is the point of the model */}
-      {Object.keys(item.source_record_ids).length > 0 && (
-        <div className="mt-3 flex flex-wrap items-center gap-1.5 border-t border-border pt-3">
-          <span className="text-eyebrow font-semibold uppercase text-muted-foreground/70">
-            Source
-          </span>
-          <span className="font-mono text-[0.75rem] text-muted-foreground">
-            {item.source}
-          </span>
-          {Object.entries(item.source_record_ids).map(([key, val]) => (
-            <span
-              key={key}
-              className="rounded-md bg-muted px-1.5 py-0.5 font-mono text-[0.75rem] text-muted-foreground"
-            >
-              {key}: {String(val)}
+      <p className="max-w-3xl text-copy text-muted-foreground">{item.explanation}</p>
+      <dl className="mt-3 grid gap-x-6 gap-y-1.5 sm:grid-cols-[7rem_1fr]">
+        {facts.map(([k, v]) => (
+          <div key={k} className="contents">
+            <dt className="label-caps">{k}</dt>
+            <dd className="text-ui text-foreground">{v}</dd>
+          </div>
+        ))}
+        <dt className="label-caps">Records</dt>
+        <dd className="font-mono text-meta text-foreground">
+          {ids.length ? (
+            ids.map(([k, v]) => (
+              <span key={k} className="mr-3 inline-block">
+                {k}: {String(v)}
+              </span>
+            ))
+          ) : (
+            <span className="text-muted-foreground">
+              None recorded: derived from the lab-report cohort
             </span>
-          ))}
-        </div>
-      )}
+          )}
+        </dd>
+        <dt className="label-caps">Evidence ID</dt>
+        <dd className="font-mono text-meta text-muted-foreground">{item.evidence_id}</dd>
+      </dl>
     </>
   );
 }

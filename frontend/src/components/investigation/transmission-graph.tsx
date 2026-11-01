@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useId, useMemo, useState } from "react";
 import {
   ReactFlow,
   Node,
@@ -22,6 +22,7 @@ import { evidenceTypeLabel, formatMinutes } from "@/lib/risk";
 import { shortBedLabel } from "@/lib/patient-placement";
 import { cn } from "@/lib/utils";
 import { Switch } from "@/components/ui/switch";
+import { ChevronDown, SlidersHorizontal } from "lucide-react";
 import {
   EntityNode,
   ENTITY_STYLES,
@@ -59,6 +60,12 @@ function placementLine(p: PatientPlacement | undefined): string | undefined {
   const bed = shortBedLabel(p.bed);
   if (p.ward && bed) return `${p.ward} • ${bed}`;
   return p.ward ?? bed ?? undefined;
+}
+
+/** What a contact edge carries: the evidence behind it, from every chain that uses it. */
+interface EdgeEvidence extends Record<string, unknown> {
+  evidenceIds: string[];
+  chainIds: string[];
 }
 
 interface BuiltGraph {
@@ -118,6 +125,7 @@ function buildGraph(
   });
 
   // --- Vectors (staff mediating chains) and downstream cases ---
+  const edgeByPair = new Map<string, Edge>();
   let vectorCol = 0;
   let downstreamCol = 0;
 
@@ -159,33 +167,47 @@ function buildGraph(
       downstreamCol += 1;
     }
 
-    // Contact edges: dashed + red. The relationship name comes from the
-    // evidence type behind the hop — not every chain is staff-mediated
-    // (patient_colocation chains have no vector at all).
-    const hop = chain.hops[0];
-    const hopEvidence = hop ? evidenceById.get(hop.evidence_id) : undefined;
-    const overlap = hop?.overlap_minutes;
-    const relation = hopEvidence
-      ? evidenceTypeLabel(hopEvidence.type, true)
-      : "Contact";
-    const duration = overlap ? formatMinutes(overlap) : null;
-    /**
-     * Two label registers. A staff-mediated hop runs through a vector card that
-     * already says "Intermediary vector", so repeating "Staff contact" on both
-     * of its edges is noise — the duration is the only new information. A direct
-     * hop has no such card, so it still names the relationship.
-     */
-    const viaLabel = duration ?? relation;
-    const directLabel = duration ? `${relation} · ${duration}` : relation;
+    // Contact edges: dashed + red. Each edge is one hop of the chain — hop i
+    // joins nodes[i] and nodes[i + 1] — and takes its label and its evidence
+    // from that hop, not from the chain's first hop.
+    const hopLabel = (hopIdx: number, direct: boolean) => {
+      const hop = chain.hops[hopIdx];
+      const hopEvidence = hop ? evidenceById.get(hop.evidence_id) : undefined;
+      const relation = hopEvidence ? evidenceTypeLabel(hopEvidence.type, true) : "Contact";
+      const duration = hop?.overlap_minutes ? formatMinutes(hop.overlap_minutes) : null;
+      /**
+       * Two label registers. A staff-mediated hop runs through a vector card that
+       * already says "Intermediary vector", so repeating "Staff contact" on its
+       * edges is noise — the duration is the only new information. A direct hop
+       * has no such card, so it still names the relationship.
+       */
+      if (!direct) return duration ?? relation;
+      return duration ? `${relation} · ${duration}` : relation;
+    };
 
     const contactEdge = (
       source: string,
       target: string,
       suffix: string,
+      hopIdx: number,
       label: string
     ) => {
       if (!nodeMap.has(source) || !nodeMap.has(target)) return;
-      edges.push({
+      const evidenceId = chain.hops[hopIdx]?.evidence_id;
+
+      // A hop several chains share (index → nurse in every staff-mediated
+      // chain) is drawn once and carries each chain's evidence for it, instead
+      // of stacking identical edges where only the top one can be clicked.
+      const pair = `${source}->${target}`;
+      const existing = edgeByPair.get(pair);
+      if (existing) {
+        const d = existing.data as EdgeEvidence;
+        if (evidenceId && !d.evidenceIds.includes(evidenceId)) d.evidenceIds.push(evidenceId);
+        d.chainIds.push(chain.chain_id);
+        return;
+      }
+
+      const edge: Edge = {
         id: `${chain.chain_id}-${suffix}`,
         source,
         target,
@@ -219,16 +241,21 @@ function buildGraph(
           width: 13,
           height: 13,
         },
-        data: { evidenceId: hop?.evidence_id },
+        data: {
+          evidenceIds: evidenceId ? [evidenceId] : [],
+          chainIds: [chain.chain_id],
+        } satisfies EdgeEvidence,
         zIndex: 1,
-      });
+      };
+      edgeByPair.set(pair, edge);
+      edges.push(edge);
     };
 
     if (viaKey) {
-      contactEdge(fromKey, viaKey, "a", viaLabel);
-      contactEdge(viaKey, toKey, "b", viaLabel);
+      contactEdge(fromKey, viaKey, "a", 0, hopLabel(0, false));
+      contactEdge(viaKey, toKey, "b", 1, hopLabel(1, false));
     } else {
-      contactEdge(fromKey, toKey, "direct", directLabel);
+      contactEdge(fromKey, toKey, "direct", 0, hopLabel(0, true));
     }
   }
 
@@ -329,7 +356,8 @@ interface TransmissionGraphProps {
   investigation: InvestigationCase;
   chains: TransmissionChain[];
   placements?: Record<number, PatientPlacement>;
-  onSelectEvidence?: (evidenceId: string) => void;
+  /** Receives every evidence item behind the clicked edge (one per chain that shares it). */
+  onSelectEvidence?: (evidenceIds: string[]) => void;
   height?: string;
 }
 
@@ -346,6 +374,15 @@ export function TransmissionGraph({
     vector: true,
     location: true,
   });
+
+  // The filter panel collapses to a button so it never covers a phone-width
+  // canvas; open by default where there is room for it. Filter behaviour is
+  // unchanged — this only shows or hides the same switches.
+  const [filtersOpen, setFiltersOpen] = useState(true);
+  const filtersId = useId();
+  useEffect(() => {
+    if (window.matchMedia("(max-width: 639px)").matches) setFiltersOpen(false);
+  }, []);
 
   const built = useMemo(
     () => buildGraph(investigation, chains, enabled, placements),
@@ -364,8 +401,8 @@ export function TransmissionGraph({
 
   const onEdgeClick = useCallback(
     (_: React.MouseEvent, edge: Edge) => {
-      const evId = (edge.data as Record<string, unknown>)?.evidenceId;
-      if (evId && onSelectEvidence) onSelectEvidence(String(evId));
+      const ids = (edge.data as EdgeEvidence | undefined)?.evidenceIds;
+      if (ids?.length && onSelectEvidence) onSelectEvidence(ids);
     },
     [onSelectEvidence]
   );
@@ -385,8 +422,11 @@ export function TransmissionGraph({
   return (
     <div
       className={cn("relative w-full bg-background", height)}
-      role="img"
-      aria-label={`Transmission graph: ${fallbackText}`}
+      // A group, not an image: it contains zoom controls and filter switches,
+      // and role="img" would hide those from assistive technology. The full
+      // content is also available as tables ("View as table").
+      role="group"
+      aria-label={`Transmission graph (interactive): ${fallbackText}`}
     >
       <ReactFlow
         key={Object.values(enabled).join()}
@@ -427,7 +467,7 @@ export function TransmissionGraph({
 
       {/* Cluster caption — the membership signal itself is the ring on each node */}
       {built.clusterLabel && (
-        <div className="pointer-events-none absolute left-4 top-4 z-10 flex items-center gap-2.5 rounded-lg border border-node-infected/25 bg-card px-3 py-2 shadow-card">
+        <div className="pointer-events-none absolute left-4 top-4 z-10 flex items-center gap-2.5 rounded-lg border border-node-infected/25 bg-card px-3 py-2 shadow-card max-sm:left-2 max-sm:top-2 max-sm:max-w-[calc(100%-7.5rem)]">
           <span className="h-3 w-3 shrink-0 rounded-full border border-dashed border-node-infected" />
           <span className="font-mono text-[0.625rem] uppercase tracking-[0.12em] text-risk-high-foreground">
             {built.clusterLabel}
@@ -436,11 +476,34 @@ export function TransmissionGraph({
       )}
 
       {/* Node-type filters */}
-      <div className="absolute right-4 top-4 z-10 w-[196px] overflow-hidden rounded-xl border border-border bg-card shadow-pop">
-        <p className="border-b border-border px-3.5 py-2.5 font-mono text-[0.625rem] uppercase tracking-[0.14em] text-muted-foreground">
-          Show
-        </p>
-        <div className="divide-hairline">
+      <div
+        className={cn(
+          "absolute right-4 top-4 z-10 overflow-hidden rounded-xl border border-border bg-card shadow-pop max-sm:right-2 max-sm:top-2",
+          // Collapsed, it is only as wide as its label, so it never covers the canvas
+          filtersOpen ? "w-[196px]" : "w-auto"
+        )}
+      >
+        <button
+          type="button"
+          onClick={() => setFiltersOpen((v) => !v)}
+          aria-expanded={filtersOpen}
+          aria-controls={filtersId}
+          className={cn(
+            "flex w-full items-center justify-between gap-2 px-3.5 py-2.5 font-mono text-[0.625rem] uppercase tracking-[0.14em] text-muted-foreground transition-colors hover:text-foreground max-sm:min-h-11",
+            filtersOpen && "border-b border-border"
+          )}
+        >
+          <span className="flex items-center gap-2">
+            <SlidersHorizontal aria-hidden className="h-3.5 w-3.5" />
+            Show
+            <span className="normal-case tracking-normal max-sm:hidden">
+              · {(Object.keys(ENTITY_STYLES) as EntityKind[]).filter((k) => enabled[k] && built.counts[k] > 0).length} of{" "}
+              {(Object.keys(ENTITY_STYLES) as EntityKind[]).filter((k) => built.counts[k] > 0).length} types
+            </span>
+          </span>
+          <ChevronDown aria-hidden className={cn("h-3.5 w-3.5 transition-transform", filtersOpen && "rotate-180")} />
+        </button>
+        <div id={filtersId} hidden={!filtersOpen} className="divide-hairline">
           {(Object.keys(ENTITY_STYLES) as EntityKind[]).map((kind) => {
             const count = built.counts[kind];
             const absent = count === 0;
@@ -450,7 +513,9 @@ export function TransmissionGraph({
                 className={cn(
                   "flex items-center justify-between gap-2 px-3.5 py-2.5 transition-colors",
                   absent
-                    ? "cursor-not-allowed opacity-40"
+                    ? // Absent from this case: muted text at full strength (6:1)
+                      // rather than a 40% fade, which failed contrast
+                      "cursor-not-allowed"
                     : "cursor-pointer hover:bg-muted/50"
                 )}
               >
@@ -458,10 +523,16 @@ export function TransmissionGraph({
                   <span
                     className={cn(
                       "h-2 w-2 shrink-0 rounded-full",
-                      ENTITY_STYLES[kind].dot
+                      ENTITY_STYLES[kind].dot,
+                      absent && "opacity-40"
                     )}
                   />
-                  <span className="truncate text-[0.75rem] text-foreground">
+                  <span
+                    className={cn(
+                      "truncate text-[0.75rem]",
+                      absent ? "text-muted-foreground" : "text-foreground"
+                    )}
+                  >
                     {ENTITY_STYLES[kind].label}
                   </span>
                   <span className="shrink-0 font-mono text-[0.6875rem] tabular-nums text-muted-foreground">

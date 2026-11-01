@@ -147,8 +147,8 @@ export default function LandingPage() {
             >
               RogRakshak fuses patient movement logs, staff shift rosters and
               microbiology cultures into a temporal graph, then scores every
-              suspected pathway deterministically, with each figure traceable
-              to the record it came from.
+              suspected pathway deterministically, with every finding linked to
+              its source evidence.
             </p>
             <div
               className="animate-rise-in mt-8 flex flex-wrap items-center gap-3"

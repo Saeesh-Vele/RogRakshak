@@ -1,4 +1,7 @@
+import logging
 import os
+import threading
+from contextlib import asynccontextmanager
 from pathlib import Path
 
 from dotenv import load_dotenv
@@ -17,7 +20,41 @@ elif root_env.exists():
 else:
     load_dotenv()
 
+# uvicorn.error is the logger uvicorn prints, so the seeding outcome shows in the terminal
+logger = logging.getLogger("uvicorn.error")
+
+
+def _seed_default_cases() -> None:
+    # Imported here so app import stays light; this runs on a worker thread.
+    from app.services.detection.investigation_service import InvestigationService
+
+    service = InvestigationService()
+    try:
+        created = service.ensure_default_cases()
+        logger.info("Default cases seeded: %s", created or "none needed")
+    except Exception:
+        logger.exception("Default case seeding failed")
+    finally:
+        service.close()
+
+
+@asynccontextmanager
+async def lifespan(_: FastAPI):
+    """Seed the demo cases at startup, in the background.
+
+    The investigation store is in memory, so every restart empties it. The
+    demo cases (CASE-2026-001 and CASE-2026-004) are re-created on a
+    background thread so the server starts accepting requests immediately; a
+    request that arrives first waits for, or performs, the same seeding.
+    Set SEED_DEFAULT_CASES=0 to turn this off.
+    """
+    if os.getenv("SEED_DEFAULT_CASES", "1") != "0":
+        threading.Thread(target=_seed_default_cases, name="seed-default-cases", daemon=True).start()
+    yield
+
+
 app = FastAPI(
+    lifespan=lifespan,
     title="RogRakshak Backend",
     description="HAI surveillance, contact tracing, and multi-agent outbreak investigation service",
     version="0.1.0",

@@ -51,23 +51,59 @@ export function shortBedLabel(bed: string | null | undefined): string | null {
   return match ? `Bed ${match[1]}` : bed;
 }
 
+/**
+ * Raw /graph/patient/{id}/timeline responses, fetched in parallel. A patient
+ * whose timeline fails is simply absent from the result.
+ */
+export async function fetchPatientTimelines(
+  patientIds: number[]
+): Promise<Record<number, PatientTimelineResponse>> {
+  const unique = Array.from(new Set(patientIds));
+  const settled = await Promise.allSettled(
+    unique.map(async (id) => ({ id, timeline: await graphApi.getPatientTimeline(id) }))
+  );
+  const out: Record<number, PatientTimelineResponse> = {};
+  for (const r of settled) if (r.status === "fulfilled") out[r.value.id] = r.value.timeline;
+  return out;
+}
+
+export function placementsFrom(
+  timelines: Record<number, PatientTimelineResponse>
+): Record<number, PatientPlacement> {
+  const out: Record<number, PatientPlacement> = {};
+  for (const [id, t] of Object.entries(timelines)) out[Number(id)] = placementFromTimeline(t);
+  return out;
+}
+
 export async function fetchPatientPlacements(
   patientIds: number[]
 ): Promise<Record<number, PatientPlacement>> {
-  const unique = Array.from(new Set(patientIds));
+  return placementsFrom(await fetchPatientTimelines(patientIds));
+}
 
-  const settled = await Promise.allSettled(
-    unique.map(async (id) => ({
-      id,
-      placement: placementFromTimeline(await graphApi.getPatientTimeline(id)),
+export interface WardStay {
+  ward: string;
+  start: string;
+  end: string;
+}
+
+/**
+ * Ward stays with their recorded exit times — movement events of
+ * location_type "ward", which carry end_timestamp. Nothing is inferred.
+ */
+export function wardStaysFromTimeline(timeline: PatientTimelineResponse): WardStay[] {
+  return timeline.events
+    .filter(
+      (e) =>
+        e.event_type === "movement" &&
+        e.details?.location_type === "ward" &&
+        e.details?.location_name &&
+        e.end_timestamp
+    )
+    .map((e) => ({
+      ward: String(e.details?.location_name),
+      start: e.timestamp,
+      end: e.end_timestamp as string,
     }))
-  );
-
-  const out: Record<number, PatientPlacement> = {};
-  for (const result of settled) {
-    if (result.status === "fulfilled") {
-      out[result.value.id] = result.value.placement;
-    }
-  }
-  return out;
+    .sort((a, b) => a.start.localeCompare(b.start));
 }

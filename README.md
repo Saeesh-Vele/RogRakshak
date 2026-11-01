@@ -125,11 +125,17 @@ case.
 
 What that means in practice:
 
-- `CASE-2026-001` (the planted outbreak, index patient 1) is regenerated on demand,
-  so `/api/investigations` and `/api/investigations/CASE-2026-001` always work. The
-  first request after a restart runs the full workflow and takes a few seconds.
-- Any other case you created (e.g. `CASE-2026-004`) returns **404** after a restart
-  until you run that investigation again from **New investigation**.
+- The two demo cases, `CASE-2026-001` (index patient 1) and `CASE-2026-004`
+  (index patient 4), both *Klebsiella pneumoniae* MDR, are **seeded automatically
+  at startup** on a background thread (`DEFAULT_CASES` in
+  `investigation_service.py`; the startup hook is in `app/main.py`). The log
+  prints `Default cases seeded: [...]` when it finishes, a few seconds after
+  boot. A request that arrives first waits for, or performs, the same seeding.
+  Seeding never replaces a case that already exists.
+- Set `SEED_DEFAULT_CASES=0` to turn startup seeding off. The defaults are then
+  still created on demand by the first request that needs them.
+- Any other case you create (e.g. `CASE-2026-007`) returns **404** after a
+  restart until you run that investigation again from **New investigation**.
 - Case IDs are derived from the index patient (`CASE-2026-{patient_id:03d}`), so
   re-running an investigation for the same patient replaces that case. The UI asks
   for confirmation before it does.

@@ -107,10 +107,14 @@ export function project([x, y, z]: [number, number, number]) {
   const f = 1 / Math.tan(((CAMERA_FOV / 2) * Math.PI) / 180);
   const ndcX = (f * rx) / depth / FIGURE_ASPECT;
   const ndcY = (f * y) / depth;
+  // Rounded to 0.1 user units: the server (Node) and the browser can differ in
+  // the last floating-point digit of the trigonometry above, and unrounded
+  // values make the server-rendered SVG fail hydration.
+  const r = (v: number) => Math.round(v * 10) / 10;
   return {
-    x: (ndcX + 1) * 500,
-    y: (1 - ndcY) * 400,
+    x: r((ndcX + 1) * 500),
+    y: r((1 - ndcY) * 400),
     // pixels per world unit at this depth, for radii
-    scale: (f / depth) * 400,
+    scale: r((f / depth) * 400),
   };
 }

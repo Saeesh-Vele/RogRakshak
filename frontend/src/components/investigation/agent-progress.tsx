@@ -1,11 +1,11 @@
 "use client";
 
-import { Check, Loader2, X } from "lucide-react";
+import { Check, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 /**
  * The seven LangGraph nodes, in the order they are wired in
- * backend/app/services/detection/langgraph_workflow.py (lines 279-294).
+ * backend/app/services/detection/langgraph_workflow.py (create_investigation_graph).
  */
 export const WORKFLOW_STEPS = [
   { node: "load_context", label: "Loading patient context" },
@@ -20,100 +20,87 @@ export const WORKFLOW_STEPS = [
 export type ProgressState = "idle" | "running" | "done" | "error";
 
 interface AgentProgressProps {
-  /** Index of the step currently in flight; steps before it are complete. */
+  /** Index of the step the staged indicator is showing; not measured progress. */
   activeStep: number;
   state: ProgressState;
   elapsedMs: number;
 }
 
-export function AgentProgress({
-  activeStep,
-  state,
-  elapsedMs,
-}: AgentProgressProps) {
-  const completedCount =
-    state === "done" ? WORKFLOW_STEPS.length : Math.max(0, activeStep);
+/**
+ * A staged indicator, not a progress report. The backend runs the whole graph
+ * as one synchronous request and reports nothing until it finishes, so the
+ * steps advance on a timer and the panel says so before anything else. Only
+ * two things here are real: the elapsed time and the final outcome. The last
+ * step holds until the response actually arrives.
+ */
+export function AgentProgress({ activeStep, state, elapsedMs }: AgentProgressProps) {
+  const seconds = (elapsedMs / 1000).toFixed(1);
+  const status =
+    state === "done"
+      ? `Finished in ${seconds}s.`
+      : state === "error"
+        ? `Stopped after ${seconds}s: the request failed.`
+        : state === "running"
+          ? "Running. Waiting for the backend's single response."
+          : "Not started.";
 
   return (
-    <div className="rounded-xl border border-border bg-card p-5 shadow-card">
+    <div>
       <div className="flex items-baseline justify-between gap-3">
-        <h2 className="text-lg font-bold tracking-tight text-foreground">
-          Agent Activity
-        </h2>
-        <span className="text-[0.8125rem] text-muted-foreground tabular-nums">
-          {(elapsedMs / 1000).toFixed(1)}s elapsed
+        <h2 className="font-display text-title-sm text-foreground">Workflow</h2>
+        <span className="font-mono text-meta text-foreground">
+          {state === "idle" ? "—" : `${seconds}s elapsed`}
         </span>
       </div>
-      <p role="status" className="mt-0.5 text-sm text-muted-foreground">
-        {state === "done"
-          ? `Complete: all ${WORKFLOW_STEPS.length} steps`
-          : state === "error"
-            ? `Failed at step ${activeStep + 1}: ${WORKFLOW_STEPS[activeStep]?.label}`
-            : `${completedCount} of ${WORKFLOW_STEPS.length} steps · ${WORKFLOW_STEPS[activeStep]?.label}`}
+
+      <p className="mt-2 border-l-2 border-border pl-3 text-meta text-muted-foreground">
+        Indicative only. The backend runs these seven steps as one request and does not report
+        per-step progress, so the steps below advance on a timer. The elapsed time and the result
+        are real; the step timings are not measured.
       </p>
 
-      <ol className="mt-4">
+      <p role="status" className="mt-3 text-ui font-medium text-foreground">
+        {status}
+      </p>
+
+      <ol className="mt-3">
         {WORKFLOW_STEPS.map((step, i) => {
-          const complete = state === "done" || i < activeStep;
+          const complete = state === "done" || (state !== "idle" && i < activeStep);
           const active = state === "running" && i === activeStep;
           const failed = state === "error" && i === activeStep;
-          const isLast = i === WORKFLOW_STEPS.length - 1;
-
           return (
-            <li key={step.node} className="flex gap-3">
-              <div className="relative flex w-5 flex-none justify-center">
-                {!isLast && (
-                  <span
-                    aria-hidden
-                    className="absolute top-6 h-full w-px bg-border"
-                  />
+            <li key={step.node} className="flex gap-3 border-t border-border py-2 first:border-t-0">
+              <span
+                aria-hidden
+                className={cn(
+                  "mt-0.5 grid h-4 w-4 shrink-0 place-items-center rounded-full border",
+                  complete && "border-foreground bg-foreground text-background",
+                  active && "border-primary",
+                  failed && "border-destructive bg-destructive text-white",
+                  !complete && !active && !failed && "border-input"
                 )}
+              >
+                {complete && <Check className="h-2.5 w-2.5" />}
+                {failed && <X className="h-2.5 w-2.5" />}
+                {active && <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-primary" />}
+              </span>
+              <span className="min-w-0">
                 <span
                   className={cn(
-                    "relative z-10 mt-0.5 grid h-5 w-5 place-items-center rounded-full ring-4 ring-card",
-                    complete && "bg-success",
-                    active && "bg-primary-soft",
-                    failed && "bg-risk-high",
-                    !complete && !active && !failed && "bg-muted"
-                  )}
-                >
-                  {complete && <Check className="h-3 w-3 text-white" />}
-                  {active && (
-                    <Loader2 className="h-3 w-3 animate-spin text-primary" />
-                  )}
-                  {failed && (
-                    <X className="h-3 w-3 text-risk-high-foreground" />
-                  )}
-                </span>
-              </div>
-
-              <div className={cn("min-w-0 flex-1", isLast ? "pb-0" : "pb-4")}>
-                <p
-                  className={cn(
-                    "text-[0.9375rem] font-medium leading-5",
-                    complete && "text-foreground",
-                    active && "text-primary",
-                    failed && "text-risk-high-foreground",
-                    !complete && !active && !failed && "text-muted-foreground"
+                    "block text-ui",
+                    active ? "font-medium text-foreground" : complete ? "text-foreground" : "text-muted-foreground",
+                    failed && "text-destructive"
                   )}
                 >
                   {step.label}
-                </p>
-                <p className="mt-0.5 font-mono text-[0.75rem] text-muted-foreground/70">
-                  {step.node}
-                </p>
-              </div>
+                  {active && <span className="text-muted-foreground"> (shown, not measured)</span>}
+                </span>
+                <span className="block font-mono text-[0.6875rem] text-muted-foreground">{step.node}</span>
+              </span>
             </li>
           );
         })}
       </ol>
-
-      <p className="mt-4 border-t border-border pt-3 text-[0.8125rem] italic leading-snug text-muted-foreground">
-        Step progress is indicative only. The backend runs this graph as one
-        synchronous call and does not report per-step status, so the checklist
-        is paced on the client — the elapsed time is real, the individual step
-        timings are not measured.
-      </p>
     </div>
   );
 }

@@ -120,7 +120,7 @@ export function EntityNode({ data }: NodeProps) {
             {name}
           </p>
           {roleLabel && (
-            <p className="mt-1 font-mono text-[0.5625rem] uppercase tracking-[0.1em] text-muted-foreground/70">
+            <p className="mt-1 font-mono text-[0.5625rem] uppercase tracking-[0.1em] text-muted-foreground">
               {roleLabel}
             </p>
           )}
@@ -191,7 +191,7 @@ export function EntityNode({ data }: NodeProps) {
             )}
 
             {placement && (
-              <p className="mt-1 truncate font-mono text-[0.5625rem] uppercase tracking-[0.08em] text-muted-foreground/75">
+              <p className="mt-1 truncate font-mono text-[0.5625rem] uppercase tracking-[0.08em] text-muted-foreground">
                 {placement}
               </p>
             )}

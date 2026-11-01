@@ -92,7 +92,7 @@ export function ProductShowcase() {
         bodyClassName="max-h-[420px] [mask-image:linear-gradient(to_bottom,black_80%,transparent)]"
       >
         <div style={{ zoom: 0.78 }}>
-          <TimelineView entries={inv.timeline} />
+          <TimelineView entries={inv.timeline} explainMissingStays={false} />
         </div>
       </Frame>
       </FrameColumn>
