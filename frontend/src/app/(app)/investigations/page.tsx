@@ -3,9 +3,10 @@
 import { useEffect, useState, useMemo } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { getProvider } from "@/lib/data-provider";
-import type { InvestigationCase, InvestigationStatus } from "@/types/api";
+import type { InvestigationStatus } from "@/types/api";
 import { useAppStore } from "@/lib/store";
+import { useCasesStore } from "@/lib/cases-store";
+import { ErrorState, LoadingState, Skeleton } from "@/components/ui/states";
 import { caseStartedAt } from "@/lib/metrics";
 import { StatusBadge } from "@/components/investigation/status-badge";
 import { Card, CardContent } from "@/components/ui/card";
@@ -19,7 +20,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { AlertTriangle, Plus, Search } from "lucide-react";
+import { Plus, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { PageHeader } from "@/components/layout/page-header";
 
@@ -32,9 +33,8 @@ function formatDay(iso: string) {
 }
 
 export default function InvestigationsListPage() {
-  const [cases, setCases] = useState<InvestigationCase[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const { cases, status, error, startedAt, load } = useCasesStore();
+  const loading = status === "idle" || status === "loading";
   const searchParams = useSearchParams();
   const [search, setSearch] = useState(searchParams.get("q") ?? "");
   const [statusFilter, setStatusFilter] = useState<InvestigationStatus | "ALL">(
@@ -44,25 +44,8 @@ export default function InvestigationsListPage() {
   const mode = useAppStore((s) => s.mode);
 
   useEffect(() => {
-    let cancelled = false;
-    async function load() {
-      setLoading(true);
-      setError(null);
-      try {
-        const resp = await getProvider().list();
-        if (!cancelled) setCases(resp.cases);
-      } catch (err: unknown) {
-        if (!cancelled)
-          setError(err instanceof Error ? err.message : "Failed to load");
-      } finally {
-        if (!cancelled) setLoading(false);
-      }
-    }
-    load();
-    return () => {
-      cancelled = true;
-    };
-  }, [mode]);
+    void load();
+  }, [load, mode]);
 
   // Reflect top-bar searches that navigate here with a ?q= param
   useEffect(() => {
@@ -152,27 +135,32 @@ export default function InvestigationsListPage() {
       </div>
 
       {loading && (
-        <div className="flex items-center gap-3 py-16 text-sm text-muted-foreground">
-          <div className="h-4 w-4 animate-spin rounded-full border-2 border-primary border-t-transparent" />
-          Loading investigations…
-        </div>
-      )}
-
-      {error && (
-        <Card className="border-risk-high-foreground/20">
-          <CardContent className="flex items-start gap-3 p-5">
-            <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-risk-high-foreground" />
-            <div>
-              <p className="text-sm font-semibold text-foreground">
-                Failed to load investigations
-              </p>
-              <p className="mt-0.5 text-sm text-muted-foreground">{error}</p>
+        <LoadingState
+          startedAt={startedAt}
+          skeleton={
+            <div className="divide-hairline rounded-lg border border-border bg-card">
+              {[0, 1, 2, 3].map((i) => (
+                <div key={i} className="flex items-center gap-6 px-3 py-3">
+                  <Skeleton className="h-3 w-28" />
+                  <Skeleton className="h-3 w-40" />
+                  <Skeleton className="h-3 w-36" />
+                  <Skeleton className="ml-auto h-3 w-10" />
+                </div>
+              ))}
             </div>
-          </CardContent>
-        </Card>
+          }
+        />
       )}
 
-      {!loading && !error && (
+      {status === "error" && (
+        <ErrorState
+          title="Couldn't load investigations"
+          message={error ?? "The analysis service did not return the case list."}
+          onRetry={() => void load({ force: true })}
+        />
+      )}
+
+      {status === "ready" && (
         <>
           <p className="text-sm text-muted-foreground">
             {filtered.length} investigation{filtered.length !== 1 ? "s" : ""}

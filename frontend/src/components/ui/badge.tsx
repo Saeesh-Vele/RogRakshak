@@ -3,37 +3,44 @@ import { cva, type VariantProps } from "class-variance-authority"
 import { cn } from "@/lib/utils"
 
 /**
- * Soft pastel pill: tinted background + darker text, never a solid fill.
- * `risk*` variants are the HIGH / MEDIUM / LOW tiers used across evidence,
- * contacts and locations; `status*` variants map investigation statuses.
+ * A typographic status marker, not a pill: a small uppercase label led by a
+ * glyph whose *shape* also encodes the level — filled square for high / cluster,
+ * hollow square for medium / potential, a dash for low / no signal — so the
+ * meaning survives without colour. Colour is only ever red or amber when the
+ * label itself says HIGH, MEDIUM, cluster or potential contact.
  */
 const badgeVariants = cva(
-  "inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold whitespace-nowrap transition-colors",
+  cn(
+    "inline-flex items-center gap-1.5 whitespace-nowrap font-medium uppercase leading-none tracking-[0.07em]",
+    "before:shrink-0 before:content-['']"
+  ),
   {
     variants: {
       variant: {
-        default: "bg-muted text-muted-foreground",
-        outline: "border border-border text-muted-foreground",
-        primary: "bg-primary-soft text-primary-soft-foreground",
+        default: "text-muted-foreground before:hidden",
+        outline:
+          "rounded-sm border border-border px-1.5 py-1 text-muted-foreground normal-case tracking-normal before:hidden",
+        primary: "text-primary before:hidden",
 
         // Risk tiers
-        riskHigh: "bg-risk-high text-risk-high-foreground",
-        riskMedium: "bg-risk-medium text-risk-medium-foreground",
-        riskLow: "bg-risk-low text-risk-low-foreground",
+        riskHigh: "text-risk-high-foreground before:h-[7px] before:w-[7px] before:bg-current",
+        riskMedium:
+          "text-risk-medium-foreground before:h-[7px] before:w-[7px] before:border-[1.5px] before:border-current",
+        riskLow: "text-muted-foreground before:h-[1.5px] before:w-2 before:bg-current",
 
         // Investigation statuses
-        cluster: "bg-risk-high text-risk-high-foreground",
-        highPriority: "bg-risk-high text-risk-high-foreground",
-        potential: "bg-risk-medium text-risk-medium-foreground",
-        noSignal: "bg-risk-low text-risk-low-foreground",
+        cluster: "text-risk-high-foreground before:h-[7px] before:w-[7px] before:bg-current",
+        highPriority: "text-risk-high-foreground before:h-[7px] before:w-[7px] before:bg-current",
+        potential:
+          "text-risk-medium-foreground before:h-[7px] before:w-[7px] before:border-[1.5px] before:border-current",
+        noSignal: "text-muted-foreground before:h-[1.5px] before:w-2 before:bg-current",
 
-        success: "bg-success/15 text-success",
+        success: "text-success before:h-[7px] before:w-[7px] before:rounded-full before:bg-current",
       },
       size: {
-        default: "px-2.5 py-0.5 text-xs",
-        sm: "px-2 py-0.5 text-[0.6875rem]",
-        // Uppercase micro-pill used for HIGH / MEDIUM / LOW
-        tier: "px-2 py-0.5 text-[0.6875rem] font-bold tracking-wide uppercase",
+        default: "text-[0.6875rem]",
+        sm: "text-[0.6875rem]",
+        tier: "text-[0.6875rem] font-semibold",
       },
     },
     defaultVariants: {
@@ -44,13 +51,11 @@ const badgeVariants = cva(
 )
 
 export interface BadgeProps
-  extends React.HTMLAttributes<HTMLDivElement>,
+  extends React.HTMLAttributes<HTMLSpanElement>,
     VariantProps<typeof badgeVariants> {}
 
 function Badge({ className, variant, size, ...props }: BadgeProps) {
-  return (
-    <div className={cn(badgeVariants({ variant, size }), className)} {...props} />
-  )
+  return <span className={cn(badgeVariants({ variant, size }), className)} {...props} />
 }
 
 export { Badge, badgeVariants }

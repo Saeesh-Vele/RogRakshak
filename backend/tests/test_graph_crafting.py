@@ -142,3 +142,15 @@ def test_api_contact_path():
     data = response.json()
     assert data["path_found"] is True
     assert data["hops_count"] == 2
+
+
+def test_api_list_patients():
+    response = client.get("/graph/patients")
+    assert response.status_code == 200
+    data = response.json()
+    assert data["total"] == len(data["patients"]) > 0
+    by_id = {p["id"]: p for p in data["patients"]}
+    index = by_id[1]
+    assert index["mrn"]
+    assert index["latest_culture"]["organism"] == "Klebsiella pneumoniae"
+    assert index["latest_culture"]["resistance_profile"] == "MDR"

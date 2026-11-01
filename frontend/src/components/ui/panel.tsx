@@ -13,7 +13,7 @@ export function Panel({
   return (
     <div
       className={cn(
-        "overflow-hidden rounded-xl border border-border bg-card shadow-card",
+        "overflow-hidden rounded-lg border border-border bg-card",
         className
       )}
       {...props}
@@ -38,16 +38,16 @@ export function PanelHeader({
   return (
     <div
       className={cn(
-        "flex flex-wrap items-start justify-between gap-x-4 gap-y-2 border-b border-border px-5 py-4",
+        "flex flex-wrap items-baseline justify-between gap-x-4 gap-y-2 border-b border-border px-5 py-3.5",
         className
       )}
     >
       <div className="min-w-0">
-        <h2 className="font-mono text-[0.6875rem] uppercase tracking-[0.14em] text-foreground">
+        <h2 className="label-caps text-foreground">
           {title}
         </h2>
         {description && (
-          <p className="mt-1.5 text-[0.8125rem] leading-relaxed text-muted-foreground">
+          <p className="mt-1 text-ui text-muted-foreground">
             {description}
           </p>
         )}
@@ -55,7 +55,7 @@ export function PanelHeader({
       {(meta || actions) && (
         <div className="flex shrink-0 items-center gap-2">
           {meta && (
-            <span className="rounded-md bg-muted px-2 py-1 font-mono text-[0.6875rem] tabular-nums text-muted-foreground">
+            <span className="font-mono text-meta text-muted-foreground">
               {meta}
             </span>
           )}

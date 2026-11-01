@@ -114,3 +114,22 @@ npm install
 npm run dev
 ```
 Open `http://localhost:3000` to access the dashboard.
+
+## Investigation storage and restarts
+
+Investigation results are held **in memory** in the backend process
+(`_investigation_store` in `backend/app/services/detection/investigation_service.py`).
+Nothing is written to the database, so a backend restart — including an automatic
+`--reload` after a code change, or a Render instance spinning down — clears every
+case.
+
+What that means in practice:
+
+- `CASE-2026-001` (the planted outbreak, index patient 1) is regenerated on demand,
+  so `/api/investigations` and `/api/investigations/CASE-2026-001` always work. The
+  first request after a restart runs the full workflow and takes a few seconds.
+- Any other case you created (e.g. `CASE-2026-004`) returns **404** after a restart
+  until you run that investigation again from **New investigation**.
+- Case IDs are derived from the index patient (`CASE-2026-{patient_id:03d}`), so
+  re-running an investigation for the same patient replaces that case. The UI asks
+  for confirmation before it does.

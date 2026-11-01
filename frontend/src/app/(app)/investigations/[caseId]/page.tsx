@@ -6,6 +6,10 @@ import Link from "next/link";
 import { getProvider } from "@/lib/data-provider";
 import type { InvestigationCase } from "@/types/api";
 import { useAppStore } from "@/lib/store";
+import { useCasesStore } from "@/lib/cases-store";
+import { describeError } from "@/lib/api-client";
+import { ErrorState, LoadingState, Skeleton } from "@/components/ui/states";
+import { toast } from "sonner";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 import { CaseHeader } from "@/components/investigation/case-header";
@@ -28,7 +32,9 @@ export default function InvestigationDetailPage() {
     null
   );
   const [loading, setLoading] = useState(true);
+  const [startedAt, setStartedAt] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [notFound, setNotFound] = useState(false);
   const [rerunning, setRerunning] = useState(false);
   const [placements, setPlacements] = useState<Record<number, PatientPlacement>>(
     {}
@@ -39,24 +45,37 @@ export default function InvestigationDetailPage() {
   } | null>(null);
 
   const mode = useAppStore((s) => s.mode);
+  const upsert = useCasesStore((s) => s.upsert);
 
   const load = useCallback(async () => {
+    // Already in the shared list (e.g. arriving from the dashboard): no fetch.
+    const cached = useCasesStore
+      .getState()
+      .cases.find((c) => c.case_id === caseId);
+    if (cached && useCasesStore.getState().loadedMode === mode) {
+      setInvestigation(cached);
+      setLoading(false);
+      return;
+    }
     setLoading(true);
+    setStartedAt(Date.now());
     setError(null);
+    setNotFound(false);
     try {
       const result = await getProvider().get(caseId);
       if (result) setInvestigation(result);
-      else setError(`Investigation case '${caseId}' not found.`);
+      else setNotFound(true);
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : "Failed to load");
+      setError(describeError(err));
     } finally {
       setLoading(false);
+      setStartedAt(null);
     }
-  }, [caseId]);
+  }, [caseId, mode]);
 
   useEffect(() => {
     void load();
-  }, [load, mode]);
+  }, [load]);
 
   // Ward/bed for the graph cards lives on /graph/patient/{id}/timeline, not on
   // the investigation payload. Loaded separately so a failure here degrades to
@@ -86,7 +105,9 @@ export default function InvestigationDetailPage() {
   const onRerun = useCallback(async () => {
     if (!investigation) return;
     setRerunning(true);
-    setError(null);
+    const pending = toast.loading(`Re-running ${investigation.case_id}…`, {
+      description: "The workflow rebuilds evidence, chains and scoring.",
+    });
     try {
       const updated = await getProvider().create({
         target_patient_id: investigation.index_patient.id,
@@ -95,12 +116,20 @@ export default function InvestigationDetailPage() {
         use_mock_graph: false,
       });
       setInvestigation(updated);
+      upsert(updated);
+      toast.success(`${updated.case_id} updated`, {
+        id: pending,
+        description: `${Math.round(updated.confidence * 100)}% confidence · ${updated.evidence.length} evidence items`,
+      });
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : "Re-run failed");
+      toast.error("Re-run failed", {
+        id: pending,
+        description: `${describeError(err)} The previous results are unchanged.`,
+      });
     } finally {
       setRerunning(false);
     }
-  }, [investigation]);
+  }, [investigation, upsert]);
 
   // Evidence rows are collapsed by default, so a graph edge click hands the id
   // to the list rather than driving the DOM itself. The nonce lets the same
@@ -115,36 +144,43 @@ export default function InvestigationDetailPage() {
   if (loading) {
     return (
       <div className="mx-auto max-w-[1400px] p-6 lg:p-8">
-        <div className="flex items-center gap-3 py-16 text-sm text-muted-foreground">
-          <div className="h-4 w-4 animate-spin rounded-full border-2 border-primary border-t-transparent" />
-          Loading investigation…
-        </div>
+        <LoadingState
+          startedAt={startedAt}
+          what="this case"
+          skeleton={
+            <div className="space-y-4">
+              <Skeleton className="h-3 w-40" />
+              <Skeleton className="h-9 w-80" />
+              <Skeleton className="h-3 w-56" />
+              <Skeleton className="mt-6 h-64 w-full rounded-lg" />
+            </div>
+          }
+        />
       </div>
     );
   }
 
-  if (error || !investigation) {
+  if (error || notFound || !investigation) {
     return (
       <div className="mx-auto max-w-[1400px] space-y-4 p-6 lg:p-8">
         <Link
           href="/investigations"
-          className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground"
+          className="inline-flex items-center gap-1.5 text-ui text-muted-foreground hover:text-foreground"
         >
-          <ArrowLeft className="h-4 w-4" /> Back to Investigations
+          <ArrowLeft className="h-4 w-4" /> Back to investigations
         </Link>
-        <Card>
-          <CardContent className="flex items-start gap-3 p-6">
-            <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-risk-high-foreground" />
-            <div>
-              <p className="font-semibold text-foreground">
-                {error || "Investigation not found"}
-              </p>
-              <p className="mt-1 text-sm text-muted-foreground">
-                The case may not exist, or the backend may be unavailable.
-              </p>
-            </div>
-          </CardContent>
-        </Card>
+        {error ? (
+          <ErrorState
+            title={`Couldn't load ${caseId}`}
+            message={error}
+            onRetry={() => void load()}
+          />
+        ) : (
+          <ErrorState
+            title={`${caseId} was not found`}
+            message="Investigations are held in memory by the backend, so cases other than CASE-2026-001 disappear when it restarts. Run the investigation again to recreate it."
+          />
+        )}
       </div>
     );
   }

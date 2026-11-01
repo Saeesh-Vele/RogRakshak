@@ -124,6 +124,7 @@ export function EvidenceList({ items, focused }: EvidenceListProps) {
                   type="button"
                   onClick={() => toggle(id)}
                   aria-expanded={open}
+                  aria-controls={`evidence-panel-${id}`}
                   className={cn(
                     "flex w-full items-center gap-3 px-3.5 py-2.5 text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring",
                     TIER_ROW[tier]
@@ -152,7 +153,9 @@ export function EvidenceList({ items, focused }: EvidenceListProps) {
                 </button>
 
                 {open && (
-                  <div className="animate-fade-in border-t border-border bg-card px-3.5 py-3.5 pl-[3.25rem]">
+                  <div
+                    id={`evidence-panel-${id}`}
+                    className="animate-fade-in border-t border-border bg-card px-3.5 py-3.5 pl-[3.25rem]">
                     <EvidenceDetail item={item} />
                   </div>
                 )}

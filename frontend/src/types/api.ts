@@ -202,3 +202,24 @@ export interface HealthResponse {
   status: string;
   service: string;
 }
+
+// --- Patient directory (GET /graph/patients) ---
+
+export interface LatestCulture {
+  lab_report_id: number;
+  organism: string;
+  resistance_profile?: string | null;
+  collected_at: string;
+}
+
+export interface PatientListItem {
+  id: number;
+  name: string;
+  mrn: string;
+  latest_culture?: LatestCulture | null;
+}
+
+export interface PatientListResponse {
+  total: number;
+  patients: PatientListItem[];
+}

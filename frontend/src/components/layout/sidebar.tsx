@@ -1,147 +1,145 @@
 "use client";
 
+import { useEffect, useRef } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
-  LayoutDashboard,
   FolderSearch,
+  LayoutDashboard,
   Network,
-  PlusCircle,
-  Menu,
+  Plus,
   X,
 } from "lucide-react";
 import { useAppStore } from "@/lib/store";
 import { cn } from "@/lib/utils";
-import { ModeToggle } from "@/components/layout/mode-toggle";
 import { Wordmark } from "@/components/layout/wordmark";
+import { ServiceStatus } from "@/components/layout/service-status";
+
+/** Only routes that exist. */
+const NAV = [
+  { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
+  { href: "/investigations", label: "Investigations", icon: FolderSearch },
+  { href: "/investigations/new", label: "New investigation", icon: Plus },
+  { href: "/graph", label: "Graph explorer", icon: Network },
+] as const;
+
+function isActive(pathname: string, href: string) {
+  if (href === "/investigations") {
+    return (
+      pathname.startsWith("/investigations") &&
+      !pathname.startsWith("/investigations/new")
+    );
+  }
+  return pathname === href || pathname.startsWith(href + "/");
+}
+
+export const SIDEBAR_ID = "app-sidebar";
 
 /**
- * Only routes that actually exist — no placeholder destinations.
- * Graph Explorer renders the same single-case transmission graph as the
- * investigation detail page, selected by case picker rather than route param.
- *
- * Grouped by what the route does rather than alphabetically: "Monitor" is
- * where you read the current picture, "Investigate" is where you start or
- * follow a specific chain. The split is real, so it earns its labels.
+ * Always visible from md up. Below that it is a drawer opened from the top
+ * bar's menu button: closed by default, closed again on every navigation and
+ * on Escape, and it hands focus back to the button that opened it.
  */
-const navGroups = [
-  {
-    label: "Monitor",
-    items: [
-      {
-        href: "/dashboard",
-        label: "Dashboard",
-        icon: LayoutDashboard,
-        exact: true,
-      },
-      { href: "/investigations", label: "Investigations", icon: FolderSearch },
-    ],
-  },
-  {
-    label: "Investigate",
-    items: [
-      {
-        href: "/investigations/new",
-        label: "New investigation",
-        icon: PlusCircle,
-        exact: true,
-      },
-      { href: "/graph", label: "Graph explorer", icon: Network },
-    ],
-  },
-];
-
 export function Sidebar() {
   const pathname = usePathname();
-  const { sidebarOpen, toggleSidebar } = useAppStore();
+  const open = useAppStore((s) => s.sidebarOpen);
+  const setOpen = useAppStore((s) => s.setSidebarOpen);
+  const firstLink = useRef<HTMLAnchorElement>(null);
+
+  // Navigating closes the drawer
+  useEffect(() => {
+    setOpen(false);
+  }, [pathname, setOpen]);
+
+  useEffect(() => {
+    if (!open) return;
+    firstLink.current?.focus();
+    function onKey(e: KeyboardEvent) {
+      if (e.key === "Escape") {
+        setOpen(false);
+        document.getElementById("sidebar-toggle")?.focus();
+      }
+    }
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, [open, setOpen]);
 
   return (
     <>
-      {/* Mobile toggle */}
-      <button
-        onClick={toggleSidebar}
-        className="fixed left-4 top-3.5 z-50 rounded-lg border border-border bg-card p-2 text-muted-foreground shadow-card md:hidden"
-        aria-label={sidebarOpen ? "Close sidebar" : "Open sidebar"}
-      >
-        {sidebarOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-      </button>
-
-      {/* Overlay */}
-      {sidebarOpen && (
+      {open && (
         <div
-          className="fixed inset-0 z-30 bg-ink/50 md:hidden"
-          onClick={toggleSidebar}
+          aria-hidden
+          className="fixed inset-0 z-30 bg-foreground/20 md:hidden"
+          onClick={() => setOpen(false)}
         />
       )}
 
-      {/*
-       * The chrome sits on ink so the working area reads as the lit surface —
-       * the same ink the marketing page uses for its instrument panels, so
-       * signing in is a change of register rather than a change of product.
-       */}
       <aside
+        id={SIDEBAR_ID}
+        aria-label="Primary"
         className={cn(
-          "fixed left-0 top-0 z-40 flex h-screen w-[248px] flex-col border-r border-ink-line bg-ink transition-transform duration-200",
-          sidebarOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"
+          "fixed inset-y-0 left-0 z-40 flex w-[248px] flex-col border-r border-border bg-background",
+          "transition-transform duration-200 ease-out md:w-[220px] md:translate-x-0",
+          open ? "translate-x-0 shadow-pop md:shadow-none" : "-translate-x-full max-md:invisible"
         )}
       >
-        <div className="flex h-[72px] shrink-0 items-center border-b border-ink-line px-6">
-          <Wordmark tone="light" />
+        <div className="flex h-14 shrink-0 items-center justify-between px-5">
+          <Wordmark />
+          <button
+            type="button"
+            onClick={() => {
+              setOpen(false);
+              document.getElementById("sidebar-toggle")?.focus();
+            }}
+            aria-label="Close navigation"
+            className="grid h-11 w-11 place-items-center rounded-md text-muted-foreground hover:bg-sunken hover:text-foreground md:hidden"
+          >
+            <X className="h-5 w-5" />
+          </button>
         </div>
 
-        <nav
-          className="flex-1 space-y-7 overflow-y-auto px-3 py-6"
-          aria-label="Main navigation"
-        >
-          {navGroups.map((group) => (
-            <div key={group.label}>
-              <p className="px-3 pb-2 font-mono text-[0.625rem] uppercase tracking-[0.16em] text-white/30">
-                {group.label}
-              </p>
-              <ul className="space-y-0.5">
-                {group.items.map((item) => {
-                  const active = item.exact
-                    ? pathname === item.href
-                    : pathname.startsWith(item.href) &&
-                      pathname !== "/investigations/new";
-                  return (
-                    <li key={item.href}>
-                      <Link
-                        href={item.href}
-                        aria-current={active ? "page" : undefined}
-                        className={cn(
-                          "relative flex items-center gap-3 rounded-lg py-2.5 pl-3 pr-3 text-[0.875rem] transition-colors",
-                          "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40",
-                          active
-                            ? "bg-white/[0.07] font-medium text-white"
-                            : "text-white/55 hover:bg-white/[0.04] hover:text-white/90"
-                        )}
-                      >
-                        {/* Position marker — the one place the rail appears */}
-                        <span
-                          aria-hidden
-                          className={cn(
-                            "absolute left-0 top-1/2 h-5 w-[2px] -translate-y-1/2 rounded-r bg-primary transition-opacity",
-                            active ? "opacity-100" : "opacity-0"
-                          )}
-                        />
-                        <item.icon
-                          className={cn(
-                            "h-[18px] w-[18px] shrink-0",
-                            active ? "text-primary" : "text-white/40"
-                          )}
-                        />
-                        {item.label}
-                      </Link>
-                    </li>
-                  );
-                })}
-              </ul>
-            </div>
-          ))}
+        <nav aria-label="Main" className="flex-1 overflow-y-auto px-3 pt-4">
+          <ul className="space-y-px">
+            {NAV.map((item, i) => {
+              const active = isActive(pathname, item.href);
+              return (
+                <li key={item.href}>
+                  <Link
+                    ref={i === 0 ? firstLink : undefined}
+                    href={item.href}
+                    aria-current={active ? "page" : undefined}
+                    className={cn(
+                      "relative flex h-9 items-center gap-2.5 rounded-md px-2.5 text-ui transition-colors duration-100 max-md:h-11",
+                      active
+                        ? "bg-sunken font-medium text-foreground"
+                        : "text-muted-foreground hover:bg-sunken/60 hover:text-foreground"
+                    )}
+                  >
+                    {/* Position marker */}
+                    <span
+                      aria-hidden
+                      className={cn(
+                        "absolute -left-3 top-2 bottom-2 w-[2px] bg-primary transition-opacity",
+                        active ? "opacity-100" : "opacity-0"
+                      )}
+                    />
+                    <item.icon
+                      aria-hidden
+                      strokeWidth={1.75}
+                      className={cn(
+                        "h-4 w-4 shrink-0",
+                        active ? "text-primary" : "text-muted-foreground"
+                      )}
+                    />
+                    {item.label}
+                  </Link>
+                </li>
+              );
+            })}
+          </ul>
         </nav>
 
-        <ModeToggle />
+        <ServiceStatus />
       </aside>
     </>
   );

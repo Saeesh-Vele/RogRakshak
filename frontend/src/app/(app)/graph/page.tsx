@@ -3,21 +3,17 @@
 import { Suspense, useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { getProvider } from "@/lib/data-provider";
 import { fetchPatientPlacements } from "@/lib/patient-placement";
-import type {
-  InvestigationCase,
-  PatientPlacement,
-} from "@/types/api";
+import type { PatientPlacement } from "@/types/api";
 import { useAppStore } from "@/lib/store";
-import { Card, CardContent } from "@/components/ui/card";
+import { useCasesStore } from "@/lib/cases-store";
+import { EmptyState, ErrorState, LoadingState, Skeleton } from "@/components/ui/states";
 import { Panel } from "@/components/ui/panel";
 import { Select } from "@/components/ui/select";
 import {
   GraphLegend,
   TransmissionGraph,
 } from "@/components/investigation/transmission-graph";
-import { AlertTriangle } from "lucide-react";
 import { PageHeader } from "@/components/layout/page-header";
 
 function GraphExplorer() {
@@ -25,46 +21,31 @@ function GraphExplorer() {
   const searchParams = useSearchParams();
   const mode = useAppStore((s) => s.mode);
 
-  const [cases, setCases] = useState<InvestigationCase[]>([]);
+  const { cases, status, error, startedAt, load } = useCasesStore();
+  const loading = status === "idle" || status === "loading";
   const [selectedId, setSelectedId] = useState<string>("");
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [placements, setPlacements] = useState<Record<number, PatientPlacement>>(
     {}
   );
 
-  // The list endpoint already returns full cases, so no per-case fetch is
-  // needed to render the graph — this reuses exactly the payload the detail
-  // page uses, just selected by dropdown instead of a route param.
   useEffect(() => {
-    let cancelled = false;
-    async function load() {
-      setLoading(true);
-      setError(null);
-      try {
-        const resp = await getProvider().list();
-        if (cancelled) return;
-        setCases(resp.cases);
-        const requested = searchParams.get("case");
-        const initial =
-          resp.cases.find((c) => c.case_id === requested)?.case_id ??
-          resp.cases[0]?.case_id ??
-          "";
-        setSelectedId(initial);
-      } catch (err: unknown) {
-        if (!cancelled)
-          setError(err instanceof Error ? err.message : "Failed to load cases");
-      } finally {
-        if (!cancelled) setLoading(false);
-      }
-    }
-    load();
-    return () => {
-      cancelled = true;
-    };
-    // searchParams intentionally read once on mount for the initial selection
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [mode]);
+    void load();
+  }, [load, mode]);
+
+  // The list endpoint already returns full cases, so no per-case fetch is
+  // needed to render the graph. Pick the ?case= one if present, else the first.
+  useEffect(() => {
+    if (status !== "ready") return;
+    setSelectedId((current) => {
+      if (current && cases.some((c) => c.case_id === current)) return current;
+      const requested = searchParams.get("case");
+      return (
+        cases.find((c) => c.case_id === requested)?.case_id ??
+        cases[0]?.case_id ??
+        ""
+      );
+    });
+  }, [status, cases, searchParams]);
 
   const selected = useMemo(
     () => cases.find((c) => c.case_id === selectedId) ?? null,
@@ -137,42 +118,34 @@ function GraphExplorer() {
       </div>
 
       {loading && (
-        <div className="flex items-center gap-3 py-16 text-sm text-muted-foreground">
-          <div className="h-4 w-4 animate-spin rounded-full border-2 border-primary border-t-transparent" />
-          Loading investigations…
-        </div>
+        <LoadingState
+          startedAt={startedAt}
+          skeleton={<Skeleton className="h-[520px] w-full rounded-lg" />}
+        />
       )}
 
-      {error && (
-        <Card>
-          <CardContent className="flex items-start gap-3 p-5">
-            <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-risk-high-foreground" />
-            <div>
-              <p className="text-sm font-semibold text-foreground">
-                Failed to load investigations
-              </p>
-              <p className="mt-0.5 text-sm text-muted-foreground">{error}</p>
-            </div>
-          </CardContent>
-        </Card>
+      {status === "error" && (
+        <ErrorState
+          title="Couldn't load investigations"
+          message={error ?? "The analysis service did not return the case list."}
+          onRetry={() => void load({ force: true })}
+        />
       )}
 
-      {!loading && !error && !selected && (
-        <Card>
-          <CardContent className="p-10 text-center text-sm text-muted-foreground">
-            No investigations available.{" "}
-            <Link
-              href="/investigations/new"
-              className="font-medium text-primary hover:underline"
-            >
-              Start one
+      {status === "ready" && !selected && (
+        <EmptyState
+          className="rounded-lg border border-border bg-card"
+          title="No investigations yet"
+          body="The graph draws a case's contact network. Run an investigation to create one."
+          action={
+            <Link href="/investigations/new" className="text-ui font-medium text-primary hover:underline">
+              Start an investigation
             </Link>
-            .
-          </CardContent>
-        </Card>
+          }
+        />
       )}
 
-      {!loading && !error && selected && (
+      {status === "ready" && selected && (
         <Panel>
           {/* Toolbar strip: the key on the left, the way out on the right */}
           <div className="flex flex-wrap items-center justify-between gap-x-6 gap-y-3 border-b border-border bg-muted/40 px-5 py-3">

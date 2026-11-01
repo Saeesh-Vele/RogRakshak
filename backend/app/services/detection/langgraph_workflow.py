@@ -218,14 +218,43 @@ def synthesize_summary(state: InvestigationState) -> Dict[str, Any]:
     cand_names = [c.name for c in candidates]
     chains = state.get("chains", [])
 
-    summary = (
-        f"EPIDEMIOLOGICAL INVESTIGATION BRIEFING [{status}]: "
-        f"An active cluster of {org} ({res}) was identified centering on {idx_name} (ID: {state['target_patient_id']}). "
-        f"Identified {len(candidates)} linked candidate cases ({', '.join(cand_names)}). "
-        f"Deterministic contact tracing revealed {len(chains)} verified staff-mediated contact pathway(s) "
-        f"with high cumulative exposure duration. Overall investigation confidence score: {conf * 100:.1f}%. "
-        f"Recommended actions: Enhanced barrier nursing, staff cohorting, environmental disinfection, and active surveillance cultures."
+    actions = (
+        "Recommended actions: Enhanced barrier nursing, staff cohorting, "
+        "environmental disinfection, and active surveillance cultures."
     )
+
+    if status in ("SUSPECTED_CLUSTER", "HIGH_PRIORITY_INVESTIGATION"):
+        # Wording for genuine cluster classifications is unchanged.
+        summary = (
+            f"EPIDEMIOLOGICAL INVESTIGATION BRIEFING [{status}]: "
+            f"An active cluster of {org} ({res}) was identified centering on {idx_name} (ID: {state['target_patient_id']}). "
+            f"Identified {len(candidates)} linked candidate cases ({', '.join(cand_names)}). "
+            f"Deterministic contact tracing revealed {len(chains)} verified staff-mediated contact pathway(s) "
+            f"with high cumulative exposure duration. Overall investigation confidence score: {conf * 100:.1f}%. "
+            f"{actions}"
+        )
+    else:
+        # Below the cluster threshold the briefing must not claim a cluster or
+        # verified pathways — it reports what was reviewed and what was found.
+        org_label = f"{org} ({res})" if res else org
+        finding = (
+            "Contact evidence was found but does not meet the cluster threshold"
+            if status == "POTENTIAL_CONTACT"
+            else "No transmission signal was found"
+        )
+        reviewed = (
+            f"{len(candidates)} other patient(s) with matching cultures were reviewed ({', '.join(cand_names)}). "
+            if candidates
+            else "No other patients with matching cultures were found. "
+        )
+        summary = (
+            f"EPIDEMIOLOGICAL INVESTIGATION BRIEFING [{status}]: "
+            f"{finding} for {org_label} around {idx_name} (ID: {state['target_patient_id']}). "
+            f"{reviewed}"
+            f"Deterministic contact tracing found {len(chains)} candidate contact pathway(s). "
+            f"Overall investigation confidence score: {conf * 100:.1f}%. "
+            f"{actions}"
+        )
 
     return {"summary": summary}
 

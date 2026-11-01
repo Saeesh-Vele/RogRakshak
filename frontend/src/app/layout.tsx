@@ -1,42 +1,55 @@
-import type { Metadata } from "next";
-import { IBM_Plex_Mono, IBM_Plex_Sans, Inter, Newsreader } from "next/font/google";
+import type { Metadata, Viewport } from "next";
+import { IBM_Plex_Mono, IBM_Plex_Sans, Newsreader } from "next/font/google";
 import "./globals.css";
 import { cn } from "@/lib/utils";
 
-const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
-
 /**
- * Marketing typeface trio, loaded here but only applied on the public landing
- * page (see src/app/page.tsx). The signed-in product stays on Inter.
+ * Three faces, each with one job.
  *
- * Newsreader — display. Its italic carries organism names, matching the
- * binomial-nomenclature convention the domain already uses.
- * IBM Plex Sans / Mono — body and data. Plex is drawn for technical and
- * scientific settings, which is the register the product speaks in.
+ * Newsreader — titles and large numerals. A text serif that stays sturdy at
+ *   44px figures, and whose italic sets organism names the way the domain
+ *   writes them.
+ * IBM Plex Sans — every piece of interface text. Drawn for technical and
+ *   scientific settings; tabular figures are switched on globally.
+ * IBM Plex Mono — anything that is a record: case IDs, MRNs, timestamps,
+ *   source record IDs.
  */
 const newsreader = Newsreader({
   subsets: ["latin"],
-  weight: ["300", "400", "500", "600"],
+  weight: ["400", "500"],
   style: ["normal", "italic"],
   variable: "--font-display",
+  display: "swap",
+  // Next ships no fallback metrics for Newsreader; name a close serif instead.
+  fallback: ["Iowan Old Style", "Georgia", "serif"],
+  adjustFontFallback: false,
 });
 
 const plexSans = IBM_Plex_Sans({
   subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
+  weight: ["400", "500", "600"],
   variable: "--font-body",
+  display: "swap",
 });
 
 const plexMono = IBM_Plex_Mono({
   subsets: ["latin"],
-  weight: ["400", "500", "600"],
+  weight: ["400", "500"],
   variable: "--font-mono",
+  display: "swap",
 });
 
 export const metadata: Metadata = {
-  title: "RogRakshak | HAI Surveillance & Outbreak Tracing",
+  title: {
+    default: "RogRakshak — HAI surveillance and outbreak tracing",
+    template: "%s — RogRakshak",
+  },
   description:
     "Hospital-acquired infection surveillance, contact tracing, and multi-agent outbreak investigation platform",
+};
+
+export const viewport: Viewport = {
+  themeColor: "#F9F8F5",
 };
 
 /**
@@ -52,32 +65,9 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={cn(
-        "font-sans",
-        inter.variable,
-        newsreader.variable,
-        plexSans.variable,
-        plexMono.variable
-      )}
-      // Replaced before paint by the script below; keeps SSR and the first
-      // client render agreeing so React does not warn about a mismatch.
-      data-theme="light"
-      suppressHydrationWarning
+      className={cn(newsreader.variable, plexSans.variable, plexMono.variable)}
     >
-      <head>
-        {/*
-          Applies the stored theme before the first paint, so a signed-in user
-          who chose dark never sees a white flash. Inline and synchronous by
-          necessity — anything deferred paints the wrong theme first.
-          The key must match THEME_STORAGE_KEY in src/lib/store.ts.
-        */}
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `try{if(localStorage.getItem("rograkshak-theme")==="dark"){document.documentElement.dataset.theme="dark"}}catch(e){}`,
-          }}
-        />
-      </head>
-      <body className="antialiased">{children}</body>
+      <body>{children}</body>
     </html>
   );
 }

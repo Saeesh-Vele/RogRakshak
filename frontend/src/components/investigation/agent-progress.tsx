@@ -44,8 +44,12 @@ export function AgentProgress({
           {(elapsedMs / 1000).toFixed(1)}s elapsed
         </span>
       </div>
-      <p className="mt-0.5 text-sm text-muted-foreground">
-        {completedCount} of {WORKFLOW_STEPS.length} steps
+      <p role="status" className="mt-0.5 text-sm text-muted-foreground">
+        {state === "done"
+          ? `Complete: all ${WORKFLOW_STEPS.length} steps`
+          : state === "error"
+            ? `Failed at step ${activeStep + 1}: ${WORKFLOW_STEPS[activeStep]?.label}`
+            : `${completedCount} of ${WORKFLOW_STEPS.length} steps · ${WORKFLOW_STEPS[activeStep]?.label}`}
       </p>
 
       <ol className="mt-4">

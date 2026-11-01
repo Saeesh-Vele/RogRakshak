@@ -11,7 +11,7 @@ import hashlib
 from pathlib import Path
 from datetime import datetime
 from typing import List, Dict, Any, Optional, Tuple
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, selectinload
 
 # Ensure backend package is in python path
 backend_path = Path(__file__).resolve().parent.parent.parent
@@ -220,7 +220,7 @@ class ContactEventEngine:
         # -------------------------------------------------------------
         # 3. Patient <-> Procedure Staff Overlaps
         # -------------------------------------------------------------
-        procedures = self.db.query(Procedure).all()
+        procedures = self.db.query(Procedure).options(selectinload(Procedure.staff_members)).all()
         for proc in procedures:
             p_obj = patients.get(proc.patient_id)
             w_obj = wards.get(proc.location_id) or Ward(id=proc.location_id, name="Procedure Room", department="Clinical")

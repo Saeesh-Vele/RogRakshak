@@ -22,7 +22,6 @@ import { evidenceTypeLabel, formatMinutes } from "@/lib/risk";
 import { shortBedLabel } from "@/lib/patient-placement";
 import { cn } from "@/lib/utils";
 import { Switch } from "@/components/ui/switch";
-import { useAppStore } from "@/lib/store";
 import {
   EntityNode,
   ENTITY_STYLES,
@@ -341,7 +340,6 @@ export function TransmissionGraph({
   onSelectEvidence,
   height = "h-[560px]",
 }: TransmissionGraphProps) {
-  const theme = useAppStore((s) => s.theme);
   const [enabled, setEnabled] = useState<Record<EntityKind, boolean>>({
     index: true,
     downstream: true,
@@ -408,8 +406,8 @@ export function TransmissionGraph({
         <Background
           variant={BackgroundVariant.Dots}
           /* ReactFlow writes this straight onto an SVG fill attribute, which
-             does not resolve var(), so the token is picked per theme here. */
-          color={theme === "dark" ? "#3A4058" : "#DDE0E7"}
+             does not resolve var(), so this mirrors --dot in globals.css. */
+          color="#D7D2CA"
           gap={18}
           size={1}
         />

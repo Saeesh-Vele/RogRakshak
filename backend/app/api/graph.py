@@ -2,6 +2,7 @@
 FastAPI Graph API Router (Graph/Crafting Layer).
 
 Exposes REST endpoints for the Detection Team, LangGraph agents, and frontend:
+- GET /graph/patients
 - GET /graph/patient/{patient_id}/contacts
 - GET /graph/patient/{patient_id}/timeline
 - GET /graph/organism/{organism}/patients
@@ -17,6 +18,7 @@ from app.schemas.graph import (
     PatientTimelineResponse,
     OrganismPatientCohort,
     ContactPathResponse,
+    PatientListResponse,
 )
 from app.services.graph.graph_query_service import GraphQueryService
 
@@ -31,6 +33,18 @@ class ContactPathRequest(BaseModel):
     source_patient_id: int = Field(description="Origin patient ID (e.g. Index Case)")
     target_patient_id: int = Field(description="Target patient ID (e.g. Downstream Case)")
     max_hops: int = Field(default=3, description="Maximum hops to traverse")
+
+
+@router.get("/patients", response_model=PatientListResponse)
+def list_patients(
+    service: GraphQueryService = Depends(get_graph_service),
+) -> PatientListResponse:
+    """List every patient (id, name, MRN) with their most recent culture. Read-only."""
+    try:
+        with service:
+            return service.list_patients()
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Internal graph query error: {e}")
 
 
 @router.get("/patient/{patient_id}/contacts", response_model=PatientContactsResponse)

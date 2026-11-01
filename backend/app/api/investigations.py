@@ -9,7 +9,7 @@ Exposes REST endpoints for the Frontend Team and external surveillance clients:
 - GET /api/investigations/{case_id}/timeline
 """
 
-from typing import List
+from typing import Iterator, List
 from fastapi import APIRouter, HTTPException, Depends
 
 from app.schemas.detection import (
@@ -24,8 +24,14 @@ from app.services.detection.investigation_service import InvestigationService
 router = APIRouter(prefix="/api/investigations", tags=["Outbreak Investigations"])
 
 
-def get_investigation_service() -> InvestigationService:
-    return InvestigationService()
+def get_investigation_service() -> Iterator[InvestigationService]:
+    # One service per request; close it afterwards so its database session is
+    # returned to the pool instead of waiting for garbage collection.
+    service = InvestigationService()
+    try:
+        yield service
+    finally:
+        service.close()
 
 
 @router.get("", response_model=InvestigationListResponse)

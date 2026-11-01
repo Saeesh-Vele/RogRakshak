@@ -1,14 +1,7 @@
 "use client";
 
 import type { EvidenceItem } from "@/types/api";
-import { Badge } from "@/components/ui/badge";
-import {
-  evidenceTier,
-  evidenceTypeLabel,
-  tierBadgeVariant,
-  tierReason,
-  formatMinutes,
-} from "@/lib/risk";
+import { formatMinutes } from "@/lib/risk";
 import { Clock, MapPin, User } from "lucide-react";
 
 function formatDateTime(iso: string | null | undefined): string {
@@ -82,30 +75,5 @@ export function EvidenceDetail({ item }: { item: EvidenceItem }) {
         </div>
       )}
     </>
-  );
-}
-
-export function EvidenceCard({ item }: { item: EvidenceItem }) {
-  const label = evidenceTypeLabel(item.type);
-  const tier = evidenceTier(item);
-
-  return (
-    <div className="rounded-xl border border-border bg-card p-4 transition-colors hover:border-primary/30">
-      <div className="flex items-start justify-between gap-3">
-        <div className="min-w-0">
-          <p className="font-semibold text-foreground">{label}</p>
-          <p className="mt-0.5 text-[0.8125rem] text-muted-foreground">
-            {tierReason(item)}
-          </p>
-        </div>
-        <Badge variant={tierBadgeVariant[tier]} size="tier" className="shrink-0">
-          {tier}
-        </Badge>
-      </div>
-
-      <div className="mt-2.5">
-        <EvidenceDetail item={item} />
-      </div>
-    </div>
   );
 }

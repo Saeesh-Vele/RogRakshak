@@ -240,3 +240,25 @@ def test_api_get_investigation_evidence_and_timeline():
     tl_resp = client.get("/api/investigations/CASE-2026-001/timeline")
     assert tl_resp.status_code == 200
     assert isinstance(tl_resp.json(), list)
+
+
+def test_summary_does_not_claim_cluster_below_threshold():
+    from app.services.detection.langgraph_workflow import synthesize_summary
+
+    base = {
+        "confidence": 0.12,
+        "organism": "Klebsiella pneumoniae",
+        "resistance_profile": "MDR",
+        "target_patient_id": 9,
+        "candidate_patients": [],
+        "chains": [],
+    }
+    for status in ("NO_SIGNAL", "POTENTIAL_CONTACT"):
+        text = synthesize_summary({**base, "status": status})["summary"]
+        assert "active cluster" not in text
+        assert "verified" not in text
+        assert f"[{status}]" in text
+        assert "Recommended actions:" in text
+
+    cluster = synthesize_summary({**base, "status": "SUSPECTED_CLUSTER"})["summary"]
+    assert "An active cluster of Klebsiella pneumoniae (MDR) was identified" in cluster

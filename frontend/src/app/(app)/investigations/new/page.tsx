@@ -1,10 +1,13 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
+import { toast } from "sonner";
 import { getProvider } from "@/lib/data-provider";
 import type { CreateInvestigationRequest } from "@/types/api";
 import { useAppStore } from "@/lib/store";
+import { useCasesStore } from "@/lib/cases-store";
+import { describeError } from "@/lib/api-client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -48,8 +51,13 @@ function Field({
 export default function NewInvestigationPage() {
   const router = useRouter();
   const mode = useAppStore((s) => s.mode);
+  const upsert = useCasesStore((s) => s.upsert);
+  const searchParams = useSearchParams();
 
-  const [patientId, setPatientId] = useState("1");
+  // ?patient= comes from the search palette's "start investigation" result.
+  const [patientId, setPatientId] = useState(
+    () => searchParams.get("patient") ?? "1"
+  );
   const [organism, setOrganism] = useState("Klebsiella pneumoniae");
   const [resistance, setResistance] = useState("MDR");
   const [useMockGraph, setUseMockGraph] = useState(false);
@@ -115,12 +123,17 @@ export default function NewInvestigationPage() {
       const result = await getProvider().create(request);
       setElapsed(Date.now() - startedAt.current);
       setProgress("done");
+      upsert(result);
+      toast.success(`${result.case_id} ready`, {
+        description: `${Math.round(result.confidence * 100)}% confidence · opening the case`,
+      });
       // Brief beat so the completed checklist is visible before navigating
       setTimeout(() => router.push(`/investigations/${result.case_id}`), 550);
     } catch (err: unknown) {
       setElapsed(Date.now() - startedAt.current);
       setProgress("error");
-      setError(err instanceof Error ? err.message : "Investigation failed");
+      setError(describeError(err));
+      toast.error("Investigation failed", { description: describeError(err) });
     }
   }
 

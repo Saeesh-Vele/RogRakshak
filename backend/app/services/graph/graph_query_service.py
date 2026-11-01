@@ -16,7 +16,7 @@ import json
 from pathlib import Path
 from datetime import datetime
 from typing import Dict, Any, List, Optional, Set
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, selectinload
 
 # Ensure backend package is in python path
 backend_path = Path(__file__).resolve().parent.parent.parent
@@ -35,6 +35,9 @@ from app.schemas.graph import (
     OrganismPatientCohort,
     ContactPathHop,
     ContactPathResponse,
+    LatestCulture,
+    PatientListItem,
+    PatientListResponse,
 )
 from app.services.graph.neo4j_service import Neo4jService
 from app.services.graph.contact_event_service import ContactEventEngine
@@ -50,6 +53,26 @@ class GraphQueryService:
         self.db = db_session or SessionLocal()
         self.neo4j = neo4j_service or Neo4jService()
         self._contact_engine = ContactEventEngine(db_session=self.db)
+        # Contact events are derived from the whole movement/procedure table, so
+        # one investigation run used to rebuild them once per find_contact_path
+        # call (twice per candidate). They cannot change within one service
+        # instance's lifetime — a single request — so compute them once.
+        self._contact_events: Optional[List[ContactEvent]] = None
+        self._patients: Dict[int, Optional[Patient]] = {}
+
+    def _patient(self, patient_id: int) -> Optional[Patient]:
+        # find_contact_path runs twice per candidate in one investigation; the
+        # same handful of patients would otherwise be re-fetched every time.
+        if patient_id not in self._patients:
+            self._patients[patient_id] = (
+                self.db.query(Patient).filter(Patient.id == patient_id).first()
+            )
+        return self._patients[patient_id]
+
+    def _all_contact_events(self) -> List[ContactEvent]:
+        if self._contact_events is None:
+            self._contact_events = self._contact_engine.generate_all_contact_events()
+        return self._contact_events
 
     def close(self):
         if self._owns_session:
@@ -63,6 +86,34 @@ class GraphQueryService:
         self.close()
 
     # -------------------------------------------------------------
+    # 0. List Patients (read-only directory for the investigation picker)
+    # -------------------------------------------------------------
+    def list_patients(self) -> PatientListResponse:
+        """Every patient with their most recent culture, in two queries."""
+        patients = self.db.query(Patient).order_by(Patient.id).all()
+        latest: Dict[int, LabReport] = {}
+        for r in self.db.query(LabReport).order_by(LabReport.collected_at.desc(), LabReport.id.desc()).all():
+            latest.setdefault(r.patient_id, r)
+
+        items = []
+        for p in patients:
+            r = latest.get(p.id)
+            items.append(
+                PatientListItem(
+                    id=p.id,
+                    name=p.name,
+                    mrn=p.mrn,
+                    latest_culture=LatestCulture(
+                        lab_report_id=r.id,
+                        organism=r.organism,
+                        resistance_profile=r.resistance_profile,
+                        collected_at=r.collected_at.isoformat(),
+                    ) if r else None,
+                )
+            )
+        return PatientListResponse(total=len(items), patients=items)
+
+    # -------------------------------------------------------------
     # 1. Get Patient Contacts
     # -------------------------------------------------------------
     def get_patient_contacts(self, patient_id: int) -> PatientContactsResponse:
@@ -71,7 +122,7 @@ class GraphQueryService:
         if not patient:
             raise ValueError(f"Patient with ID {patient_id} not found.")
 
-        all_events = self._contact_engine.generate_all_contact_events()
+        all_events = self._all_contact_events()
 
         staff_contacts: List[ContactEvent] = []
         patient_contacts: List[ContactEvent] = []
@@ -151,16 +202,22 @@ class GraphQueryService:
             .order_by(Movement.entry_time)
             .all()
         )
+        ward_ids = {m.location_id for m in movements if m.location_type == "ward"}
+        bed_ids = {m.location_id for m in movements if m.location_type == "bed"}
+        ward_names = (
+            {w.id: w.name for w in self.db.query(Ward).filter(Ward.id.in_(ward_ids)).all()}
+            if ward_ids else {}
+        )
+        bed_numbers = (
+            {b.id: b.bed_number for b in self.db.query(Bed).filter(Bed.id.in_(bed_ids)).all()}
+            if bed_ids else {}
+        )
         for m in movements:
             loc_name = f"Location {m.location_id}"
-            if m.location_type == "ward":
-                w = self.db.query(Ward).filter(Ward.id == m.location_id).first()
-                if w:
-                    loc_name = w.name
-            elif m.location_type == "bed":
-                b = self.db.query(Bed).filter(Bed.id == m.location_id).first()
-                if b:
-                    loc_name = f"Bed {b.bed_number}"
+            if m.location_type == "ward" and m.location_id in ward_names:
+                loc_name = ward_names[m.location_id]
+            elif m.location_type == "bed" and m.location_id in bed_numbers:
+                loc_name = f"Bed {bed_numbers[m.location_id]}"
 
             events.append(
                 TimelineEvent(
@@ -179,6 +236,7 @@ class GraphQueryService:
         # Procedures
         procedures = (
             self.db.query(Procedure)
+            .options(selectinload(Procedure.staff_members))
             .filter(Procedure.patient_id == patient_id)
             .order_by(Procedure.start_time)
             .all()
@@ -251,13 +309,16 @@ class GraphQueryService:
         patient_ids = list(dict.fromkeys(r.patient_id for r in reports))
         report_ids = [r.id for r in reports]
 
+        names = (
+            {p.id: p.name for p in self.db.query(Patient).filter(Patient.id.in_(patient_ids)).all()}
+            if patient_ids else {}
+        )
         summary_list = []
         for r in reports:
-            p = self.db.query(Patient).filter(Patient.id == r.patient_id).first()
             summary_list.append({
                 "lab_report_id": r.id,
                 "patient_id": r.patient_id,
-                "patient_name": p.name if p else "Unknown",
+                "patient_name": names.get(r.patient_id, "Unknown"),
                 "organism": r.organism,
                 "resistance_profile": r.resistance_profile,
                 "specimen_type": r.specimen_type,
@@ -284,12 +345,12 @@ class GraphQueryService:
         Discovers temporal contact paths between source and target patients.
         Example: Patient 1 -> Staff 1 (Nurse Anita) -> Patient 2.
         """
-        p_src = self.db.query(Patient).filter(Patient.id == source_patient_id).first()
-        p_tgt = self.db.query(Patient).filter(Patient.id == target_patient_id).first()
+        p_src = self._patient(source_patient_id)
+        p_tgt = self._patient(target_patient_id)
         if not p_src or not p_tgt:
             raise ValueError("Source or target patient not found.")
 
-        all_events = self._contact_engine.generate_all_contact_events()
+        all_events = self._all_contact_events()
 
         # Check direct Patient <-> Patient contact
         direct_matches = [

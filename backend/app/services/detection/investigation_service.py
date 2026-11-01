@@ -23,6 +23,12 @@ class InvestigationService:
         self.graph_provider = graph_provider or LiveGraphEvidenceProvider()
         self.workflow = create_investigation_graph()
 
+    def close(self) -> None:
+        """Releases the graph provider's database session, if it owns one."""
+        close = getattr(self.graph_provider, "close", None)
+        if callable(close):
+            close()
+
     def run_investigation(
         self,
         target_patient_id: int = 1,

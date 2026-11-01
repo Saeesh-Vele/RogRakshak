@@ -93,3 +93,25 @@ class ContactPathResponse(BaseModel):
     hops_count: int
     path: List[ContactPathHop] = Field(default_factory=list)
     explanation: Optional[str] = None
+
+
+class LatestCulture(BaseModel):
+    """Most recent microbiology culture on record for a patient."""
+    lab_report_id: int
+    organism: str
+    resistance_profile: Optional[str] = None
+    collected_at: str
+
+
+class PatientListItem(BaseModel):
+    id: int
+    name: str
+    mrn: str
+    latest_culture: Optional[LatestCulture] = Field(
+        default=None, description="Most recent culture by collection time, if any"
+    )
+
+
+class PatientListResponse(BaseModel):
+    total: int
+    patients: List[PatientListItem] = Field(default_factory=list)

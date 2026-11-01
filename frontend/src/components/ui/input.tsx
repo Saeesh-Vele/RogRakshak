@@ -7,9 +7,10 @@ const Input = React.forwardRef<HTMLInputElement, React.InputHTMLAttributes<HTMLI
       <input
         type={type}
         className={cn(
-          "flex h-10 w-full rounded-lg border border-border bg-card px-3.5 py-2 text-sm text-foreground",
+          "flex h-9 w-full rounded-md border border-input bg-card px-3 py-2 text-copy text-foreground max-sm:h-11",
           "placeholder:text-muted-foreground",
-          "focus-visible:outline-none focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/15",
+          "focus-visible:border-primary",
+          "aria-[invalid=true]:border-destructive",
           "disabled:cursor-not-allowed disabled:opacity-50",
           className
         )}
@@ -21,16 +22,16 @@ const Input = React.forwardRef<HTMLInputElement, React.InputHTMLAttributes<HTMLI
 )
 Input.displayName = "Input"
 
-/** Pill-shaped search field on a light gray fill — the top-bar / filter look. */
+/** Search field for in-page filters. */
 const SearchInput = React.forwardRef<HTMLInputElement, React.InputHTMLAttributes<HTMLInputElement>>(
   ({ className, ...props }, ref) => {
     return (
       <input
         type="search"
         className={cn(
-          "flex h-11 w-full rounded-xl border border-transparent bg-muted px-3.5 py-2 text-sm text-foreground",
+          "flex h-9 w-full rounded-md border border-input bg-card px-3 py-2 text-copy text-foreground max-sm:h-11",
           "placeholder:text-muted-foreground",
-          "focus-visible:outline-none focus-visible:border-primary/40 focus-visible:bg-card focus-visible:ring-2 focus-visible:ring-primary/15",
+          "focus-visible:border-primary",
           "[&::-webkit-search-cancel-button]:appearance-none",
           className
         )}

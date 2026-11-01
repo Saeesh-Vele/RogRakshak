@@ -2,9 +2,33 @@ import Link from "next/link";
 import { cn } from "@/lib/utils";
 
 /**
- * Product mark. Shared by the sidebar, the auth screens and the landing page so
- * the identity is defined in exactly one place.
+ * Product mark, shared by the sidebar, the auth screens and the landing page.
+ *
+ * The glyph is the product's own subject in miniature: an index patient (red),
+ * the staff member who carried it (teal) and a downstream case (amber), joined
+ * by the hops between them — the same three node colours the transmission
+ * graph uses. The name is set in the display serif.
  */
+export function ChainMark({ className }: { className?: string }) {
+  return (
+    <svg
+      viewBox="0 0 28 12"
+      aria-hidden
+      className={cn("h-3 w-7 shrink-0", className)}
+    >
+      <path
+        d="M3 6h22"
+        stroke="currentColor"
+        strokeOpacity="0.35"
+        strokeWidth="1.25"
+      />
+      <circle cx="3" cy="6" r="2.75" fill="hsl(var(--node-infected))" />
+      <circle cx="14" cy="6" r="2.75" fill="hsl(var(--node-location))" />
+      <circle cx="25" cy="6" r="2.75" fill="hsl(var(--node-downstream))" />
+    </svg>
+  );
+}
+
 export function Wordmark({
   href = "/dashboard",
   size = "default",
@@ -13,39 +37,26 @@ export function Wordmark({
 }: {
   href?: string;
   size?: "default" | "lg";
-  /** "light" inverts the wordmark for the landing page's ink sections. */
+  /** "light" inverts the wordmark for dark surfaces. */
   tone?: "default" | "light";
   className?: string;
 }) {
   const lg = size === "lg";
 
   return (
-    <Link href={href} className={cn("flex items-center gap-2.5", className)}>
-      <span
-        aria-hidden
-        className={cn(
-          "relative grid shrink-0 place-items-center rounded-lg bg-primary",
-          lg ? "h-10 w-10" : "h-8 w-8"
-        )}
-      >
-        <span
-          className={cn(
-            "absolute rounded-full bg-white/95",
-            lg ? "left-2 top-2 h-2.5 w-2.5" : "left-1.5 top-1.5 h-2 w-2"
-          )}
-        />
-        <span
-          className={cn(
-            "absolute rounded-full bg-[#F97362]",
-            lg ? "bottom-2 right-2 h-3 w-3" : "bottom-1.5 right-1.5 h-2.5 w-2.5"
-          )}
-        />
-      </span>
+    <Link
+      href={href}
+      className={cn(
+        "inline-flex items-center gap-2.5 rounded-sm",
+        tone === "light" ? "text-white" : "text-foreground",
+        className
+      )}
+    >
+      <ChainMark className={lg ? "h-3.5 w-8" : undefined} />
       <span
         className={cn(
-          "font-bold tracking-tight",
-          tone === "light" ? "text-white" : "text-foreground",
-          lg ? "text-xl" : "text-lg"
+          "font-display font-medium tracking-[-0.01em]",
+          lg ? "text-[1.375rem]" : "text-[1.1875rem]"
         )}
       >
         RogRakshak

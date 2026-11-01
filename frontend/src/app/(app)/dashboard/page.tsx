@@ -1,10 +1,10 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo } from "react";
 import Link from "next/link";
-import { getProvider } from "@/lib/data-provider";
-import type { InvestigationCase } from "@/types/api";
 import { useAppStore } from "@/lib/store";
+import { useCasesStore } from "@/lib/cases-store";
+import { ErrorState, LoadingState, Skeleton } from "@/components/ui/states";
 import {
   deriveMetrics,
   deriveFlaggedLocations,
@@ -20,7 +20,7 @@ import {
   StatusBadge,
   STATUS_RAIL,
 } from "@/components/investigation/status-badge";
-import { AlertTriangle, ChevronRight, Plus } from "lucide-react";
+import { ChevronRight, Plus } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 function formatDay(iso: string) {
@@ -31,32 +31,13 @@ function formatDay(iso: string) {
 }
 
 export default function DashboardPage() {
-  const [cases, setCases] = useState<InvestigationCase[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const mode = useAppStore((s) => s.mode);
+  const { cases, status, error, startedAt, load } = useCasesStore();
+  const loading = status === "idle" || status === "loading";
 
   useEffect(() => {
-    let cancelled = false;
-    async function load() {
-      setLoading(true);
-      setError(null);
-      try {
-        const provider = getProvider();
-        const resp = await provider.list();
-        if (!cancelled) setCases(resp.cases);
-      } catch (err: unknown) {
-        if (!cancelled)
-          setError(err instanceof Error ? err.message : "Failed to load data");
-      } finally {
-        if (!cancelled) setLoading(false);
-      }
-    }
-    load();
-    return () => {
-      cancelled = true;
-    };
-  }, [mode]);
+    void load();
+  }, [load, mode]);
 
   const metrics = useMemo(() => deriveMetrics(cases), [cases]);
   const locations = useMemo(() => deriveFlaggedLocations(cases), [cases]);
@@ -96,35 +77,31 @@ export default function DashboardPage() {
       />
 
       {loading && (
-        <div
-          className="grid grid-cols-1 gap-px overflow-hidden rounded-xl border border-border bg-border sm:grid-cols-2 xl:grid-cols-4"
-          aria-hidden
-        >
-          {[0, 1, 2, 3].map((i) => (
-            <div key={i} className="animate-pulse space-y-3 bg-card px-5 py-5">
-              <div className="h-2 w-24 rounded bg-muted" />
-              <div className="h-8 w-12 rounded bg-muted" />
-              <div className="h-2 w-32 rounded bg-muted" />
+        <LoadingState
+          startedAt={startedAt}
+          skeleton={
+            <div className="grid grid-cols-1 gap-px overflow-hidden rounded-lg border border-border bg-border sm:grid-cols-2 xl:grid-cols-4">
+              {[0, 1, 2, 3].map((i) => (
+                <div key={i} className="space-y-3 bg-card px-5 py-5">
+                  <Skeleton className="h-2.5 w-24" />
+                  <Skeleton className="h-9 w-14" />
+                  <Skeleton className="h-2.5 w-32" />
+                </div>
+              ))}
             </div>
-          ))}
-        </div>
+          }
+        />
       )}
 
-      {error && (
-        <Panel className="border-node-infected/30">
-          <div className="flex items-start gap-3 p-5">
-            <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-node-infected" />
-            <div>
-              <p className="text-sm font-semibold text-foreground">
-                Failed to load data
-              </p>
-              <p className="mt-0.5 text-sm text-muted-foreground">{error}</p>
-            </div>
-          </div>
-        </Panel>
+      {status === "error" && (
+        <ErrorState
+          title="Couldn't load the dashboard"
+          message={error ?? "The analysis service did not return the case list."}
+          onRetry={() => void load({ force: true })}
+        />
       )}
 
-      {!loading && !error && (
+      {status === "ready" && (
         <>
           <StatusBand
             stats={[

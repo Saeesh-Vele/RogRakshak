@@ -20,9 +20,11 @@ const config: Config = {
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
         background: "hsl(var(--background))",
+        sunken: "hsl(var(--sunken))",
         foreground: "hsl(var(--foreground))",
         primary: {
           DEFAULT: "hsl(var(--primary))",
+          hover: "hsl(var(--primary-hover))",
           foreground: "hsl(var(--primary-foreground))",
           soft: "hsl(var(--primary-soft))",
           "soft-foreground": "hsl(var(--primary-soft-foreground))",
@@ -90,26 +92,39 @@ const config: Config = {
         },
       },
       fontFamily: {
-        display: ["var(--font-display)", "Iowan Old Style", "Georgia", "serif"],
+        // Plex Sans is the default for all UI text; see src/app/layout.tsx.
+        sans: ["var(--font-body)", "system-ui", "sans-serif"],
         body: ["var(--font-body)", "system-ui", "sans-serif"],
+        display: ["var(--font-display)", "Iowan Old Style", "Georgia", "serif"],
         mono: ["var(--font-mono)", "ui-monospace", "SFMono-Regular", "monospace"],
       },
+      // Small, consistent radii: 6px for objects, 4px for controls inside them.
       borderRadius: {
+        xl: "calc(var(--radius) + 2px)",
         lg: "var(--radius)",
-        md: "calc(var(--radius) - 4px)",
-        sm: "calc(var(--radius) - 6px)",
-        xl: "calc(var(--radius) + 4px)",
+        md: "calc(var(--radius) - 2px)",
+        sm: "calc(var(--radius) - 3px)",
       },
+      // Elevation is reserved for things that float: menus, dialogs, toasts.
       boxShadow: {
-        // Deliberately soft — the mockups lean on hairline borders, not elevation
-        card: "0 1px 2px 0 rgb(16 24 40 / 0.04), 0 1px 3px 0 rgb(16 24 40 / 0.03)",
-        "card-hover":
-          "0 2px 6px -1px rgb(16 24 40 / 0.07), 0 1px 3px -1px rgb(16 24 40 / 0.04)",
-        pop: "0 8px 24px -6px rgb(16 24 40 / 0.12), 0 2px 6px -2px rgb(16 24 40 / 0.06)",
+        card: "none",
+        "card-hover": "none",
+        pop: "0 12px 32px -12px rgb(28 25 20 / 0.22), 0 2px 6px -2px rgb(28 25 20 / 0.08)",
       },
+      /*
+       * Type scale. Sizes are named for their job, so a page reads as a set of
+       * roles rather than a list of pixel values.
+       */
       fontSize: {
-        // Small uppercase eyebrow used on stat cards and report rows
-        eyebrow: ["0.6875rem", { lineHeight: "1rem", letterSpacing: "0.06em" }],
+        eyebrow: ["0.6875rem", { lineHeight: "1rem", letterSpacing: "0.08em" }],
+        meta: ["0.75rem", { lineHeight: "1.125rem" }],
+        ui: ["0.8125rem", { lineHeight: "1.25rem" }],
+        copy: ["0.875rem", { lineHeight: "1.4rem" }],
+        lead: ["1rem", { lineHeight: "1.6rem" }],
+        "title-sm": ["1.25rem", { lineHeight: "1.6rem", letterSpacing: "-0.01em" }],
+        title: ["1.875rem", { lineHeight: "2.2rem", letterSpacing: "-0.015em" }],
+        numeral: ["2.75rem", { lineHeight: "1", letterSpacing: "-0.02em" }],
+        display: ["3.5rem", { lineHeight: "1.04", letterSpacing: "-0.025em" }],
       },
       keyframes: {
         "accordion-down": {
