@@ -133,3 +133,18 @@ What that means in practice:
 - Case IDs are derived from the index patient (`CASE-2026-{patient_id:03d}`), so
   re-running an investigation for the same patient replaces that case. The UI asks
   for confirmation before it does.
+
+## Landing page product frames are sample data
+
+The "The product" section of the public landing page (`/`) shows the real
+dashboard, timeline, evidence and scoring components, each labelled
+**"Sample data, CASE-2026-001"**. They render a **static snapshot** of the API,
+the bundled fixture `frontend/src/data/mock_investigation_results.json`, not live
+data: the landing page is public and is served without a backend or a signed-in
+session. The snapshot was checked against `GET /api/investigations/CASE-2026-001`
+and matches it on every figure shown (confidence, status, the 15 evidence items,
+the five scoring dimensions and the timeline). If the detection logic changes,
+regenerate the fixture with `data/export_mock_investigation.py` so the landing
+page stays truthful. The script writes `data/fixtures/mock_investigation_results.json`;
+copy it over `frontend/src/data/mock_investigation_results.json` (the two are
+currently identical).

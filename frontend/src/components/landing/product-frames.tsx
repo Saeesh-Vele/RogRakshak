@@ -62,7 +62,10 @@ export function Frame({
       <div className="overflow-hidden rounded-lg border border-border bg-background shadow-pop transition-transform duration-300 ease-out group-hover:-translate-y-1.5">
         <div className="flex h-8 items-center gap-2 border-b border-border bg-card px-3">
           <span aria-hidden className="h-1.5 w-1.5 rounded-full bg-node-location" />
-          <span className="truncate font-mono text-[0.6875rem] text-muted-foreground">{route}</span>
+          <span className="min-w-0 flex-1 truncate font-mono text-[0.6875rem] text-muted-foreground">{route}</span>
+          <span className="shrink-0 rounded-sm border border-border px-1.5 py-0.5 text-[0.6875rem] text-muted-foreground">
+            Sample data, CASE-2026-001
+          </span>
         </div>
         <div
           data-frame-body

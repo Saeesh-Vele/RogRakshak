@@ -1,9 +1,9 @@
 import fixtureRaw from "@/data/mock_investigation_results.json";
 import type { InvestigationCase } from "@/types/api";
-import { deriveMetrics } from "@/lib/metrics";
+import { deriveSummary, deriveWardRisk } from "@/lib/metrics";
 import { evidenceTier } from "@/lib/risk";
-import { StatusBand } from "@/components/dashboard/status-band";
-import { StatusBadge } from "@/components/investigation/status-badge";
+import { StatRow } from "@/components/dashboard/stat-row";
+import { CaseRows } from "@/components/dashboard/case-rows";
 import { TimelineView } from "@/components/investigation/timeline-view";
 import { EvidenceList } from "@/components/investigation/evidence-list";
 import { ScoringBreakdownView } from "@/components/investigation/scoring-breakdown";
@@ -12,7 +12,9 @@ import { Frame, FrameColumn, ProductFrames } from "@/components/landing/product-
 /**
  * The real product, rendered from its real components with CASE-2026-001.
  *
- * The data is the bundled fixture (src/data/mock_investigation_results.json),
+ * Every frame is labelled "Sample data, CASE-2026-001": this is a static
+ * snapshot, not a live view. The data is the bundled fixture
+ * (src/data/mock_investigation_results.json),
  * which matches what GET /api/investigations/CASE-2026-001 returns for every
  * figure shown — confidence, status, the 15 evidence items, the five scoring
  * dimensions and the timeline. Using it means the landing page renders
@@ -24,9 +26,12 @@ import { Frame, FrameColumn, ProductFrames } from "@/components/landing/product-
 
 const inv = (fixtureRaw as unknown as { investigation: InvestigationCase }).investigation;
 const TIER_RANK = { HIGH: 0, MEDIUM: 1, LOW: 2 } as const;
+const day = (iso: string | null) =>
+  iso ? new Date(iso).toLocaleDateString("en-GB", { day: "2-digit", month: "short" }) : "—";
 
 export function ProductShowcase() {
-  const m = deriveMetrics([inv]);
+  const summary = deriveSummary([inv]);
+  const wards = deriveWardRisk([inv]);
   const evidence = [...inv.evidence].sort(
     (a, b) => TIER_RANK[evidenceTier(a)] - TIER_RANK[evidenceTier(b)] || b.strength - a.strength
   );
@@ -42,29 +47,16 @@ export function ProductShowcase() {
         bodyClassName="max-h-[300px]"
       >
         <div style={{ zoom: 0.82 }}>
-          <StatusBand
+          <StatRow
             stats={[
-              { label: "Active cases", value: m.activeCases, tone: "primary", hint: "Open investigations" },
-              { label: "High-risk contacts", value: m.highRiskContacts, tone: "high", hint: `${m.highRiskLinks} with high-tier evidence` },
-              { label: "Potential clusters", value: m.potentialClusters, tone: "medium", hint: m.highPriorityCount > 0 ? `${m.highPriorityCount} high priority` : "None escalated" },
-              { label: "Flagged locations", value: m.flaggedLocations, tone: "location", hint: m.topLocation ?? "—" },
+              { label: "Investigations", value: summary.caseCount, sub: `${summary.byStatus.SUSPECTED_CLUSTER ?? 0} suspected cluster` },
+              { label: "Positive cultures", value: summary.positivePatients, sub: `Patients, ${day(summary.firstPositive)}–${day(summary.lastPositive)}` },
+              { label: "Linked at high tier", value: summary.highTierPatients, sub: `of ${summary.patientsInvolved} patients involved`, risk: true },
+              { label: "Wards implicated", value: summary.wardCount, sub: wards.map((w) => w.name).join(", ") },
             ]}
           />
-          <div className="mt-4 flex items-center gap-4 rounded-lg border border-border bg-card px-5 py-3.5">
-            <div className="min-w-0 flex-1">
-              <p className="flex items-center gap-2.5">
-                <span className="font-mono text-ui font-medium text-foreground">{inv.case_id}</span>
-                <StatusBadge status={inv.status} />
-              </p>
-              <p className="mt-1 truncate text-ui text-muted-foreground">
-                {inv.index_patient.name} · <span className="italic">{inv.organism}</span> ·{" "}
-                {inv.resistance_profile} · {inv.candidate_patients.length} contacts
-              </p>
-            </div>
-            <p className="font-display text-[1.375rem] leading-none text-foreground">
-              {Math.round(inv.confidence * 100)}
-              <span className="text-meta text-muted-foreground">%</span>
-            </p>
+          <div className="mt-4 overflow-hidden rounded-lg border border-border bg-card">
+            <CaseRows cases={[inv]} />
           </div>
         </div>
       </Frame>

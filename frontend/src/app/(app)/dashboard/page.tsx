@@ -1,33 +1,53 @@
 "use client";
 
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
+import { ArrowRight, Plus } from "lucide-react";
+
 import { useAppStore } from "@/lib/store";
 import { useCasesStore } from "@/lib/cases-store";
-import { ErrorState, LoadingState, Skeleton } from "@/components/ui/states";
-import {
-  deriveMetrics,
-  deriveFlaggedLocations,
-  deriveTrend,
-  caseStartedAt,
-} from "@/lib/metrics";
-import { Panel, PanelHeader } from "@/components/ui/panel";
-import { Button } from "@/components/ui/button";
+import { deriveSummary, deriveTrend, deriveWardRisk } from "@/lib/metrics";
+import type { InvestigationStatus } from "@/types/api";
 import { PageHeader } from "@/components/layout/page-header";
-import { StatusBand } from "@/components/dashboard/status-band";
-import { TrendChart } from "@/components/dashboard/trend-chart";
-import {
-  StatusBadge,
-  STATUS_RAIL,
-} from "@/components/investigation/status-badge";
-import { ChevronRight, Plus } from "lucide-react";
+import { Panel, PanelHeader } from "@/components/ui/panel";
+import { buttonVariants } from "@/components/ui/button";
+import { EmptyState, ErrorState, LoadingState, Skeleton } from "@/components/ui/states";
+import { StatRow } from "@/components/dashboard/stat-row";
+import { EpiCurve } from "@/components/dashboard/epi-curve";
+import { WardStrip } from "@/components/dashboard/ward-strip";
+import { MiniChainGraph } from "@/components/dashboard/mini-chain-graph";
+import { CaseRows } from "@/components/dashboard/case-rows";
 import { cn } from "@/lib/utils";
 
-function formatDay(iso: string) {
-  return new Date(iso).toLocaleDateString("en-GB", {
-    day: "2-digit",
-    month: "short",
-  });
+const STATUS_WORD: Record<InvestigationStatus, string> = {
+  HIGH_PRIORITY_INVESTIGATION: "high priority",
+  SUSPECTED_CLUSTER: "suspected cluster",
+  POTENTIAL_CONTACT: "potential contact",
+  NO_SIGNAL: "no signal",
+};
+
+function fmtDay(iso: string) {
+  return new Date(iso).toLocaleDateString("en-GB", { day: "2-digit", month: "short" });
+}
+
+function DashboardSkeleton() {
+  return (
+    <div className="space-y-6">
+      <div className="grid grid-cols-2 gap-6 border-y border-border py-5 lg:grid-cols-4">
+        {[0, 1, 2, 3].map((i) => (
+          <div key={i} className="space-y-3">
+            <Skeleton className="h-2.5 w-24" />
+            <Skeleton className="h-11 w-14" />
+            <Skeleton className="h-2.5 w-32" />
+          </div>
+        ))}
+      </div>
+      <div className="grid gap-6 lg:grid-cols-12">
+        <Skeleton className="h-56 rounded-lg lg:col-span-7" />
+        <Skeleton className="h-56 rounded-lg lg:col-span-5" />
+      </div>
+    </div>
+  );
 }
 
 export default function DashboardPage() {
@@ -39,59 +59,45 @@ export default function DashboardPage() {
     void load();
   }, [load, mode]);
 
-  const metrics = useMemo(() => deriveMetrics(cases), [cases]);
-  const locations = useMemo(() => deriveFlaggedLocations(cases), [cases]);
-  const trend = useMemo(() => deriveTrend(cases), [cases]);
-
   const sorted = useMemo(
-    () =>
-      [...cases].sort(
-        (a, b) =>
-          new Date(b.generated_at).getTime() - new Date(a.generated_at).getTime()
-      ),
+    () => [...cases].sort((a, b) => b.confidence - a.confidence),
     [cases]
   );
+  const summary = useMemo(() => deriveSummary(cases), [cases]);
+  const trend = useMemo(() => deriveTrend(cases), [cases]);
+  const wards = useMemo(() => deriveWardRisk(cases), [cases]);
+
+  // Which case the mini graph shows; defaults to the highest-confidence case
+  const [graphCaseId, setGraphCaseId] = useState<string | null>(null);
+  const graphCase = sorted.find((c) => c.case_id === graphCaseId) ?? sorted[0];
+
+  const statusLine = (Object.entries(summary.byStatus) as [InvestigationStatus, number][])
+    .map(([s, n]) => `${n} ${STATUS_WORD[s]}`)
+    .join(" · ");
 
   return (
-    <div className="mx-auto max-w-[1400px] space-y-6 p-6 lg:p-8">
+    <div className="mx-auto max-w-[1400px] space-y-8 p-5 md:p-8">
       <PageHeader
         eyebrow="Surveillance"
         title="Dashboard"
         description={
-          loading
-            ? "Loading investigations…"
-            : error
-              ? "Figures unavailable while the data source is unreachable."
-              : `Derived from ${cases.length} investigation${
-                  cases.length === 1 ? "" : "s"
-                } · ${mode === "mock" ? "fixture data" : "live graph"}`
+          status === "ready"
+            ? `Derived from ${cases.length} investigation${cases.length === 1 ? "" : "s"} · ${
+                mode === "mock" ? "fixture data" : "live service"
+              }`
+            : status === "error"
+              ? "Figures are unavailable while the analysis service is unreachable."
+              : "Loading investigations…"
         }
         actions={
-          <Link href="/investigations/new">
-            <Button>
-              <Plus />
-              New investigation
-            </Button>
+          <Link href="/investigations/new" className={buttonVariants()}>
+            <Plus />
+            New investigation
           </Link>
         }
       />
 
-      {loading && (
-        <LoadingState
-          startedAt={startedAt}
-          skeleton={
-            <div className="grid grid-cols-1 gap-px overflow-hidden rounded-lg border border-border bg-border sm:grid-cols-2 xl:grid-cols-4">
-              {[0, 1, 2, 3].map((i) => (
-                <div key={i} className="space-y-3 bg-card px-5 py-5">
-                  <Skeleton className="h-2.5 w-24" />
-                  <Skeleton className="h-9 w-14" />
-                  <Skeleton className="h-2.5 w-32" />
-                </div>
-              ))}
-            </div>
-          }
-        />
-      )}
+      {loading && <LoadingState startedAt={startedAt} skeleton={<DashboardSkeleton />} />}
 
       {status === "error" && (
         <ErrorState
@@ -101,200 +107,129 @@ export default function DashboardPage() {
         />
       )}
 
-      {status === "ready" && (
+      {status === "ready" && cases.length === 0 && (
+        <EmptyState
+          className="rounded-lg border border-border bg-card"
+          title="No investigations yet"
+          body="The dashboard is derived entirely from investigations. Run one against an index patient to populate it."
+          action={
+            <Link href="/investigations/new" className={buttonVariants()}>
+              <Plus />
+              Start an investigation
+            </Link>
+          }
+        />
+      )}
+
+      {status === "ready" && cases.length > 0 && (
         <>
-          <StatusBand
+          <StatRow
             stats={[
+              { label: "Investigations", value: summary.caseCount, sub: statusLine },
               {
-                label: "Active cases",
-                value: metrics.activeCases,
-                tone: "primary",
-                hint:
-                  metrics.casesThisWeek > 0
-                    ? `+${metrics.casesThisWeek} this week`
-                    : "None this week",
-                emphasiseHint: metrics.casesThisWeek > 0,
+                label: "Positive cultures",
+                value: summary.positivePatients,
+                sub:
+                  summary.firstPositive && summary.lastPositive
+                    ? `Patients, ${fmtDay(summary.firstPositive)}–${fmtDay(summary.lastPositive)}`
+                    : "No culture dates recorded",
               },
               {
-                label: "High-risk contacts",
-                value: metrics.highRiskContacts,
-                tone: "high",
-                hint: `${metrics.highRiskLinks} with high-tier evidence`,
+                label: "Linked at high tier",
+                value: summary.highTierPatients,
+                sub: `of ${summary.patientsInvolved} patients involved`,
+                risk: summary.highTierPatients > 0,
               },
               {
-                label: "Potential clusters",
-                value: metrics.potentialClusters,
-                tone: "medium",
-                hint:
-                  metrics.highPriorityCount > 0
-                    ? `${metrics.highPriorityCount} high priority`
-                    : "None escalated",
-                emphasiseHint: metrics.highPriorityCount > 0,
-              },
-              {
-                label: "Flagged locations",
-                value: metrics.flaggedLocations,
-                tone: "location",
-                hint: metrics.topLocation ?? "No locations in evidence",
+                label: "Wards implicated",
+                value: summary.wardCount,
+                sub: wards[0] ? `Most evidence: ${wards[0].name}` : "None recorded",
               },
             ]}
           />
 
-          {/* Cases + where they are happening */}
-          <div className="grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,1fr)_340px]">
-            <Panel>
+          <div className="grid gap-6 lg:grid-cols-12 lg:items-start">
+            <Panel className="lg:col-span-7">
               <PanelHeader
-                title="Active infection cases"
-                meta={`${sorted.length} case${sorted.length !== 1 ? "s" : ""}`}
+                title="Investigations"
+                meta={`${cases.length} case${cases.length === 1 ? "" : "s"}`}
                 actions={
-                  sorted.length > 0 && (
-                    <Link
-                      href="/investigations"
-                      className="rounded-md px-2 py-1 text-[0.8125rem] font-medium text-primary transition-colors hover:bg-primary-soft focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
-                    >
-                      View all
-                    </Link>
-                  )
+                  <Link
+                    href="/investigations"
+                    className="rounded-sm text-ui font-medium text-primary hover:underline"
+                  >
+                    View all
+                  </Link>
                 }
               />
-              {sorted.length === 0 ? (
-                <div className="px-5 py-10 text-center">
-                  <p className="text-sm text-foreground">No investigations yet.</p>
-                  <p className="mx-auto mt-1 max-w-xs text-[0.8125rem] leading-relaxed text-muted-foreground">
-                    Point the workflow at an index patient and organism to build
-                    the first case.
-                  </p>
-                  <Link href="/investigations/new" className="mt-4 inline-block">
-                    <Button size="sm">
-                      <Plus />
-                      New investigation
-                    </Button>
+              <CaseRows cases={sorted} />
+            </Panel>
+
+            {graphCase && (
+              <Panel className="flex flex-col lg:col-span-5">
+                <PanelHeader
+                  title="Transmission"
+                  meta={graphCase.case_id}
+                  actions={
+                    sorted.length > 1 ? (
+                      <div role="group" aria-label="Case shown" className="flex gap-1">
+                        {sorted.map((c) => (
+                          <button
+                            key={c.case_id}
+                            type="button"
+                            aria-pressed={c.case_id === graphCase.case_id}
+                            onClick={() => setGraphCaseId(c.case_id)}
+                            className={cn(
+                              "h-7 rounded-sm px-2 font-mono text-[0.6875rem] transition-colors max-sm:h-11",
+                              c.case_id === graphCase.case_id
+                                ? "bg-foreground text-background"
+                                : "text-muted-foreground hover:bg-sunken hover:text-foreground"
+                            )}
+                          >
+                            {c.case_id.replace("CASE-2026-", "")}
+                          </button>
+                        ))}
+                      </div>
+                    ) : undefined
+                  }
+                />
+                <div className="flex-1 px-4 pt-3">
+                  <MiniChainGraph investigation={graphCase} />
+                </div>
+                <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2 border-t border-border px-5 py-3">
+                  <span className="text-meta text-muted-foreground">
+                    {graphCase.transmission_chains.length} chain
+                    {graphCase.transmission_chains.length === 1 ? "" : "s"} · edge labels are
+                    recorded overlap
+                  </span>
+                  <Link
+                    href={`/graph?case=${encodeURIComponent(graphCase.case_id)}`}
+                    className="inline-flex items-center gap-1 rounded-sm text-ui font-medium text-primary hover:underline"
+                  >
+                    Open graph
+                    <ArrowRight className="h-3.5 w-3.5" />
                   </Link>
                 </div>
-              ) : (
-                <ul className="divide-hairline">
-                  {sorted.map((c) => {
-                    const started = caseStartedAt(c);
-                    const contacts = c.candidate_patients.length;
-                    return (
-                      <li key={c.case_id}>
-                        <Link
-                          href={`/investigations/${c.case_id}`}
-                          className="group relative flex items-center gap-4 py-3.5 pl-6 pr-4 transition-colors hover:bg-muted/50 focus-visible:outline-none focus-visible:bg-muted/50"
-                        >
-                          <span
-                            aria-hidden
-                            className={cn(
-                              "absolute inset-y-2 left-0 w-[3px] rounded-r",
-                              STATUS_RAIL[c.status] ?? "bg-node-neutral"
-                            )}
-                          />
-                          <div className="min-w-0 flex-1">
-                            <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1">
-                              <span className="font-mono text-[0.8125rem] font-medium text-foreground">
-                                {c.case_id}
-                              </span>
-                              <StatusBadge status={c.status} />
-                            </div>
-                            <p className="mt-1.5 truncate text-[0.8125rem] text-muted-foreground">
-                              {c.index_patient.name} ·{" "}
-                              <span className="italic">{c.organism}</span>
-                              {c.resistance_profile && ` · ${c.resistance_profile}`}
-                              {contacts > 0 &&
-                                ` · ${contacts} contact${contacts !== 1 ? "s" : ""}`}
-                            </p>
-                          </div>
-
-                          <div className="shrink-0 text-right">
-                            <p className="font-display text-[1.25rem] leading-none tabular-nums text-foreground">
-                              {Math.round(c.confidence * 100)}
-                              <span className="text-[0.75rem] text-muted-foreground">
-                                %
-                              </span>
-                            </p>
-                            <p
-                              className="mt-1.5 font-mono text-[0.625rem] uppercase tracking-[0.1em] text-muted-foreground"
-                              title={
-                                started.isFallback
-                                  ? "No timeline events — showing when the investigation was generated"
-                                  : new Date(started.iso).toLocaleString("en-GB")
-                              }
-                            >
-                              {formatDay(started.iso)}
-                            </p>
-                          </div>
-
-                          <ChevronRight className="h-4 w-4 shrink-0 text-muted-foreground/50 transition-transform group-hover:translate-x-0.5 group-hover:text-muted-foreground" />
-                        </Link>
-                      </li>
-                    );
-                  })}
-                </ul>
-              )}
-            </Panel>
-
-            <Panel>
-              <PanelHeader
-                title="Flagged locations"
-                meta={`${locations.length} flagged`}
-              />
-              {locations.length === 0 ? (
-                <p className="px-5 py-8 text-center text-[0.8125rem] text-muted-foreground">
-                  No locations recorded in contact evidence.
-                </p>
-              ) : (
-                <ul className="divide-hairline">
-                  {locations.map((loc) => (
-                    <li
-                      key={loc.name}
-                      className="relative flex items-start justify-between gap-3 py-3.5 pl-6 pr-5"
-                    >
-                      <span
-                        aria-hidden
-                        className={cn(
-                          "absolute inset-y-2 left-0 w-[3px] rounded-r",
-                          loc.tier === "HIGH"
-                            ? "bg-node-infected"
-                            : "bg-node-downstream"
-                        )}
-                      />
-                      <div className="min-w-0">
-                        <p className="truncate text-[0.875rem] font-medium leading-tight text-foreground">
-                          {loc.name}
-                        </p>
-                        <p className="mt-1.5 font-mono text-[0.6875rem] leading-snug text-muted-foreground">
-                          {loc.evidenceCount} evidence item
-                          {loc.evidenceCount !== 1 ? "s" : ""} ·{" "}
-                          {loc.caseIds.length} case
-                          {loc.caseIds.length !== 1 ? "s" : ""}
-                        </p>
-                      </div>
-                      <span
-                        className={cn(
-                          "mt-0.5 shrink-0 font-mono text-[0.625rem] font-semibold uppercase tracking-[0.1em]",
-                          loc.tier === "HIGH"
-                            ? "text-node-infected"
-                            : "text-risk-medium-foreground"
-                        )}
-                      >
-                        {loc.tier}
-                      </span>
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </Panel>
+              </Panel>
+            )}
           </div>
 
-          <Panel>
-            <PanelHeader
-              title="Epidemic curve"
-              description="New confirmed positives per day, from recorded culture dates, with the running total."
-            />
-            <div className="pb-4 pt-4">
-              <TrendChart points={trend} />
-            </div>
-          </Panel>
+          <div className="grid gap-6 lg:grid-cols-12 lg:items-start">
+            <Panel className="lg:col-span-7">
+              <PanelHeader
+                title="Positive cultures by day"
+                description="From recorded culture dates; each patient counted once."
+              />
+              <EpiCurve points={trend} />
+            </Panel>
+            <Panel className="lg:col-span-5">
+              <PanelHeader
+                title="Contact evidence by ward"
+                description="Located contact items per ward, by tier."
+              />
+              <WardStrip wards={wards} />
+            </Panel>
+          </div>
         </>
       )}
     </div>

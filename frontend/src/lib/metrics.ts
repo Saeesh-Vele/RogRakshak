@@ -2,142 +2,113 @@
  * Dashboard metric derivation.
  *
  * Everything here is computed from the investigation list the API already
- * returns — there is no metrics/analytics endpoint, and nothing is synthesised.
- * Where the reference design assumed a figure we cannot source, the metric is
- * reframed to what the data genuinely supports rather than invented.
+ * returns. There is no metrics or analytics endpoint and nothing is
+ * synthesised: a figure that the data cannot support is left out rather than
+ * approximated.
  */
 
-import type { InvestigationCase } from "@/types/api";
-import { evidenceTier } from "@/lib/risk";
+import type { InvestigationCase, InvestigationStatus } from "@/types/api";
+import { evidenceTier, type RiskTier } from "@/lib/risk";
 
-export interface DashboardMetrics {
-  activeCases: number;
-  casesThisWeek: number;
-  highRiskContacts: number;
-  highRiskLinks: number;
-  potentialClusters: number;
-  highPriorityCount: number;
-  flaggedLocations: number;
-  topLocation: string | null;
+export interface DashboardSummary {
+  caseCount: number;
+  byStatus: Partial<Record<InvestigationStatus, number>>;
+  /** Distinct patients with a recorded positive culture, across all cases. */
+  positivePatients: number;
+  firstPositive: string | null;
+  lastPositive: string | null;
+  /** Distinct patients appearing in any case, as index or candidate. */
+  patientsInvolved: number;
+  /** Distinct non-index patients linked to a case's index by HIGH-tier evidence. */
+  highTierPatients: number;
+  wardCount: number;
 }
 
-const WEEK_MS = 7 * 24 * 60 * 60 * 1000;
-
-export function deriveMetrics(cases: InvestigationCase[]): DashboardMetrics {
-  const now = Date.now();
-
-  const casesThisWeek = cases.filter(
-    (c) => now - new Date(c.generated_at).getTime() <= WEEK_MS
-  ).length;
-
-  // Distinct non-index patients implicated across every case
-  const contactIds = new Set<number>();
+/** Every patient's culture date, from whichever record in any case carries it. */
+function cultureDates(cases: InvestigationCase[]): Map<number, string> {
+  const out = new Map<number, string>();
   for (const c of cases) {
-    for (const p of c.candidate_patients) contactIds.add(p.id);
+    // index_patient is built from the timeline and has no culture date; the
+    // same patient's entry in `patients` does. Take the date from any record.
+    for (const p of [c.index_patient, ...c.patients, ...c.candidate_patients]) {
+      if (p.positive_culture_date && !out.has(p.id)) out.set(p.id, p.positive_culture_date);
+    }
   }
+  return out;
+}
 
-  // Distinct patients linked by at least one HIGH-tier piece of evidence
-  const highRiskIds = new Set<number>();
+export function deriveSummary(cases: InvestigationCase[]): DashboardSummary {
+  const byStatus: DashboardSummary["byStatus"] = {};
+  const involved = new Set<number>();
+  const highTier = new Set<number>();
+  const wards = new Set<string>();
+
   for (const c of cases) {
+    byStatus[c.status] = (byStatus[c.status] ?? 0) + 1;
+    involved.add(c.index_patient.id);
+    for (const p of c.candidate_patients) involved.add(p.id);
     for (const e of c.evidence) {
-      if (evidenceTier(e) === "HIGH") {
-        if (e.object_patient_id !== c.index_patient.id) {
-          highRiskIds.add(e.object_patient_id);
-        }
-        if (e.subject_patient_id !== c.index_patient.id) {
-          highRiskIds.add(e.subject_patient_id);
-        }
+      if (e.location) wards.add(e.location);
+      if (evidenceTier(e) !== "HIGH") continue;
+      for (const id of [e.subject_patient_id, e.object_patient_id]) {
+        if (id !== c.index_patient.id) highTier.add(id);
       }
     }
   }
 
-  const potentialClusters = cases.filter(
-    (c) =>
-      c.status === "SUSPECTED_CLUSTER" ||
-      c.status === "HIGH_PRIORITY_INVESTIGATION"
-  ).length;
-
-  const highPriorityCount = cases.filter(
-    (c) => c.status === "HIGH_PRIORITY_INVESTIGATION"
-  ).length;
-
-  // Locations that appear in contact evidence
-  const locationCounts = new Map<string, number>();
-  for (const c of cases) {
-    for (const e of c.evidence) {
-      if (e.location) {
-        locationCounts.set(e.location, (locationCounts.get(e.location) ?? 0) + 1);
-      }
-    }
-  }
-  const topLocation =
-    Array.from(locationCounts.entries()).sort((a, b) => b[1] - a[1])[0]?.[0] ??
-    null;
-
+  const dates = Array.from(cultureDates(cases).values()).sort();
   return {
-    activeCases: cases.length,
-    casesThisWeek,
-    highRiskContacts: contactIds.size,
-    highRiskLinks: highRiskIds.size,
-    potentialClusters,
-    highPriorityCount,
-    flaggedLocations: locationCounts.size,
-    topLocation,
+    caseCount: cases.length,
+    byStatus,
+    positivePatients: dates.length,
+    firstPositive: dates[0] ?? null,
+    lastPositive: dates[dates.length - 1] ?? null,
+    patientsInvolved: involved.size,
+    highTierPatients: highTier.size,
+    wardCount: wards.size,
   };
 }
 
-export interface FlaggedLocation {
+export interface WardRisk {
   name: string;
-  evidenceCount: number;
+  counts: Record<RiskTier, number>;
+  total: number;
   caseIds: string[];
-  tier: "HIGH" | "MEDIUM";
 }
 
 /**
- * Locations ranked by how much contact evidence implicates them.
- * Tier reflects whether any HIGH-tier evidence occurred there — not a
- * review/triage state, which the backend does not model.
+ * Contact evidence per ward, split by tier. Only evidence that records a
+ * location counts (lab-derived items carry none), so these totals are the
+ * contact links observed on each ward.
  */
-export function deriveFlaggedLocations(
-  cases: InvestigationCase[]
-): FlaggedLocation[] {
-  const map = new Map<
-    string,
-    { count: number; caseIds: Set<string>; high: boolean }
-  >();
-
+export function deriveWardRisk(cases: InvestigationCase[]): WardRisk[] {
+  const map = new Map<string, { counts: Record<RiskTier, number>; cases: Set<string> }>();
   for (const c of cases) {
     for (const e of c.evidence) {
       if (!e.location) continue;
-      const entry = map.get(e.location) ?? {
-        count: 0,
-        caseIds: new Set<string>(),
-        high: false,
+      const w = map.get(e.location) ?? {
+        counts: { HIGH: 0, MEDIUM: 0, LOW: 0 },
+        cases: new Set<string>(),
       };
-      entry.count += 1;
-      entry.caseIds.add(c.case_id);
-      if (evidenceTier(e) === "HIGH") entry.high = true;
-      map.set(e.location, entry);
+      w.counts[evidenceTier(e)] += 1;
+      w.cases.add(c.case_id);
+      map.set(e.location, w);
     }
   }
-
   return Array.from(map.entries())
-    .map(([name, v]) => ({
+    .map(([name, w]) => ({
       name,
-      evidenceCount: v.count,
-      caseIds: Array.from(v.caseIds),
-      tier: (v.high ? "HIGH" : "MEDIUM") as "HIGH" | "MEDIUM",
+      counts: w.counts,
+      total: w.counts.HIGH + w.counts.MEDIUM + w.counts.LOW,
+      caseIds: Array.from(w.cases).sort(),
     }))
-    .sort((a, b) => b.evidenceCount - a.evidenceCount);
+    .sort((a, b) => b.counts.HIGH - a.counts.HIGH || b.total - a.total);
 }
 
 /**
  * Earliest recorded clinical event for a case — "when did this actually start",
  * as opposed to `generated_at`, which is only when the workflow was run.
- *
- * The list endpoint already returns each case's full `timeline`, so this needs
- * no extra request per row. Falls back to `generated_at` for a case whose
- * timeline came back empty.
+ * Falls back to `generated_at` for a case whose timeline came back empty.
  */
 export function caseStartedAt(c: InvestigationCase): {
   iso: string;
@@ -155,47 +126,33 @@ export function caseStartedAt(c: InvestigationCase): {
 export interface TrendPoint {
   date: string;
   label: string;
-  /** New confirmed positives recorded on this day — the epi curve bars. */
+  /** New confirmed positives recorded on this day. */
   count: number;
   cumulative: number;
 }
 
 /**
- * Confirmed positive cultures per day, with a running total.
+ * Confirmed positive cultures per calendar day, from the first positive to the
+ * last, with a running total. Days in between with no positive are real zeros;
+ * nothing is added before the first or after the last.
  *
- * Sourced from `PatientSummary.positive_culture_date`, the only real
- * time-series the API exposes — there is no trend/analytics endpoint. Patients
- * without a recorded culture date are excluded rather than back-filled.
+ * Sourced from PatientSummary.positive_culture_date — the only real time series
+ * the API exposes. Each patient is counted once.
  */
 export function deriveTrend(cases: InvestigationCase[]): TrendPoint[] {
-  const dates: string[] = [];
-  const seen = new Set<number>();
-
-  for (const c of cases) {
-    for (const p of [c.index_patient, ...c.candidate_patients, ...c.patients]) {
-      if (seen.has(p.id)) continue;
-      seen.add(p.id);
-      if (p.positive_culture_date) dates.push(p.positive_culture_date.slice(0, 10));
-    }
-  }
-
+  const dates = Array.from(cultureDates(cases).values())
+    .map((d) => d.slice(0, 10))
+    .sort();
   if (dates.length === 0) return [];
-
-  dates.sort();
-  const first = new Date(`${dates[0]}T00:00:00Z`);
-  const last = new Date(`${dates[dates.length - 1]}T00:00:00Z`);
-
-  // Pad by a day either side so the curve does not start hard against the axis
-  first.setUTCDate(first.getUTCDate() - 1);
-  last.setUTCDate(last.getUTCDate() + 1);
 
   const perDay = new Map<string, number>();
   for (const d of dates) perDay.set(d, (perDay.get(d) ?? 0) + 1);
 
   const points: TrendPoint[] = [];
   let running = 0;
+  const last = new Date(`${dates[dates.length - 1]}T00:00:00Z`);
   for (
-    let d = new Date(first);
+    let d = new Date(`${dates[0]}T00:00:00Z`);
     d <= last;
     d.setUTCDate(d.getUTCDate() + 1)
   ) {
@@ -213,6 +170,5 @@ export function deriveTrend(cases: InvestigationCase[]): TrendPoint[] {
       cumulative: running,
     });
   }
-
   return points;
 }
