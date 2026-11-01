@@ -74,10 +74,6 @@
     --input: 40 5% 50%;
     --ring: 214 58% 29%;
 
-    /* Landing-page ink surfaces, retired in Stage B */
-    --ink: 228 42% 7%;
-    --ink-panel: 230 32% 14%;
-
     /* Dot grid — used only where it stands for the graph canvas */
     --dot: 40 10% 82%;
 
@@ -106,10 +102,6 @@
   :focus-visible {
     outline: 2px solid hsl(var(--ring)) !important;
     outline-offset: 2px;
-  }
-  /* The landing page's ink sections need a light ring (until Stage B). */
-  .bg-ink :focus-visible {
-    outline-color: #fff !important;
   }
 
   ::selection {
@@ -186,15 +178,14 @@
     display: none;
   }
 
-  /* Landing-only (retired in Stage B) */
-  .bg-graph-dots-ink {
-    background-image: radial-gradient(rgba(255, 255, 255, 0.11) 1px, transparent 1px);
-    background-size: 18px 18px;
-  }
-  .bg-day-rules {
+  /*
+   * Day rules for the case timeline: one hairline per calendar day across a
+   * six-and-a-half day window (7 gridlines / 6.5 days).
+   */
+  .bg-day-rules-light {
     background-image: linear-gradient(
       to right,
-      rgba(255, 255, 255, 0.07) 1px,
+      hsl(var(--border)) 1px,
       transparent 1px
     );
     background-size: 15.3846% 100%;

@@ -71,25 +71,6 @@ const config: Config = {
           patient: "hsl(var(--node-patient))",
           staff: "hsl(var(--node-staff))",
         },
-        /**
-         * Landing-page-only surfaces. The marketing hero, scoring section and
-         * footer sit on ink so the product's clinical white reads as a
-         * deliberate change of register when you sign in — not as more of the
-         * same page. Not used anywhere inside the app shell.
-         */
-        ink: {
-          // Token-driven so the sidebar can sit a shade deeper in dark mode.
-          // The landing pins itself to the light values via [data-theme].
-          DEFAULT: "hsl(var(--ink))",
-          panel: "hsl(var(--ink-panel))",
-          // The chrome is dark in both themes, so its hairline is always white.
-          line: "rgba(255, 255, 255, 0.09)",
-        },
-        /** The coral already in the wordmark, promoted to a real accent. */
-        coral: {
-          DEFAULT: "#F97362",
-          soft: "#FFE9E5",
-        },
       },
       fontFamily: {
         // Plex Sans is the default for all UI text; see src/app/layout.tsx.
@@ -127,49 +108,19 @@ const config: Config = {
         display: ["3.5rem", { lineHeight: "1.04", letterSpacing: "-0.025em" }],
       },
       keyframes: {
-        "accordion-down": {
-          from: { height: "0" },
-          to: { height: "var(--radix-accordion-content-height)" },
-        },
-        "accordion-up": {
-          from: { height: "var(--radix-accordion-content-height)" },
-          to: { height: "0" },
-        },
         "fade-in": {
           from: { opacity: "0", transform: "translateY(2px)" },
           to: { opacity: "1", transform: "none" },
         },
-        /* Landing hero load sequence — see contact-timeline.tsx */
+        /* Landing hero entry */
         "rise-in": {
           from: { opacity: "0", transform: "translateY(10px)" },
           to: { opacity: "1", transform: "none" },
         },
-        "bar-wipe": {
-          from: { opacity: "0", transform: "scaleX(0)" },
-          to: { opacity: "1", transform: "scaleX(1)" },
-        },
-        "mark-pop": {
-          from: { opacity: "0", transform: "translate(-50%, -50%) scale(0.3)" },
-          to: { opacity: "1", transform: "translate(-50%, -50%) scale(1)" },
-        },
-        "chain-draw": {
-          from: { opacity: "0", transform: "scaleY(0)" },
-          to: { opacity: "1", transform: "scaleY(1)" },
-        },
-        "window-in": {
-          from: { opacity: "0" },
-          to: { opacity: "1" },
-        },
       },
       animation: {
-        "accordion-down": "accordion-down 0.2s ease-out",
-        "accordion-up": "accordion-up 0.2s ease-out",
         "fade-in": "fade-in 0.25s ease-out both",
         "rise-in": "rise-in 0.7s cubic-bezier(0.22, 1, 0.36, 1) both",
-        "bar-wipe": "bar-wipe 0.75s cubic-bezier(0.22, 1, 0.36, 1) both",
-        "mark-pop": "mark-pop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both",
-        "chain-draw": "chain-draw 0.6s cubic-bezier(0.22, 1, 0.36, 1) both",
-        "window-in": "window-in 0.8s ease-out both",
       },
     },
   },
