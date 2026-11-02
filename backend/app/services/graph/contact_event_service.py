@@ -101,19 +101,24 @@ class ContactEventEngine:
             .all()
         )
 
+        # Group staff movements by ward so each patient movement only scans
+        # staff in the same ward. Order within each ward is kept (entry_time).
+        staff_movements_by_ward: Dict[int, List[Movement]] = {}
+        for sm in staff_ward_movements:
+            staff_movements_by_ward.setdefault(sm.location_id, []).append(sm)
+
         for pm in patient_ward_movements:
-            p_obj = patients.get(pm.location_id if False else pm.patient_id)
+            p_obj = patients.get(pm.patient_id)
             if not p_obj:
                 continue
 
-            for sm in staff_ward_movements:
-                # Same ward check
-                if pm.location_id != sm.location_id:
-                    continue
+            w_obj = wards.get(pm.location_id)
+            if not w_obj:
+                continue
 
+            for sm in staff_movements_by_ward.get(pm.location_id, []):
                 s_obj = staff_members.get(sm.staff_id)
-                w_obj = wards.get(pm.location_id)
-                if not s_obj or not w_obj:
+                if not s_obj:
                     continue
 
                 overlap = compute_interval_overlap(pm.entry_time, pm.exit_time, sm.entry_time, sm.exit_time)
